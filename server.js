@@ -80,20 +80,20 @@ function complex(re, im) {
 // Draw an ASCII art mandelbrot set.
 function render() {
   var z = new complex (0, 0);
-  var buffer = new Buffer(IM_SIZE * RE_SIZE * 3);
+  var buffer = new Buffer(RE_SIZE * IM_SIZE * 3);
   var rowpos = 0;
   var pos = 0;
   var result = 0;
 
   for (y = IM_MIN; y < IM_MAX; y = y + IM_INCR) {
-    rowpos = y * RE_SIZE;
+    rowpos = y * RE_SIZE * 3;
     for (x = RE_MIN; x < RE_MAX; x = x + RE_INCR) {
-      pos = rowpos + x;
+      pos = rowpos + x * 3;
 
       z.re = x;
       z.im = y;
 
-      result = Number((z.iterate(z)/MAX_ITER)*255);
+      result = Number((z.iterate(MAX_ITER)/MAX_ITER)*255);
       
       buffer[pos] = result;
       buffer[pos+1] = result;
@@ -106,7 +106,7 @@ function render() {
 
 // The main wrapper for stuff to do
 function doit() {
-  var png = new Png(render(), IM_SIZE, RE_SIZE, 'rgb');
+  var png = new Png(render(), RE_SIZE, IM_SIZE, 'rgb');
   var png_image = png.encodeSync();
   return png_image.toString('binary');
 }

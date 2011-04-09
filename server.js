@@ -20,6 +20,7 @@ const IM_MIN = -1.0;
 const IM_MAX = 1.0;
 const IM_SIZE = 60.0;
 const IM_INCR = (IM_MAX - IM_MIN) / IM_SIZE;
+const MAX_ITER = 100;
 
 /*
  * Functions that we'll attach to complex numbers as methods.
@@ -79,28 +80,32 @@ function complex(re, im) {
 // Draw an ASCII art mandelbrot set.
 function render() {
   var z = new complex (0, 0);
-  var result = '';
+  var buffer = new Buffer(IM_SIZE * RE_SIZE * 3);
+  var rowpos = 0;
+  var pos = 0;
+  var result = 0;
 
   for (y = IM_MIN; y < IM_MAX; y = y + IM_INCR) {
+    rowpos = y * RE_SIZE;
     for (x = RE_MIN; x < RE_MAX; x = x + RE_INCR) {
+      pos = rowpos + x;
+
       z.re = x;
       z.im = y;
-      if (z.iterate(100)) {
-        result = result + " ";
-      } else {
-        result = result + "*";
-      }
+
+      result = Number((z.iterate(z)/MAX_ITER)*255);
+      
+      buffer[pos] = result;
+      buffer[pos+1] = result;
+      buffer[pos+2] = result;
     }
-    // Finish the line.
-    result = result + "\n";
   }
 
-  return result;
+  return buffer;
 }
 
 // The main wrapper for stuff to do
 function doit() {
-  buffer = new Buffer(IM_SIZE * RE_SIZE * 3);
   png = new Png(buffer, IM_SIZE, RE_SIZE, 'rgb');
   return buffer.toString('binary');
 }

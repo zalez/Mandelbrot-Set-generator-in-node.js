@@ -102,7 +102,7 @@ function render() {
 function doit() {
   buffer = new Buffer(IM_SIZE * RE_SIZE * 3);
   png = new Png(buffer, IM_SIZE, RE_SIZE, rgb);
-  return buffer;
+  return buffer.toString('binary');
 }
  
 var server = http.createServer(function (req, res) {

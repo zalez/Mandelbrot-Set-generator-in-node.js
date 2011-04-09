@@ -107,7 +107,8 @@ function render() {
 // The main wrapper for stuff to do
 function doit() {
   var png = new Png(render(), IM_SIZE, RE_SIZE, 'rgb');
-  return buffer.toString('binary');
+  var png_image = png.encodeSync();
+  return png_image.toString('binary');
 }
  
 var server = http.createServer(function (req, res) {

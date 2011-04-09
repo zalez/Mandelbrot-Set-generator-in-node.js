@@ -104,6 +104,24 @@ function render() {
   return buffer;
 }
 
+function test() {
+  var x = "\x00\x00\x00\x00";
+  var o = "\xff\x00\x00\x00";
+
+  var img = x + o + o + o + o +
+            o + x + o + o + o +
+            o + o + x + o + o +
+            o + o + o + x + o +
+            o + o + o + o + x;
+
+  var rgba = new Buffer(100);
+  rgba.write(img, 'binary');
+
+  var png = new Png(rgba, 5, 5, 'rgba');
+  var png_image = png.encodeSync();
+  return png_image.toString('binary');
+}
+
 // The main wrapper for stuff to do
 function doit() {
   var png = new Png(render(), RE_SIZE, IM_SIZE, 'rgb');
@@ -113,7 +131,7 @@ function doit() {
  
 var server = http.createServer(function (req, res) {
   res.writeHead(200, { "Content-Type": "image/png" })
-  res.end(doit());
+  res.end(test());
 });
  
 server.listen(process.env.PORT || 8001);

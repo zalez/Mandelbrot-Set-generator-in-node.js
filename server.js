@@ -101,7 +101,7 @@ function render() {
 // The main wrapper for stuff to do
 function doit() {
   buffer = new Buffer(IM_SIZE * RE_SIZE * 3);
-  png = new Png(buffer, IM_SIZE, RE_SIZE, rgb);
+  png = new Png(buffer, IM_SIZE, RE_SIZE, 'rgb');
   return buffer.toString('binary');
 }
  

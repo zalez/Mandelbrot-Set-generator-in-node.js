@@ -6,6 +6,10 @@
  *
  */
 
+// Modules we want to use.
+var http = require('http');
+var Png = require('png').Png;
+
 // Constants
 const PORT = 27706;
 const RE_MIN = -2.5;
@@ -73,7 +77,7 @@ function complex(re, im) {
 
 // Our main function that does the work.
 // Draw an ASCII art mandelbrot set.
-function doit() {
+function render() {
   var z = new complex (0, 0);
   var result = '';
 
@@ -94,10 +98,15 @@ function doit() {
   return result;
 }
 
-var http = require('http');
+// The main wrapper for stuff to do
+function doit() {
+  buffer = new Buffer(IM_SIZE * RE_SIZE * 3);
+  png = new Png(buffer, IM_SIZE, RE_SIZE, rgb);
+  return buffer;
+}
  
 var server = http.createServer(function (req, res) {
-  res.writeHead(200, { "Content-Type": "text/plain" })
+  res.writeHead(200, { "Content-Type": "image/png" })
   res.end(doit());
 });
  

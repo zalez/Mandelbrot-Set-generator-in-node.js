@@ -131,7 +131,7 @@ function doit() {
  
 var server = http.createServer(function (req, res) {
   res.writeHead(200, { "Content-Type": "image/png" })
-  res.end(test(), 'binary');
+  res.end(doit(), 'binary');
 });
  
 server.listen(process.env.PORT || 8001);

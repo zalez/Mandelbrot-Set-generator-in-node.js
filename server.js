@@ -106,7 +106,7 @@ function render() {
 
 // The main wrapper for stuff to do
 function doit() {
-  png = new Png(buffer, IM_SIZE, RE_SIZE, 'rgb');
+  var png = new Png(render(), IM_SIZE, RE_SIZE, 'rgb');
   return buffer.toString('binary');
 }
  

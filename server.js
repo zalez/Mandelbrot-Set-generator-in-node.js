@@ -60,7 +60,7 @@ function iterate(max) {
   if (i == max) {
     return 0;
   } else {
-    mu = i + 1.0 - Math.log(Math.log(Math.sqrt(z.mod2()))) / Math.LN2;
+    mu = i ;//+ 1.0 - Math.log(Math.log(Math.sqrt(z.mod2()))) / Math.LN2;
     return mu;
   }
 }

@@ -58,6 +58,7 @@ function iterate(max) {
   if (i == max) {
     return 0;
   } else {
+    mu = i + 1 - Math.log(Math.log(Math.sqrt(c.complexMod2()))) / Math.log2;
     return i;
   }
 }
@@ -83,17 +84,19 @@ function render() {
   var rowpos = 0;
   var pos = 0;
   var result = 0;
+  var color = 0;
 
   for (y = IM_MIN; y < IM_MAX; y = y + IM_INCR) {
     for (x = RE_MIN; x < RE_MAX; x = x + RE_INCR) {
       z.re = x;
       z.im = y;
 
-      result = Number((z.iterate(MAX_ITER)/MAX_ITER)*255);
+      result = z.iterate(MAX_ITER);
+      color = Number ((result / MAX_ITER) * 255 * 255 * 255);
       
-      buffer[pos++] = result;
-      buffer[pos++] = result;
-      buffer[pos++] = result;
+      buffer[pos++] = color >> 16;
+      buffer[pos++] = (color >> 8) & 0xFF ;
+      buffer[pos++] = color & 0xFF;
     }
   }
 

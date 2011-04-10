@@ -66,16 +66,15 @@ function render() {
   var rowpos = 0;
   var pos = 0;
   var result = 0;
-  var color = 0;
 
   for (y = IM_MIN; y < IM_MAX; y = y + IM_INCR) {
     for (x = RE_MIN; x < RE_MAX; x = x + RE_INCR) {
       result = iterate(x,y) / MAX_ITER; // Normalized result in [0..1)
-      color = Math.floor(result * 256);
-      
-      buffer[pos++] = color;
-      buffer[pos++] = color;
-      buffer[pos++] = color;
+
+      // Some fancy sine wave magic to generate interesting colors.
+      buffer[pos++] = Math.floor((Math.sin(result * 2 * Math.PI) + 1) * 256 / 2);
+      buffer[pos++] = Math.floor((Math.sin(result * 2 * Math.PI + Math.PI) + 1 ) * 256 / 2);
+      buffer[pos++] = Math.floor((Math.sin(result * 2 * Math.PI + Math.PI / 2) + 1) * 256 / 2);
     }
   }
 

@@ -93,7 +93,7 @@ function render() {
 
       result = z.iterate(MAX_ITER)/MAX_ITER; // Normalized result in [0..1)
       
-      buffer[pos++] = result * 256;
+      buffer[pos++] = (result * 256) % 256;
       buffer[pos++] = (result * 256 * 256) % 256;
       buffer[pos++] = (result * 256 * 256 * 256) % 256;
     }

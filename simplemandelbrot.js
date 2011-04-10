@@ -10,13 +10,15 @@
 var Png = require('png').Png;
 
 // Constants
-const RE_MIN = -2.5;
-const RE_MAX = 1.0;
 const RE_SIZE = 800.0;
+const IM_SIZE = 600.0;
+const RATIO = RE_SIZE/IM_SIZE;
+const ZOOM = 1.0;
+const RE_MIN = -2.5 * ZOOM * RATIO; // Assuming ratio is >0
+const RE_MAX = 1.0 * ZOOM * RATIO;  // Assuming ratio is >0
 const RE_INCR = (RE_MAX - RE_MIN) / RE_SIZE;
 const IM_MIN = -1.0;
 const IM_MAX = 1.0;
-const IM_SIZE = 600.0;
 const IM_INCR = (IM_MAX - IM_MIN) / IM_SIZE;
 const MAX_ITER = 100;
 const ESCAPE_RADIUS = 2;

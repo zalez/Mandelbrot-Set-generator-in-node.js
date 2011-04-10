@@ -47,18 +47,18 @@ function complexMod2() {
 // Accepts the maximun number of iterations to perform.
 function iterate(max) {
   var i = 0;
-  var c = new complex(0, 0);
+  var z = new complex(0, 0);
 
-  while (c.mod2() <= 4 && i < max) {
-    c.sq();
-    c.add(this);
+  while (z.mod2() <= 4 && i < max) {
+    z.sq();
+    z.add(this);
     i = i + 1;
   }
 
   if (i == max) {
     return 0;
   } else {
-    mu = i + 1.0 - Math.log(Math.log(Math.sqrt(c.mod2()))) / Math.LN2;
+    mu = i + 1.0 - Math.log(Math.log(Math.sqrt(z.mod2()))) / Math.LN2;
     return mu;
   }
 }

@@ -24,6 +24,19 @@ const ESCAPE_RADIUS = 3;
 const ESCAPE_RADIUS2 = ESCAPE_RADIUS * ESCAPE_RADIUS;
 
 /*
+ * Generate a colormap.
+ */
+function gen_colormap() {
+  var colormap = [];
+
+  for (var i=0; i<256; i++) {
+    colormap.push(i);
+  }
+
+  return colormap;
+}
+
+/*
  * Functions that we'll attach to complex numbers as methods.
  */
 
@@ -60,7 +73,7 @@ function iterate(max) {
   if (i == max) {
     return 0;
   } else {
-    mu = i ;//+ 1.0 - Math.log(Math.log(Math.sqrt(z.mod2()))) / Math.LN2;
+    mu = i + 1.0 - Math.log(Math.log(Math.sqrt(z.mod2()))) / Math.LN2;
     return mu;
   }
 }
@@ -87,6 +100,7 @@ function render() {
   var pos = 0;
   var result = 0;
   var color = 0;
+  var colormap = gen_colormap();
 
   for (y = IM_MIN; y < IM_MAX; y = y + IM_INCR) {
     for (x = RE_MIN; x < RE_MAX; x = x + RE_INCR) {
@@ -96,9 +110,9 @@ function render() {
       result = z.iterate(MAX_ITER) / MAX_ITER; // Normalized result in [0..1)
       color = Math.floor(result * 256);
       
-      buffer[pos++] = color;
-      buffer[pos++] = color;
-      buffer[pos++] = color;
+      buffer[pos++] = colormap[color];
+      buffer[pos++] = colormap[color];
+      buffer[pos++] = colormap[color];
     }
   }
 

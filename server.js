@@ -19,7 +19,9 @@ const IM_MIN = -1.0;
 const IM_MAX = 1.0;
 const IM_SIZE = 600.0;
 const IM_INCR = (IM_MAX - IM_MIN) / IM_SIZE;
-const MAX_ITER = 1000;
+const MAX_ITER = 18;
+const ESCAPE_RADIUS = 3;
+const ESCAPE_RADIUS2 = ESCAPE_RADIUS * ESCAPE_RADIUS;
 
 /*
  * Functions that we'll attach to complex numbers as methods.
@@ -49,7 +51,7 @@ function iterate(max) {
   var i = 0;
   var z = new complex(0, 0);
 
-  while (z.mod2() <= 4 && i < max) {
+  while (z.mod2() <= ESCAPE_RADIUS2 && i < max) {
     z.sq();
     z.add(this);
     i = i + 1;
@@ -91,7 +93,7 @@ function render() {
       z.re = x;
       z.im = y;
 
-      result = z.iterate(MAX_ITER)/MAX_ITER; // Normalized result in [0..1)
+      result = z.iterate(MAX_ITER) / MAX_ITER; // Normalized result in [0..1)
       color = Math.floor(result * 256 * 256 * 256);
       
       buffer[pos++] = color >> 16;

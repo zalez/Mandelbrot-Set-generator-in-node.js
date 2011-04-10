@@ -58,7 +58,7 @@ function iterate(max) {
   if (i == max) {
     return 0;
   } else {
-    mu = i + 1 - Math.log(Math.log(Math.sqrt(c.mod2()))) / Math.log2;
+    mu = Float(i) + 1.0 - Math.log(Math.log(Math.sqrt(Float(c.mod2())))) / Math.log2;
     return i;
   }
 }

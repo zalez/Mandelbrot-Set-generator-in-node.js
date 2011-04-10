@@ -18,10 +18,10 @@ const IM_MIN = -1.0;
 const IM_MAX = 1.0;
 const IM_SIZE = 600.0;
 const IM_INCR = (IM_MAX - IM_MIN) / IM_SIZE;
-const MAX_ITER = 18;
-const ESCAPE_RADIUS = 3;
+const MAX_ITER = 100;
+const ESCAPE_RADIUS = 2;
 const ESCAPE_RADIUS2 = ESCAPE_RADIUS * ESCAPE_RADIUS;
-const COLORS = 256;
+const COLORS = 1024;
 
 /*
  * Functions that we'll attach to complex numbers as methods.

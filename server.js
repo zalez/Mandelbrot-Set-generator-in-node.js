@@ -86,40 +86,19 @@ function render() {
   var result = 0;
 
   for (y = IM_MIN; y < IM_MAX; y = y + IM_INCR) {
-    rowpos = y * RE_SIZE * 3;
     for (x = RE_MIN; x < RE_MAX; x = x + RE_INCR) {
-      pos = rowpos + x * 3;
-
       z.re = x;
       z.im = y;
 
       result = Number((z.iterate(MAX_ITER)/MAX_ITER)*255);
       
-      buffer[pos] = result;
-      buffer[pos+1] = result;
-      buffer[pos+2] = result;
+      buffer[pos++] = result;
+      buffer[pos++] = result;
+      buffer[pos++] = result;
     }
   }
 
   return buffer;
-}
-
-function test() {
-  var x = "\x00\x00\x00\x00";
-  var o = "\xff\x00\x00\x00";
-
-  var img = x + o + o + o + o +
-            o + x + o + o + o +
-            o + o + x + o + o +
-            o + o + o + x + o +
-            o + o + o + o + x;
-
-  var rgba = new Buffer(100);
-  rgba.write(img, 'binary');
-
-  var png = new Png(rgba, 5, 5, 'rgba');
-  var png_image = png.encodeSync();
-  return png_image.toString('binary');
 }
 
 // The main wrapper for stuff to do

@@ -8,10 +8,11 @@
 // Modules we want to use.
 var http = require('http');
 var url = require('url');
+var simplemandelbrot = require('simplemandelbrot.js');
 
 function do_simplemandelbrot(req, res) {
-  res.writeHead(200, { "Content-Type": "text/plain" })
-  res.end("Prepare for some Mandelbrot action!");
+  res.writeHead(200, { "Content-Type": "image/png" })
+  res.end(simplemandelbrot.render(), 'binary');
 }
 
 // Simple HTTP server with some dispatch logic.

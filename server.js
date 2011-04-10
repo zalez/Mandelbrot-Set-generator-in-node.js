@@ -92,7 +92,7 @@ function render() {
       z.im = y;
 
       result = z.iterate(MAX_ITER);
-      color = Number ((result / MAX_ITER) * 255 * 255 * 255);
+      color = Math.abs((result / MAX_ITER) * 255 * 255 * 255);
       
       buffer[pos++] = color >> 16;
       buffer[pos++] = (color >> 8) & 0xFF ;

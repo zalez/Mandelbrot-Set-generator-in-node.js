@@ -1,8 +1,8 @@
 /*
  * simplemandelbrot.js
  *
- * A node.js implementation of the Mandelbrot set. Let's see where this
- * leads us.
+ * A node.js implementation of the Mandelbrot set.
+ * Trying to be as simple as possible.
  *
  */
 
@@ -27,60 +27,41 @@ const COLORS = 256;
  * Functions that we'll attach to complex numbers as methods.
  */
 
-// Add a complex number to this one
-function complexAdd(c) {
-  this.re = this.re + c.re;
-  this.im = this.im + c.im;
-}
-
-// Square a complex number
-function complexSq() {
-  var tmp = this.re * this.re - this.im * this.im;
-  this.im = 2 * this.re * this.im;
-  this.re = tmp;
-}
-
-// Compute the squared modulus (It's cheaper than the real modulus)
-function complexMod2() {
-  return this.re * this.re + this.im * this.im;
-}
-
 // Find out whether this complex number is in the mandelbrot set or not.
-// Accepts the maximun number of iterations to perform.
-function iterate(max) {
-  var i = 0;
-  var z = new complex(0, 0);
+// cr: Real part of complex number c to iterate with.
+// ci: Imaginary part of complex number c to iterate with.
+//
+// Returns a value mu, which is the number of iterations needed to escape the equation
+// (or 0 if the formula never escaped), plus some extra fractional value to allow for
+// smooth coloring.
+function iterate(cr, ci) {
+  var zr = 0;
+  var zi = 0;
+  var t  = 0; // A temporary store.
+  var m2 = 0; // The modulo of the complex number z, squared.
 
-  while (z.mod2() <= ESCAPE_RADIUS2 && i < max) {
-    z.sq();
-    z.add(this);
-    i = i + 1;
+  for (var i = 0; i < MAX_ITER; i++) {
+    // z = z^2 ...
+    t = zr * zr - zi * zi;
+    zi = 2 * zr * zi;
+    zr = t;
+
+    // ... + c    
+    zr += cr;
+    zi += zi;
+
+    // Test if we escaped the equation
+    m2 = zr * zr + zi * zi;
+    if (m2 > ESCAPE_RADIUS2) {
+      return i + 1.0 - Math.log(Math.log(Math.sqrt(m2))) / Math.LN2;
+    }
   }
 
-  if (i == max) {
-    return 0;
-  } else {
-    mu = i + 1.0 - Math.log(Math.log(Math.sqrt(z.mod2()))) / Math.LN2;
-    return mu;
-  }
-}
-
-// A constructor for a complex number, including methods.
-function complex(re, im) {
-  // Our individual values
-  this.re = re;
-  this.im = im;
-
-  // Standard methods for complex numbers
-  this.add = complexAdd;
-  this.sq = complexSq;
-  this.mod2 = complexMod2;
-  this.iterate = iterate;
+  return 0;
 }
 
 // Our main function that does the work.
 function render() {
-  var z = new complex (0, 0);
   var buffer = new Buffer(RE_SIZE * IM_SIZE * 3);
   var rowpos = 0;
   var pos = 0;
@@ -89,10 +70,7 @@ function render() {
 
   for (y = IM_MIN; y < IM_MAX; y = y + IM_INCR) {
     for (x = RE_MIN; x < RE_MAX; x = x + RE_INCR) {
-      z.re = x;
-      z.im = y;
-
-      result = z.iterate(MAX_ITER) / MAX_ITER; // Normalized result in [0..1)
+      result = iterate(x,y) / MAX_ITER; // Normalized result in [0..1)
       color = Math.floor(result * 256);
       
       buffer[pos++] = color;

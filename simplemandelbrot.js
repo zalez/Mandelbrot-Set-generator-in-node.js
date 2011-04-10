@@ -72,9 +72,15 @@ function render() {
       result = iterate(x,y) / MAX_ITER; // Normalized result in [0..1)
 
       // Some fancy sine wave magic to generate interesting colors.
-      buffer[pos++] = Math.floor((Math.sin(result * 2 * Math.PI) + 1) * 256 / 2);
-      buffer[pos++] = Math.floor((Math.sin(result * 2 * Math.PI + Math.PI) + 1 ) * 256 / 2);
-      buffer[pos++] = Math.floor((Math.sin(result * 2 * Math.PI + Math.PI / 2) + 1) * 256 / 2);
+      if (result) {
+        buffer[pos++] = Math.floor((Math.sin(result * 2 * Math.PI) + 1) * 256 / 2);
+        buffer[pos++] = Math.floor((Math.sin(result * 2 * Math.PI + Math.PI) + 1 ) * 256 / 2);
+        buffer[pos++] = Math.floor((Math.sin(result * 2 * Math.PI + Math.PI / 2) + 1) * 256 / 2);
+      } else {
+        buffer[pos++] = 0;
+        buffer[pos++] = 0;
+        buffer[pos++] = 0;
+      }
     }
   }
 

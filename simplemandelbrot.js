@@ -48,7 +48,7 @@ function iterate(cr, ci) {
 
     // ... + c    
     zr += cr;
-    zi += zi;
+    zi += ci;
 
     // Test if we escaped the equation
     m2 = zr * zr + zi * zi;

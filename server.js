@@ -11,14 +11,13 @@ var http = require('http');
 var Png = require('png').Png;
 
 // Constants
-const PORT = 27706;
 const RE_MIN = -2.5;
 const RE_MAX = 1.0;
-const RE_SIZE = 80.0;
+const RE_SIZE = 800.0;
 const RE_INCR = (RE_MAX - RE_MIN) / RE_SIZE;
 const IM_MIN = -1.0;
 const IM_MAX = 1.0;
-const IM_SIZE = 60.0;
+const IM_SIZE = 600.0;
 const IM_INCR = (IM_MAX - IM_MIN) / IM_SIZE;
 const MAX_ITER = 100;
 

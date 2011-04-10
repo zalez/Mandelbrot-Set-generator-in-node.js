@@ -58,7 +58,7 @@ function iterate(max) {
   if (i == max) {
     return 0;
   } else {
-    mu = i + 1.0 ; //- Math.log(Math.log(Math.sqrt(c.mod2()))) / Math.log2;
+    mu = i + 1.0 - Math.log(Math.log(Math.sqrt(c.mod2()))) / Math.log2;
     return mu;
   }
 }
@@ -93,9 +93,9 @@ function render() {
 
       result = z.iterate(MAX_ITER)/MAX_ITER; // Normalized result in [0..1)
       
-      buffer[pos++] = (result * 256) % 256;
-      buffer[pos++] = (result * 256 * 256) % 256;
-      buffer[pos++] = (result * 256 * 256 * 256) % 256;
+      buffer[pos++] = Math.floor(result * 256) % 256;
+      buffer[pos++] = Math.floor(result * 256 * 256) % 256;
+      buffer[pos++] = Math.floor(result * 256 * 256 * 256) % 256;
     }
   }
 

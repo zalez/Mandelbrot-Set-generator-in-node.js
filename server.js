@@ -19,7 +19,7 @@ const IM_MIN = -1.0;
 const IM_MAX = 1.0;
 const IM_SIZE = 600.0;
 const IM_INCR = (IM_MAX - IM_MIN) / IM_SIZE;
-const MAX_ITER = 255;
+const MAX_ITER = 1000;
 
 /*
  * Functions that we'll attach to complex numbers as methods.

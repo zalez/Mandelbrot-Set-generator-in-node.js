@@ -17,26 +17,13 @@ var Png = require('png').Png;
 const X_SIZE = 800.0;
 const Y_SIZE = 600.0;
 
-// Algorithm constants. Sometimes derived from image constants.
-
 // Which subset to render?
 const RE_CENTER = -0.75; // X-Center of the picture will represent this value on the real axis.
 const IM_CENTER = 0.0;   // Y-Center of the picture will represent this value on the imaginary axis.
 const PXPERUNIT = 200;   // How much units in the complex plane are covered by one pixel?
 
-// The following are derivatives of the above.
-const RE_MIN = RE_CENTER - X_SIZE / PXPERUNIT / 2;
-const RE_MAX = RE_CENTER + X_SIZE / PXPERUNIT / 2;
-const RE_INCR = (RE_MAX - RE_MIN) / X_SIZE;
-
-const IM_MIN = IM_CENTER - Y_SIZE / PXPERUNIT / 2;
-const IM_MAX = IM_CENTER + Y_SIZE / PXPERUNIT / 2;
-const IM_INCR = (IM_MAX - IM_MIN) / Y_SIZE;
-
 // Other iteration parameters.
 const MAX_ITER = 100;
-const ESCAPE_RADIUS = 2;
-const ESCAPE_RADIUS2 = ESCAPE_RADIUS * ESCAPE_RADIUS; // Easier to test against.
 
 /*
  * Functions that we'll attach to complex numbers as methods.
@@ -67,7 +54,7 @@ function iterate(cr, ci) {
 
     // Test if we escaped the equation
     m2 = zr * zr + zi * zi;
-    if (m2 > ESCAPE_RADIUS2) {
+    if (m2 > 4) { // Mandelbrot escape radius is 2, hence 4 since we compare to squared modulus.
       return i + 1.0 - Math.log(Math.log(Math.sqrt(m2))) / Math.LN2;
     }
   }
@@ -76,18 +63,29 @@ function iterate(cr, ci) {
 }
 
 // Our main function that does the work.
-function render() {
-  var buffer = new Buffer(X_SIZE * Y_SIZE * 3);
+// Arguments:
+// xsize, ysize: Image size.
+// re, im: Real and imaginary part of the center of the image.
+// ppu: Number of pixels in the image per unit in the complex plane (zoom factor).
+// max: Maximum value to iterate to.
+
+function render(xsize, ysize, re, im, ppu, max) {
+  var minre = re - xsize / ppu / 2;
+  var minim = im - ysize / ppu / 2;
+  var inc = 1 / ppu;
+
+  var zre = 0;
+  var zim = 0;
+
+  var buffer = new Buffer(xsize * ysize * 3);
   var pos = 0;
   var result = 0;
-  var re = 0;
-  var im = 0;
 
-  for (y = 0; y < Y_SIZE; y++) {
-    im = IM_MIN + y * IM_INCR;
-    for (x = 0; x < X_SIZE; x++) {
-      re = RE_MIN + x * RE_INCR;
-      result = iterate(re, im) / MAX_ITER; // Normalized result in [0..1)
+  for (y = 0; y < ysize; y++) {
+    zim = minim + y * inc;
+    for (x = 0; x < xsize; x++) {
+      zre = minre + x * inc;
+      result = iterate(zre, zim) / max; // Normalized result in [0..1)
 
       // Some fancy sine wave magic to generate interesting colors.
       if (result) {
@@ -106,7 +104,7 @@ function render() {
 }
 
 renderPng = function () {
-  var png = new Png(render(), X_SIZE, Y_SIZE, 'rgb');
+  var png = new Png(render(X_SIZE, Y_SIZE, RE_CENTER, IM_CENTER, PXPERUNIT, MAX_ITER), X_SIZE, Y_SIZE, 'rgb');
   var png_image = png.encodeSync();
   return png_image.toString('binary');
 }

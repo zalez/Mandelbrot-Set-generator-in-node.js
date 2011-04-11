@@ -20,7 +20,7 @@ const Y_SIZE = 600.0;
 // Which subset to render?
 const RE_CENTER = -0.75; // X-Center of the picture will represent this value on the real axis.
 const IM_CENTER = 0.0;   // Y-Center of the picture will represent this value on the imaginary axis.
-const PXPERUNIT = 200;   // How much units in the complex plane are covered by one pixel?
+const PXPERUNIT = 150;   // How much units in the complex plane are covered by one pixel?
 
 // Other iteration parameters.
 const MAX_ITER = 100;
@@ -76,6 +76,10 @@ function render(xsize, ysize, re, im, ppu, max) {
 
   var zre = 0;
   var zim = 0;
+  var x4 = 0;
+  var y2 = 0;
+  var q = 0;
+  var t = 0;
 
   var buffer = new Buffer(xsize * ysize * 3);
   var pos = 0;
@@ -85,7 +89,22 @@ function render(xsize, ysize, re, im, ppu, max) {
     zim = minim + y * inc;
     for (x = 0; x < xsize; x++) {
       zre = minre + x * inc;
+
+      // Test if the point is within the cardioid bulb to avoid calculation...
+      x4 = zre - 0.25;
+      y2 = zim * zim;
+      q = x4 * x4 + y2;
+      t = q * (q + x4);
+      if (t < y2 * 0.25) {
+        result = 0;
+      } else
+      // ...Maybe it's within the period-2-bulb...
+      if (((re + 1) * (re + 1) + y2) < (1 / 16)) {
+        result = 0;
+      } else 
+      // OK we have to go through the full calculation.
       result = iterate(zre, zim) / max; // Normalized result in [0..1)
+      
 
       // Some fancy sine wave magic to generate interesting colors.
       if (result) {

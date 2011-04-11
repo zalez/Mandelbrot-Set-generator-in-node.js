@@ -29,12 +29,6 @@ function show_image(req, res) {
 // Create a routing module that determines what to do.
 exports.handler = connect(
   connect.router( function(app) {
-    // Redirect requests to "/" to "page/index.html".
-    app.get('/', function(req, res) {
-      res.writeHead(302, {Location: "page/index.html"});
-      res.end();
-    });
-
     // Serve some static pages.
     app.get('/page', connect.static(__dirname + '/html', { maxAge: 0})); // Static pages go here.
 

@@ -22,7 +22,7 @@ const Y_SIZE = 600.0;
 // Which subset to render?
 const RE_CENTER = -0.75; // X-Center of the picture will represent this value on the real axis.
 const IM_CENTER = 0.0;   // Y-Center of the picture will represent this value on the imaginary axis.
-const PXPERUNIT = 300;   // How much units in the complex plane are covered by one pixel?
+const PXPERUNIT = 200;   // How much units in the complex plane are covered by one pixel?
 
 // The following are derivatives of the above.
 const RE_MIN = RE_CENTER - X_SIZE / PXPERUNIT / 2;

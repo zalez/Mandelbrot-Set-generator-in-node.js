@@ -80,10 +80,14 @@ function render() {
   var buffer = new Buffer(X_SIZE * Y_SIZE * 3);
   var pos = 0;
   var result = 0;
+  var re = 0;
+  var im = 0;
 
-  for (y = IM_MIN; y < IM_MAX; y = y + IM_INCR) {
-    for (x = RE_MIN; x < RE_MAX; x = x + RE_INCR) {
-      result = iterate(x,y) / MAX_ITER; // Normalized result in [0..1)
+  for (y = 0; y < Y_SIZE; y++) {
+    im = IM_MIN + y * IM_INCR;
+    for (x = 0; x < X_SIZE; x++) {
+      re = RE_MIN + x * RE_INCR;
+      result = iterate(re, im) / MAX_ITER; // Normalized result in [0..1)
 
       // Some fancy sine wave magic to generate interesting colors.
       if (result) {

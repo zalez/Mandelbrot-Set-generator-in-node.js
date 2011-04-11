@@ -40,5 +40,5 @@ export.handler = connect(
 
     // Generate the image
     app.get('/image', show_image);
-  }
+  })
 );

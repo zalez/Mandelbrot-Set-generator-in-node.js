@@ -36,7 +36,7 @@ exports.handler = connect(
     });
 
     // Serve some static pages.
-    app.get('/page', connect.static(__dirname + '/html')); // Static pages go here.
+    app.get('/page', connect.static(__dirname + '/html', { maxAge: 0})); // Static pages go here.
 
     // Generate the image
     app.get('/image', show_image);

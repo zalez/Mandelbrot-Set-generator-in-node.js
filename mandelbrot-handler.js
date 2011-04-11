@@ -28,7 +28,7 @@ function show_image(req, res) {
 
 exports.handler = connect.router(function(app) {
   app.get('/', function(req, res) {
-    res.writeHead(307, { "Location": "image.png" });
+    res.writeHead(307, { "Location": req.url + "image.png" });
     res.end();
   });
   app.get('/image.png', show_image);

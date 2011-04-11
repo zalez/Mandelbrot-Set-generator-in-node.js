@@ -31,5 +31,6 @@ exports.handler = connect(
   connect.router( function(app) {
     // Generate the image
     app.get('/image', show_image);
+    app.get('/page', connect.static(__dirname + '/html', { maxAge: 0})); // Static pages go here.
   })
 );

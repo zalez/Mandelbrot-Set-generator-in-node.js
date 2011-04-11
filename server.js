@@ -17,7 +17,6 @@ var server = connect.createServer(
   connect.profiler(),
   connect.favicon(__dirname + '/static/images/favicon.ico'),
   connect.logger(),
-  connect.static(__dirname + '/html', { maxAge: 0}) // Static pages go here.
 );
 
 server.use('/simplemandelbrot', simplemandelbrot.handler);

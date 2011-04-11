@@ -11,11 +11,6 @@ var connect = require('connect');
 // Our self-written modules.
 var simplemandelbrot = require('simplemandelbrot.js');
 
-function do_simplemandelbrot(req, res) {
-  res.writeHead(200, { "Content-Type": "image/png" })
-  res.end(simplemandelbrot.render(), 'binary');
-}
-
 // Simple HTTP server with some dispatch logic.
 var server = connect.createServer(
   connect.profiler(),
@@ -23,6 +18,6 @@ var server = connect.createServer(
   connect.logger()
 );
 
-server.use('/simplemandelbrot', do_simplemandelbrot);
+server.use('/simplemandelbrot', simplemandelbrot.handler);
 
 server.listen(80);

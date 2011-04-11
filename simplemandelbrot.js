@@ -105,9 +105,14 @@ function render() {
   return buffer;
 }
 
-// The main function to export.
-exports.render = function () {
+renderPng = function () {
   var png = new Png(render(), X_SIZE, Y_SIZE, 'rgb');
   var png_image = png.encodeSync();
   return png_image.toString('binary');
+}
+
+// The main handler function to export.
+exports.handler = function (req, res) {
+  res.writeHead(200, { "Content-Type": "image/png" })
+  res.end(renderPng(), 'binary');
 }

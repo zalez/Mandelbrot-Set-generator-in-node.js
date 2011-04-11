@@ -76,8 +76,8 @@ function render() {
       // Some fancy sine wave magic to generate interesting colors.
       if (result) {
         buffer[pos++] = Math.floor((Math.sin(result * 2 * Math.PI) + 1) * 256 / 2);
-        buffer[pos++] = Math.floor((Math.sin(result * 2 * Math.PI + Math.PI) + 1 ) * 256 / 2);
-        buffer[pos++] = Math.floor((Math.sin(result * 2 * Math.PI + Math.PI / 2) + 1) * 256 / 2);
+        buffer[pos++] = Math.floor((Math.sin(result * 3 * Math.PI) + 1 ) * 256 / 2);
+        buffer[pos++] = Math.floor((Math.sin(result * Math.PI + Math.PI / 2) + 1) * 256 / 2);
       } else {
         buffer[pos++] = 0;
         buffer[pos++] = 0;

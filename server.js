@@ -23,6 +23,6 @@ var server = connect.createServer(
   connect.logger()
 );
 
-server.use('simplemandelbrot', do_simplemandelbrot);
+server.use('/simplemandelbrot', do_simplemandelbrot);
 
 server.listen(80);

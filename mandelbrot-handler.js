@@ -19,7 +19,7 @@ var Png = require ('png').Png;
 
 // Show a Mandelbrot set image.
 function show_image(req, res) {
-  var png = new Png(mandelbrot.render_basic, X_SIZE, Y_SIZE, 'rgb');
+  var png = new Png(mandelbrot.render_basic(), X_SIZE, Y_SIZE, 'rgb');
   var png_image = png.encodeSync();
 
   res.writeHead(200, { "Content-Type": "image/png" });

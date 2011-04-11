@@ -19,6 +19,7 @@ function do_simplemandelbrot(req, res) {
 var server = http.createServer(function (req, res) {
   requrl = url.parse(req.url);
   switch(requrl.pathname) {
+    case '/':
     case '/simplemandelbrot':
       do_simplemandelbrot(req, res);
     default:

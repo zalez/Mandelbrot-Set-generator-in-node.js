@@ -18,6 +18,6 @@ function do_simplemandelbrot(req, res) {
 
 // Simple HTTP server with some dispatch logic.
 var server = connect.createServer(
-  connect.favicon();
-  connect.logger();
+  connect.favicon(),
+  connect.logger()
 );

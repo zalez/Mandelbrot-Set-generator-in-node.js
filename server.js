@@ -9,7 +9,8 @@
 var connect = require('connect');
 
 // Our self-written modules.
-var simplemandelbrot = require('simplemandelbrot.js');
+var simplemandelbrot = require('simplemandelbrot.js'); // Simple demo Mandelbrot generator.
+var mandelbrot = require('mandelbrot-handler.js'); // A more complex Mandelbrot generator.
 
 // Simple HTTP server with some dispatch logic.
 var server = connect.createServer(
@@ -19,5 +20,6 @@ var server = connect.createServer(
 );
 
 server.use('/simplemandelbrot', simplemandelbrot.handler);
+server.use('/mandelbrot', mandelbrot.handler);
 
 server.listen(80);

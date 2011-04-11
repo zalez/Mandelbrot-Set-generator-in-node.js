@@ -9,21 +9,35 @@
 // Modules we want to use.
 var Png = require('png').Png;
 
-// Constants
-const RE_SIZE = 800.0;
-const IM_SIZE = 600.0;
-const RATIO = RE_SIZE/IM_SIZE;
-const ZOOM = 1.0;
-const RE_MIN = -2.5 * ZOOM;
-const RE_MAX = 1.0 * ZOOM;
-const RE_INCR = (RE_MAX - RE_MIN) / RE_SIZE;
-const IM_MIN = -1.0;
-const IM_MAX = 1.0;
-const IM_INCR = (IM_MAX - IM_MIN) / IM_SIZE;
+/*
+ * Constants
+ */
+
+// Image constants.
+const X_SIZE = 800.0;
+const Y_SIZE = 600.0;
+const COLORS = 1024;
+
+// Algorithm constants. Sometimes derived from image constants.
+
+// Which subset to render?
+const RE_CENTER = -0.75; // X-Center of the picture will represent this value on the real axis.
+const IM_CENTER = 0;     // Y-Center of the picture will represent this value on the imaginary axis.
+const ZOOM = 300.0;      // Amount of pixels that map to a distance of 1 in the real/imaginary axis.
+
+// The following are derivatives of the above.
+const RE_MIN = RE_CENTER - X_SIZE / 2 / ZOOM;
+const RE_MAX = RE_CENTER + X_SIZE / 2 / ZOOM;
+const RE_INCR = (RE_MAX - RE_MIN) / X_SIZE;
+
+const IM_MIN = IM_CENTER - Y_SIZE / 2 / ZOOM;
+const IM_MAX = IM_CENTER + Y_SIZE / 2 / ZOOM;
+const IM_INCR = (IM_MAX - IM_MIN) / Y_SIZE;
+
+// Other iteration parameters.
 const MAX_ITER = 100;
 const ESCAPE_RADIUS = 2;
 const ESCAPE_RADIUS2 = ESCAPE_RADIUS * ESCAPE_RADIUS;
-const COLORS = 1024;
 
 /*
  * Functions that we'll attach to complex numbers as methods.
@@ -64,7 +78,7 @@ function iterate(cr, ci) {
 
 // Our main function that does the work.
 function render() {
-  var buffer = new Buffer(RE_SIZE * IM_SIZE * 3);
+  var buffer = new Buffer(X_SIZE * Y_SIZE * 3);
   var rowpos = 0;
   var pos = 0;
   var result = 0;
@@ -91,7 +105,7 @@ function render() {
 
 // The main function to export.
 exports.render = function () {
-  var png = new Png(render(), RE_SIZE, IM_SIZE, 'rgb');
+  var png = new Png(render(), X_SIZE, Y_SIZE, 'rgb');
   var png_image = png.encodeSync();
   return png_image.toString('binary');
 }

@@ -16,7 +16,7 @@ var mandelbrot = require('mandelbrot-handler.js'); // A more complex Mandelbrot 
 var server = connect.createServer(
   connect.profiler(),
   connect.favicon(__dirname + '/static/images/favicon.ico'),
-  connect.logger(),
+  connect.logger()
 );
 
 server.use('/simplemandelbrot', simplemandelbrot.handler);

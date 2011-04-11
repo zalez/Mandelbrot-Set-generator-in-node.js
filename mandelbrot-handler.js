@@ -31,7 +31,7 @@ exports.handler = connect(
   connect.router( function(app) {
     // Redirect requests to "/" to "page/index.html".
     app.get('/', function(req, res) {
-      res.writeHead(302, {Location: "/page/index.html"});
+      res.writeHead(302, {Location: "page/index.html"});
       res.end();
     });
 

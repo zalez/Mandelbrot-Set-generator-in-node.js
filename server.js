@@ -21,3 +21,5 @@ var server = connect.createServer(
   connect.favicon(),
   connect.logger()
 );
+
+server.listen(80);

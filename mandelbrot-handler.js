@@ -27,7 +27,7 @@ function show_image(req, res) {
 }
 
 // Create a routing module that determines what to do.
-export.handler = connect(
+exports.handler = connect(
   connect.router( function(app) {
     // Redirect requests to "/" to "page/index.html".
     app.get('/', function(req, res) {

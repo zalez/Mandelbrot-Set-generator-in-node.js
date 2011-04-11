@@ -18,7 +18,8 @@ function do_simplemandelbrot(req, res) {
 
 // Simple HTTP server with some dispatch logic.
 var server = connect.createServer(
-  connect.favicon(__dirname + '/images/favicon.ico'),
+  connect.profiler(),
+  connect.favicon(__dirname + '/static/images/favicon.ico'),
   connect.logger()
 );
 

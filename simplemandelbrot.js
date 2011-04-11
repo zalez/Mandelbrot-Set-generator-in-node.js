@@ -29,8 +29,8 @@ const RE_MIN = RE_CENTER - (X_SIZE * UNITPERPX) / 2;
 const RE_MAX = RE_CENTER + (X_SIZE * UNITPERPX) / 2;
 const RE_INCR = (RE_MAX - RE_MIN) / X_SIZE;
 
-const IM_MIN = IM_CENTER - (Y_SIZE * UNITPERPX) / 2);
-const IM_MAX = IM_CENTER + (Y_SIZE * UNITPERPX) / 2);
+const IM_MIN = IM_CENTER - (Y_SIZE * UNITPERPX) / 2;
+const IM_MAX = IM_CENTER + (Y_SIZE * UNITPERPX) / 2;
 const IM_INCR = (IM_MAX - IM_MIN) / Y_SIZE;
 
 // Other iteration parameters.

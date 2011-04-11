@@ -16,22 +16,21 @@ var Png = require('png').Png;
 // Image constants.
 const X_SIZE = 800.0;
 const Y_SIZE = 600.0;
-const COLORS = 1024;
 
 // Algorithm constants. Sometimes derived from image constants.
 
 // Which subset to render?
 const RE_CENTER = -0.75; // X-Center of the picture will represent this value on the real axis.
 const IM_CENTER = 0.0;   // Y-Center of the picture will represent this value on the imaginary axis.
-const ZOOM = 200.0;      // Amount of pixels that map to a distance of 1 in the real/imaginary axis.
+const PXPERUNIT = 200.0;      // Amount of pixels that map to a distance of 1 in the real/imaginary axis.
 
 // The following are derivatives of the above.
-const RE_MIN = RE_CENTER - X_SIZE / 2.0 / ZOOM;
-const RE_MAX = RE_CENTER + X_SIZE / 2.0 / ZOOM;
+const RE_MIN = RE_CENTER - (X_SIZE / PXPERUNIT / 2);
+const RE_MAX = RE_CENTER + (X_SIZE / PXPERUNIT / 2);
 const RE_INCR = (RE_MAX - RE_MIN) / X_SIZE;
 
-const IM_MIN = IM_CENTER - Y_SIZE / 2.0 / ZOOM;
-const IM_MAX = IM_CENTER + Y_SIZE / 2.0 / ZOOM;
+const IM_MIN = IM_CENTER - (Y_SIZE / PXPERUNIT / 2);
+const IM_MAX = IM_CENTER + (Y_SIZE / PXPERUNIT / 2);
 const IM_INCR = (IM_MAX - IM_MIN) / Y_SIZE;
 
 // Other iteration parameters.

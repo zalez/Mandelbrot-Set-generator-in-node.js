@@ -26,12 +26,12 @@ const IM_CENTER = 0.0;   // Y-Center of the picture will represent this value on
 const ZOOM = 200.0;      // Amount of pixels that map to a distance of 1 in the real/imaginary axis.
 
 // The following are derivatives of the above.
-const RE_MIN = RE_CENTER - X_SIZE / 2 / ZOOM;
-const RE_MAX = RE_CENTER + X_SIZE / 2 / ZOOM;
+const RE_MIN = RE_CENTER - X_SIZE / 2.0 / ZOOM;
+const RE_MAX = RE_CENTER + X_SIZE / 2.0 / ZOOM;
 const RE_INCR = (RE_MAX - RE_MIN) / X_SIZE;
 
-const IM_MIN = IM_CENTER - Y_SIZE / 2 / ZOOM;
-const IM_MAX = IM_CENTER + Y_SIZE / 2 / ZOOM;
+const IM_MIN = IM_CENTER - Y_SIZE / 2.0 / ZOOM;
+const IM_MAX = IM_CENTER + Y_SIZE / 2.0 / ZOOM;
 const IM_INCR = (IM_MAX - IM_MIN) / Y_SIZE;
 
 // Other iteration parameters.
@@ -79,7 +79,6 @@ function iterate(cr, ci) {
 // Our main function that does the work.
 function render() {
   var buffer = new Buffer(X_SIZE * Y_SIZE * 3);
-  var rowpos = 0;
   var pos = 0;
   var result = 0;
 

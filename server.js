@@ -20,7 +20,7 @@ var server = connect.createServer(
   connect.static(__dirname + '/html', { maxAge: 0}) // Static pages go here.
 );
 
-server.use('/simplemandelbrot', simplemandelbrot.handler(req, res));
-server.use('/mandelbrot', mandelbrot.handler(req, res));
+server.use('/simplemandelbrot', simplemandelbrot.handler);
+server.use('/mandelbrot', mandelbrot.handler);
 
 server.listen(80);

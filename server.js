@@ -21,5 +21,6 @@ var server = connect.createServer(
 );
 
 server.use('/simplemandelbrot', simplemandelbrot.handler);
+server.use('/mandelbrot', mandelbrot.handler);
 
 server.listen(80);

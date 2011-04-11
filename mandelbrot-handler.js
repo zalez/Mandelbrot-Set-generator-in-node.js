@@ -26,13 +26,4 @@ function show_image(req, res) {
   res.end(png_image.toString('binary'), 'binary');
 }
 
-// Create a routing module that determines what to do.
-function handler(req, res){
-  connect.router(function(app){
-    app.get('/', connect.static(__dirname + '/html', { maxAge: 0})); // Static pages go here.
-
-    app.get('/image', show_image(req, res));
-  })
-}
-
-exports.handler = handler;
+exports.handler = show_image;

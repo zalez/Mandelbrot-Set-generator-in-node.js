@@ -20,7 +20,10 @@ function do_simplemandelbrot(req, res) {
 var server = connect.createServer(
   connect.profiler(),
   connect.favicon(__dirname + '/static/images/favicon.ico'),
-  connect.logger()
+  connect.logger(),
+  connect.router(function(app) {
+    app.get('/simplemandelbrot', do_simplemandelbrot);
+  })
 );
 
 server.listen(80);

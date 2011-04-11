@@ -26,4 +26,9 @@ function show_image(req, res) {
   res.end(png_image.toString('binary'), 'binary');
 }
 
-exports.handler = show_image;
+exports.handler = connect.router(function(app) {
+  app.get('/', function(req, res) {
+    res.writeHead(307, { "Location": "image.png" })
+  });
+  app.get('/image.png', show_image);
+});

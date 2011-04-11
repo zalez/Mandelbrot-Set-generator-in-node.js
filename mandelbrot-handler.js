@@ -29,9 +29,6 @@ function show_image(req, res) {
 // Create a routing module that determines what to do.
 exports.handler = connect(
   connect.router( function(app) {
-    // Serve some static pages.
-    app.get('/page', connect.static(__dirname + '/html', { maxAge: 0})); // Static pages go here.
-
     // Generate the image
     app.get('/image', show_image);
   })

@@ -32,16 +32,16 @@ function show_image(req, res) {
   var result = mandelbrot.render(X_SIZE, Y_SIZE, RE_CENTER, IM_CENTER, PXPERUNIT, MAX_ITER);
 
   // Create a colormap.
-  var colormap = colormap.colormap(MAX_ITER * 10); // The smooth coloring algorithm allows for many colors.
+  var map = colormap.colormap(MAX_ITER * 10); // The smooth coloring algorithm allows for many colors.
 
   // Create an image buffer.
   var image = new Buffer(X_SIZE * Y_SIZE * 3);
 
   // Fill the image buffer with the result from the Mandelbrot set, mapped to the colormap.
   for (i = 0; i < X_SIZE * Y_SIZE;) {
-    image[i++] = colormap[result[i]][0];
-    image[i++] = colormap[result[i]][1];
-    image[i++] = colormap[result[i]][2];
+    image[i++] = map[result[i]][0];
+    image[i++] = map[result[i]][1];
+    image[i++] = map[result[i]][2];
   }
 
   // Convert the image into PNG format.

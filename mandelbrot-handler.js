@@ -19,7 +19,7 @@ const PXPERUNIT = 150;   // How much units in the complex plane are covered by o
 
 // Other iteration parameters.
 const MAX_ITER = 100;
-const COLORS = MAX_ITER * 100;
+const COLORS = MAX_ITER * 10;
 
 // Modules we want to use.
 var connect = require('connect');

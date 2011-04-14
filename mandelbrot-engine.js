@@ -88,7 +88,7 @@ exports.render = function (xsize, ysize, re, im, ppu, max) {
         result[pos++] = 0;
       } else 
       // OK we have to go through the full calculation.
-      result[pos++] = iterate(zre, zim, max) / max; // Normalized result in [0..1)
+      result[pos++] = iterate(zre, zim, max) / (max + 1); // Normalized result in [0..1)
     }
   }
 

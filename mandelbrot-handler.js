@@ -39,10 +39,13 @@ function show_image(req, res) {
   var image = new Buffer(X_SIZE * Y_SIZE * 3);
 
   // Fill the image buffer with the result from the Mandelbrot set, mapped to the colormap.
+  var pos = 0;
+  var color = []
   for (i = 0; i < X_SIZE * Y_SIZE;) {
-    image[i++] = map[Math.floor(result[i]*COLORS)][0];
-    image[i++] = map[Math.floor(result[i]*COLORS)][1];
-    image[i++] = map[Math.floor(result[i]*COLORS)][2];
+    color = map[Math.floor(result[i]*COLORS)];
+    image[pos++] = color[0];
+    image[pos++] = color[1];
+    image[pos++] = color[2];
   }
 
   // Convert the image into PNG format.

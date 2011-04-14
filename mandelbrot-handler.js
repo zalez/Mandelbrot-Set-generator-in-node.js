@@ -19,6 +19,7 @@ const PXPERUNIT = 150;   // How much units in the complex plane are covered by o
 
 // Other iteration parameters.
 const MAX_ITER = 100;
+const COLORS = MAX_ITER * 100;
 
 // Modules we want to use.
 var connect = require('connect');
@@ -32,16 +33,16 @@ function show_image(req, res) {
   var result = mandelbrot.render(X_SIZE, Y_SIZE, RE_CENTER, IM_CENTER, PXPERUNIT, MAX_ITER);
 
   // Create a colormap.
-  var map = colormap.colormap(MAX_ITER * 10); // The smooth coloring algorithm allows for many colors.
+  var map = colormap.colormap(COLORS);
 
   // Create an image buffer.
   var image = new Buffer(X_SIZE * Y_SIZE * 3);
 
   // Fill the image buffer with the result from the Mandelbrot set, mapped to the colormap.
   for (i = 0; i < X_SIZE * Y_SIZE;) {
-    image[i++] = map[result[i]][0];
-    image[i++] = map[result[i]][1];
-    image[i++] = map[result[i]][2];
+    image[i++] = map[Math.floor(result[i]*COLORS)][0];
+    image[i++] = map[Math.floor(result[i]*COLORS)][1];
+    image[i++] = map[Math.floor(result[i]*COLORS)][2];
   }
 
   // Convert the image into PNG format.

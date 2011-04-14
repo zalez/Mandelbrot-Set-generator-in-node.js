@@ -69,7 +69,6 @@ exports.render = function (xsize, ysize, re, im, ppu, max) {
 
   var result = new Array(xsize * ysize);
   var pos = 0;
-  var result = 0;
 
   for (y = 0; y < ysize; y++) {
     zim = minim + y * inc;

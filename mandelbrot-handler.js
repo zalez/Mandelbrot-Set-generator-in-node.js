@@ -44,9 +44,15 @@ function show_image(req, res) {
   for (i = 0; i < X_SIZE * Y_SIZE; i++) {
     index=result[i]*COLORS;
     color = map[index];
-    image[pos++] = color[0];
-    image[pos++] = color[1];
-    image[pos++] = color[2];
+    if (color) {
+      image[pos++] = color[0];
+      image[pos++] = color[1];
+      image[pos++] = color[2];
+    } else {
+      image[pos++] = 255;
+      image[pos++] = 255;
+      image[pos++] = 255;
+    }
   }
 
   // Convert the image into PNG format.

@@ -19,7 +19,7 @@ exports.colormap = function (size) {
   }
 
   // The entry for 0 is always black
-  colormap [0] = [0,0,0];
+  colormap[0] = [0,0,0];
   
   return colormap;
 }

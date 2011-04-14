@@ -14,7 +14,7 @@
 // Returns a value mu, which is the number of iterations needed to escape the e
 // (or 0 if the formula never escaped), plus some extra fractional value to all
 // smooth coloring.
-function iterate(cr, ci) {
+function iterate(cr, ci, max) {
   var zr = 0;
   var zi = 0;
   var t  = 0; // A temporary store.
@@ -22,7 +22,7 @@ function iterate(cr, ci) {
   var zr2 = 0; // Real part of z, squared. Will be reused in this variable late
   var zi2 = 0; // Imaginary part of z, squared.
 
-  for (var i = 0; i < MAX_ITER; i++) {
+  for (var i = 0; i < max; i++) {
     // z = z^2 ...
     t = zr2  - zi2;
     zi = 2 * zr * zi;
@@ -89,7 +89,7 @@ exports.render = function (xsize, ysize, re, im, ppu, max) {
         result[pos++] = 0;
       } else 
       // OK we have to go through the full calculation.
-      result[pos++] = iterate(zre, zim) / max; // Normalized result in [0..1)
+      result[pos++] = iterate(zre, zim, max) / max; // Normalized result in [0..1)
     }
   }
 

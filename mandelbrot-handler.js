@@ -42,7 +42,7 @@ function show_image(req, res) {
   var pos = 0;
   var color = [];
   for (i = 0; i < X_SIZE * Y_SIZE; i++) {
-    color = map[Math.floor(result[i]*100)];
+    color = map[Math.floor(result[i]*COLORS)];
     image[pos++] = color[0];
     image[pos++] = color[1];
     image[pos++] = color[2];

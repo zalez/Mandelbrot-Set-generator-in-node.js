@@ -7,6 +7,45 @@
  *
  */
 
+// Find out whether this complex number is in the mandelbrot set or not.
+// cr: Real part of complex number c to iterate with.
+// ci: Imaginary part of complex number c to iterate with.
+//
+// Returns a value mu, which is the number of iterations needed to escape the e
+// (or 0 if the formula never escaped), plus some extra fractional value to all
+// smooth coloring.
+function iterate(cr, ci) {
+  var zr = 0;
+  var zi = 0;
+  var t  = 0; // A temporary store.
+  var m2 = 0; // The modulo of the complex number z, squared.
+  var zr2 = 0; // Real part of z, squared. Will be reused in this variable late
+  var zi2 = 0; // Imaginary part of z, squared.
+
+  for (var i = 0; i < MAX_ITER; i++) {
+    // z = z^2 ...
+    t = zr2  - zi2;
+    zi = 2 * zr * zi;
+    zr = t;
+
+    // ... + c    
+    zr += cr;
+    zi += ci;
+
+    // To be reused in the test and the next iteration.
+    zr2 = zr * zr;
+    zi2 = zi * zi;
+
+    // Test if we escaped the equation
+    m2 = zr2 + zi2
+    if (m2 > 4) { // Mandelbrot escape radius is 2, hence 4 since we compare to
+      return i + 1.0 - Math.log(Math.log(Math.sqrt(m2))) / Math.LN2;
+    }
+  }
+
+  return 0;
+}
+
 /*
  * Our main function that does the work.
  * Arguments:

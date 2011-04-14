@@ -43,9 +43,12 @@ function show_image(req, res) {
   var color = []
   for (i = 0; i < X_SIZE * Y_SIZE; i++) {
     color = map[Math.floor(result[i]*COLORS)];
-    image[pos++] = color[0];
-    image[pos++] = color[1];
-    image[pos++] = color[2];
+    // image[pos++] = color[0];
+    // image[pos++] = color[1];
+    // image[pos++] = color[2];
+    image[pos++] = Math.floor(result[i] * 255);
+    image[pos++] = Math.floor(result[i] * 255);
+    image[pos++] = Math.floor(result[i] * 255);
   }
 
   // Convert the image into PNG format.

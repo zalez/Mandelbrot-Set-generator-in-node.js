@@ -36,7 +36,7 @@ function show_image(req, res) {
   var params = url.parse(req.url, true);
 
   // Check parameters and determine final values
-  var xsize = Number(params.query.xsize);
+  var xsize = Number(params.query.xsize) || X_SIZE;
   if (xsize == Number.NaN) {xsize = X_SIZE;}
   if (xsize > MAX_X_SIZE) { xsize = MAX_X_SIZE;}
   if (xsize < 0) {xsize = X_SIZE;}

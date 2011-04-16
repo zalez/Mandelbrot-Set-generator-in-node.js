@@ -9,8 +9,8 @@
 // Constants.
 
 // Image constants.
-const X_SIZE = 800.0; // Default value
-const Y_SIZE = 600.0; // Default value
+const X_SIZE = 512; // Default value
+const Y_SIZE = 512; // Default value
 const MAX_X_SIZE = 10000;
 const MAX_Y_SIZE = 10000;
 

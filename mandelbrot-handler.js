@@ -45,9 +45,13 @@ function show_image(req, res) {
   if (ysize == Number.NaN) {ysize = X_SIZE;}
   if (ysize > MAX_Y_SIZE) {ysize = MAX_Y_SIZE;}
   if (ysize < 0) {ysize = Y_SIZE;}
+  
+  var ppu = Number(params.query.ppu);
+  if (ppu == Number.NaN) {ppu = PXPERUNIT;}
+  if (ppu < 0) {ppu = PXPERUNIT;}
 
   // Render a Mandelbrot set into a result array
-  var result = mandelbrot.render(xsize, ysize, RE_CENTER, IM_CENTER, PXPERUNIT, MAX_ITER);
+  var result = mandelbrot.render(xsize, ysize, RE_CENTER, IM_CENTER, ppu, MAX_ITER);
 
   // Create a colormap.
   var map = colormap.colormap(COLORS);

@@ -79,6 +79,7 @@ exports.render = function (xsize, ysize, re, im, ppu, max) {
  * re, im: Real and imaginary part of the center of the image.
  * ppu: Number of pixels in the image per unit in the complex plane (zoom factor).
  * max: Maximum value to iterate to.
+ *
  * Returns: An xsize * ysize array with iteration results.
  */
 function render_norm(re, im, ppu, max, xsize, 0, 0, 9, result) {

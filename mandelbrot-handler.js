@@ -37,12 +37,12 @@ function show_image(req, res) {
 
   // Check parameters and determine final values
   var xsize = params.query.xsize;
-  if (xsize <= MAX_X_SIZE) { xsize = MAX_X_SIZE;}
-  if (xsize >0) {xsize = X_SIZE;}
+  if (xsize > MAX_X_SIZE) { xsize = MAX_X_SIZE;}
+  if (xsize < 0) {xsize = X_SIZE;}
   
   var ysize = params.query.ysize;
-  if (ysize <= MAX_Y_SIZE) {ysize = MAX_Y_SIZE;}
-  if (ysize >0) {ysize = Y_SIZE;}
+  if (ysize > MAX_Y_SIZE) {ysize = MAX_Y_SIZE;}
+  if (ysize < 0) {ysize = Y_SIZE;}
 
   // Render a Mandelbrot set into a result array
   var result = mandelbrot.render(xsize, ysize, RE_CENTER, IM_CENTER, PXPERUNIT, MAX_ITER);

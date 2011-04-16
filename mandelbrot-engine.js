@@ -69,7 +69,7 @@ exports.render = function (xsize, ysize, re, im, ppu, max) {
   // Create the result array and fill it with zeroes.
   var result = new Array(xsize * ysize);
   for (var i = 0; i < xsize * ysize; i++) {
-    result[i] = 0;
+    result[i] = 0.0;
   }
   // render_norm(xsize, ysize, re, im, ppu, max, result);
   render_opt(re, im, ppu, max, xsize, 0, 0, 9, result);

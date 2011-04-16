@@ -25,12 +25,18 @@ const COLORS = MAX_ITER * 10;
 var connect = require('connect');
 var mandelbrot = require('mandelbrot-engine.js');
 var colormap = require('colormap.js');
-var Png = require ('png').Png;
+var png = require ('png').Png;
+var url = require ('url')
 
 // Show a Mandelbrot set image.
 function show_image(req, res) {
+  // Extract parameters from the request
+  var params = url.parse(req.url, true);
+  var xsize = params.query.xsize || X_SIZE;
+  var ysize = params.query.ysize || X_SIZE;
+
   // Render a Mandelbrot set into a result array
-  var result = mandelbrot.render(X_SIZE, Y_SIZE, RE_CENTER, IM_CENTER, PXPERUNIT, MAX_ITER);
+  var result = mandelbrot.render(xsize, ysize, RE_CENTER, IM_CENTER, PXPERUNIT, MAX_ITER);
 
   // Create a colormap.
   var map = colormap.colormap(COLORS);
@@ -50,12 +56,12 @@ function show_image(req, res) {
   }
 
   // Convert the image into PNG format.
-  var png = new Png(image, X_SIZE, Y_SIZE, 'rgb');
-  var png_image = png.encodeSync();
+  var png_image = new png(image, X_SIZE, Y_SIZE, 'rgb');
+  var png_file = png_image.encodeSync();
 
   // Return the image to the browser.
   res.writeHead(200, { "Content-Type": "image/png" });
-  res.end(png_image.toString('binary'), 'binary');
+  res.end(png_file.toString('binary'), 'binary');
 }
 
 exports.handler = connect.router(function(app) {

@@ -41,16 +41,16 @@ function show_image(req, res) {
   if (xsize > MAX_X_SIZE) { xsize = MAX_X_SIZE;}
   if (xsize < 0) {xsize = X_SIZE;}
   
-  var ysize = Number(params.query.ysize);
+  var ysize = Number(params.query.ysize) || Y_SIZE;
   if (ysize == Number.NaN) {ysize = X_SIZE;}
   if (ysize > MAX_Y_SIZE) {ysize = MAX_Y_SIZE;}
   if (ysize < 0) {ysize = Y_SIZE;}
   
-  var ppu = Number(params.query.ppu);
+  var ppu = Number(params.query.ppu) || PXPERUNIT;
   if (ppu == Number.NaN) {ppu = PXPERUNIT;}
   if (ppu < 0) {ppu = PXPERUNIT;}
   
-  var max = Number(params.query.max);
+  var max = Number(params.query.max) || MAX_ITER;
   if (max == Number.NaN) {max = MAX_ITER;}
   if (max < 0) {max = MAX_ITER;}
 

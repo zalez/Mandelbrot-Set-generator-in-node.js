@@ -56,7 +56,7 @@ function show_image(req, res) {
 
   // Render a Mandelbrot set into a result array
   if (max) {
-    var result = mandelbrot.render(xsize, ysize, RE_CENTER, IM_CENTER, ppu, MAX_ITER);
+    var result = mandelbrot.render(xsize, ysize, RE_CENTER, IM_CENTER, ppu, max);
   } else {
     var result = mandelbrot.render_deep(xsize, ysize, RE_CENTER, IM_CENTER, ppu);
   }

@@ -67,7 +67,8 @@ function iterate(cr, ci, max) {
  */
 exports.render = function (xsize, ysize, re, im, ppu, max) {
   var result = new Array(xsize * ysize);
-  render_norm(xsize, ysize, re, im, ppu, max, result);
+  // render_norm(xsize, ysize, re, im, ppu, max, result);
+  render_opt(xsize, ysize, re, im, ppu, max, result);
   return result;
 }
 
@@ -80,7 +81,7 @@ exports.render = function (xsize, ysize, re, im, ppu, max) {
  * max: Maximum value to iterate to.
  * Returns: An xsize * ysize array with iteration results.
  */
-function render_norm(xsize, ysize, re, im, ppu, max, result) {
+function render_norm(re, im, ppu, max, xsize, 0, 0, 9, result) {
   var minre = re - xsize / ppu / 2;
   var minim = im - ysize / ppu / 2;
   var inc = 1 / ppu;

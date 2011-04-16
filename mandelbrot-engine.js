@@ -22,6 +22,22 @@ function iterate(cr, ci, max) {
   var zr2 = 0; // Real part of z, squared. Will be reused in this variable late
   var zi2 = 0; // Imaginary part of z, squared.
 
+  // Before we iterate, we'll perform some tests for optimization purposes.
+
+  // Test if the point is within the cardioid bulb to avoid calculation...
+  x4 = cr - 0.25;
+  y2 = ci * ci;
+  q = x4 * x4 + y2;
+  t = q * (q + x4);
+  if (t < y2 * 0.25) {
+    return 0;
+  }
+  // ...Maybe it's within the period-2-bulb...
+  if (((cr + 1) * (cr + 1) + y2) < (1 / 16)) {
+    return 0;
+  }
+
+  // Ok, we'll have to go through the whole iteration thing.
   for (var i = 0; i < max; i++) {
     // z = z^2 ...
     t = zr2  - zi2;
@@ -74,23 +90,20 @@ exports.render = function (xsize, ysize, re, im, ppu, max) {
     zim = minim + y * inc;
     for (x = 0; x < xsize; x++) {
       zre = minre + x * inc;
-
-      // Test if the point is within the cardioid bulb to avoid calculation...
-      x4 = zre - 0.25;
-      y2 = zim * zim;
-      q = x4 * x4 + y2;
-      t = q * (q + x4);
-      if (t < y2 * 0.25) {
-        result[pos++] = 0;
-      } else
-      // ...Maybe it's within the period-2-bulb...
-      if (((re + 1) * (re + 1) + y2) < (1 / 16)) {
-        result[pos++] = 0;
-      } else 
-      // OK we have to go through the full calculation.
       result[pos++] = iterate(zre, zim, max) / (max + 1); // Normalized result in [0..1)
     }
   }
 
   return result;
+}
+
+/*
+ * Here's a different approach: Segment the picture into quadrants, then apply some
+ * Optimization by figuring out if the circumference of quadrants is equal. Since the
+ * Mandelbrot set is interconnected, there can't be any holes or islands, so if the
+ * whole circumference of a quadrant is of equal value, the whole quadrant must be.
+ *
+ * Fixed to a 256*256 picture size for now.
+ */
+exports.render_opt = function (re, im, ppu, max) {
 }

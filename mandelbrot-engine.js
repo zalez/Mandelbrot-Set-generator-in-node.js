@@ -136,7 +136,7 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result) {
   var zim = 0;
 
   // Special case: If we're just a 2x2 subtile, just render.
-  if (order = 1) {
+  if (order == 1) {
     var pos = starty * size + startx;
     result[pos++] = iterate(minre, tim, max) / (max + 1); // Top left pixel.
     result[pos+=size] = iterate(minre + inc, tim, max) / (max + 1); // Top right pixel.
@@ -152,37 +152,31 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result) {
     var tim = minim + y * inc;           // Top imaginary.
     var bim = tim + (subsize - 1) * inc; // Bottom imaginary.
 
-    var touche = 0;
-
     // Test all four edges simultaneously.
     for (var i = 0; i < subsize - 1; i++) { // No need to go all the way, as the corner's already covered elsewhere.
       // Upper edge
       if (iterate(lre + i * inc, tim, max)) {
-        touche = 1;
         break;
       }
 
       // Right edge
       if (iterate(rre, tim + i * inc, max)) {
-        touche = 1;
         break;
       }
 
       // Bottom edge
       if (iterate(rre - i * inc, bim, max)) {
-        touche = 1;
         break;
       }
 
       // Left edge
       if (iterate(lre, bim - i * inc, max)) {
-        touche = 1;
         break;
       }
     }
 
     // If there was any iteration different from 0, we have work to do.
-    if (touche) {
+    if (i < subsize) {
       // Split up the subtile into 4 quadrants and recurse.
       render_opt(re, im, ppu, max, size, startx, starty, order - 1, result);
       render_opt(re, im, ppu, max, size, startx + subsize / 2, starty, order - 1, result);

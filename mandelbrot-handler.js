@@ -9,8 +9,10 @@
 // Constants.
 
 // Image constants.
-const X_SIZE = 800.0;
-const Y_SIZE = 600.0;
+const X_SIZE = 800.0; // Default value
+const Y_SIZE = 600.0; // Default value
+const MAX_X_SIZE = 10000;
+const MAX_Y_SIZE = 10000;
 
 // Which subset to render?
 const RE_CENTER = -0.75; // X-Center of the picture will represent this value on the real axis.
@@ -32,8 +34,15 @@ var url = require ('url')
 function show_image(req, res) {
   // Extract parameters from the request
   var params = url.parse(req.url, true);
-  var xsize = params.query.xsize || X_SIZE;
-  var ysize = params.query.ysize || X_SIZE;
+
+  // Check parameters and determine final values
+  var xsize = params.query.xsize;
+  xsize <= MAX_X_SIZE || xsize = MAX_X_SIZE;
+  xsize >0 || xsize = X_SIZE;
+  
+  var ysize = params.query.ysize;
+  ysize <= MAX_Y_SIZE || ysize = MAX_Y_SIZE;
+  ysize >0 || ysize = Y_SIZE;
 
   // Render a Mandelbrot set into a result array
   var result = mandelbrot.render(xsize, ysize, RE_CENTER, IM_CENTER, PXPERUNIT, MAX_ITER);
@@ -42,12 +51,12 @@ function show_image(req, res) {
   var map = colormap.colormap(COLORS);
 
   // Create an image buffer.
-  var image = new Buffer(X_SIZE * Y_SIZE * 3);
+  var image = new Buffer(xsize * ysize * 3);
 
   // Fill the image buffer with the result from the Mandelbrot set, mapped to the colormap.
   var pos = 0;
   var color = [];
-  for (i = 0; i < X_SIZE * Y_SIZE; i++) {
+  for (i = 0; i < xsize * ysize; i++) {
     index=Math.floor(result[i]*COLORS);
     color = map[index];
     image[pos++] = color[0];
@@ -56,7 +65,7 @@ function show_image(req, res) {
   }
 
   // Convert the image into PNG format.
-  var png_image = new png(image, X_SIZE, Y_SIZE, 'rgb');
+  var png_image = new png(image, xsize, ysize, 'rgb');
   var png_file = png_image.encodeSync();
 
   // Return the image to the browser.

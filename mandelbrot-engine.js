@@ -94,3 +94,19 @@ exports.render = function (xsize, ysize, re, im, ppu, max) {
 
   return result;
 }
+/*
+ * Figure out the right maximum iteration level by progessively increasing it, until
+ * No more detail is obtained.
+ */
+exports.render_deep = function (xsize, ysize, re, im, ppu) {
+  var max = 1;
+
+  var last = exports.render(xsize, ysize, re, im, ppu, max);
+  max = max * 2;
+  var current = exports.render(xsize, ysize, re, im, ppu, max);
+  while (current.toString('binary') != last.toString('binary')) {
+    last = current;
+    current = exports.render(xsize, ysize, re, im, ppu, max);
+  }
+  return last;     
+}

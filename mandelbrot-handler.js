@@ -49,9 +49,17 @@ function show_image(req, res) {
   var ppu = Number(params.query.ppu);
   if (ppu == Number.NaN) {ppu = PXPERUNIT;}
   if (ppu < 0) {ppu = PXPERUNIT;}
+  
+  var max = Number(params.query.max);
+  if (max == Number.NaN) {max = MAX_ITER;}
+  if (max < 0) {max = MAX_ITER;}
 
   // Render a Mandelbrot set into a result array
-  var result = mandelbrot.render(xsize, ysize, RE_CENTER, IM_CENTER, ppu, MAX_ITER);
+  if (max) {
+    var result = mandelbrot.render(xsize, ysize, RE_CENTER, IM_CENTER, ppu, MAX_ITER);
+  } else {
+    var result = mandelbrot.render_deep(xsize, ysize, RE_CENTER, IM_CENTER, ppu);
+  }
 
   // Create a colormap.
   var map = colormap.colormap(COLORS);

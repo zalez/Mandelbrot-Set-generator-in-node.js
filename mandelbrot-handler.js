@@ -55,11 +55,7 @@ function show_image(req, res) {
   if (max < 0) {max = MAX_ITER;}
 
   // Render a Mandelbrot set into a result array
-  if (max) {
-    var result = mandelbrot.render(xsize, ysize, RE_CENTER, IM_CENTER, ppu, max);
-  } else {
-    var result = mandelbrot.render_deep(xsize, ysize, RE_CENTER, IM_CENTER, ppu);
-  }
+  var result = mandelbrot.render(xsize, ysize, RE_CENTER, IM_CENTER, ppu, max);
 
   // Create a colormap.
   var map = colormap.colormap(COLORS);

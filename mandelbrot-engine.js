@@ -25,9 +25,9 @@ function iterate(cr, ci, max) {
   // Before we iterate, we'll perform some tests for optimization purposes.
 
   // Test if the point is within the cardioid bulb to avoid calculation...
-  x4 = cr - 0.25;
-  y2 = ci * ci;
-  q = x4 * x4 + y2;
+  var x4 = cr - 0.25;
+  var y2 = ci * ci;
+  var q = x4 * x4 + y2;
   t = q * (q + x4);
   if (t < y2 * 0.25) {
     return 0;
@@ -63,6 +63,15 @@ function iterate(cr, ci, max) {
 }
 
 /*
+ * Set up a buffer, then render the Mandelbrot set into it.
+ */
+exports.render = function (xsize, ysize, re, im, ppu, max) {
+  var result = new Array(xsize * ysize);
+  render_norm(xsize, ysize, re, im, ppu, max, result);
+  return result;
+}
+
+/*
  * Our main function that does the work.
  * Arguments:
  * xsize, ysize: Image size.
@@ -71,19 +80,14 @@ function iterate(cr, ci, max) {
  * max: Maximum value to iterate to.
  * Returns: An xsize * ysize array with iteration results.
  */
-exports.render = function (xsize, ysize, re, im, ppu, max) {
+function render_norm(xsize, ysize, re, im, ppu, max, result) {
   var minre = re - xsize / ppu / 2;
   var minim = im - ysize / ppu / 2;
   var inc = 1 / ppu;
 
   var zre = 0;
   var zim = 0;
-  var x4 = 0;
-  var y2 = 0;
-  var q = 0;
-  var t = 0;
 
-  var result = new Array(xsize * ysize);
   var pos = 0;
 
   for (y = 0; y < ysize; y++) {
@@ -94,16 +98,92 @@ exports.render = function (xsize, ysize, re, im, ppu, max) {
     }
   }
 
-  return result;
+  return;
 }
 
 /*
  * Here's a different approach: Segment the picture into quadrants, then apply some
- * Optimization by figuring out if the circumference of quadrants is equal. Since the
- * Mandelbrot set is interconnected, there can't be any holes or islands, so if the
- * whole circumference of a quadrant is of equal value, the whole quadrant must be.
+ * Optimization by figuring out if the circumference of quadrants is inside the mandelbrot
+ * Set. Since the Mandelbrot set is interconnected, there can't be any holes or islands, so if the
+ * whole circumference of a quadrant is 0, the whole quadrant must be.
  *
- * Fixed to a 256*256 picture size for now.
+ * We will call this function recursively to look at sub-tiles.
+ *
+ * Inputs:
+ * re, im, ppu, max as usual.
+ * size is the size of the whole tile.
+ * startx, starty are the top left coordinates of the subtile to look at.
+ * order is the order of the subtile. It's the exponent of 2 that yields the size of the
+ * subtile: 2 is a 2x2 tile, 3 is 8x8 and so on.
+ * buffer is a pre-allocated buffer for the whole tile. We assume that the buffer has been
+ * zeroed from the beginning.
  */
-exports.render_opt = function (re, im, ppu, max) {
+function render_opt(re, im, ppu, max, size, startx, starty, order, result) {
+  var inc = 1 / ppu; // increment per pixel.
+  var subsize = 1 << order;
+
+  // Minimum real and imaginary values for the whole master tile.
+  var minre = re - size / ppu / 2;
+  var minim = im - size / ppu / 2;
+
+  var zre = 0;
+  var zim = 0;
+
+  // Special case: If we're just a 2x2 subtile, just render.
+  if (order = 1) {
+    var pos = starty * size + startx;
+    result[pos++] = iterate(minre, tim, max) / (max + 1); // Top left pixel.
+    result[pos+=size] = iterate(minre + inc, tim, max) / (max + 1); // Top right pixel.
+    result[pos-- ] = iterate(minre + inc, tim + inc, max) / (max + 1); // Top left pixel.
+    result[pos] = iterate(minre, tim + inc, max) / (max + 1); // Top left pixel.
+    return;
+  } else {
+    // Walk the circumference of the buffer, then figure out if all values were equal.
+
+    // Figure out the real and imaginary values for the 4 corners of our subtile.
+    var lre = minre + x * inc;           // Left real.
+    var rre = lre + (subsize - 1) * inc; // Right real.
+    var tim = minim + y * inc;           // Top imaginary.
+    var bim = tim + (subsize - 1) * inc; // Bottom imaginary.
+
+    var touche = 0;
+
+    // Test all four edges simultaneously.
+    for (var i = 0; i < subsize - 1; i++) { // No need to go all the way, as the corner's already covered elsewhere.
+      // Upper edge
+      if (iterate(lre + i * inc, tim, max)) {
+        touche = 1;
+        break;
+      }
+
+      // Right edge
+      if (iterate(rre, tim + i * inc, max)) {
+        touche = 1;
+        break;
+      }
+
+      // Bottom edge
+      if (iterate(rre - i * inc, bim, max)) {
+        touche = 1;
+        break;
+      }
+
+      // Left edge
+      if (iterate(lre, bim - i * inc, max)) {
+        touche = 1;
+        break;
+      }
+    }
+
+    // If there was any iteration different from 0, we have work to do.
+    if (touche) {
+      // Split up the subtile into 4 quadrants and recurse.
+      render_opt(re, im, ppu, max, size, startx, starty, order - 1, result);
+      render_opt(re, im, ppu, max, size, startx + subsize / 2, starty, order - 1, result);
+      render_opt(re, im, ppu, max, size, startx, starty + subsize / 2, order - 1, result);
+      render_opt(re, im, ppu, max, size, startx + subsize / 2, starty + subsize / 2, order - 1, result);
+    }
+
+    return;
+  }
 }

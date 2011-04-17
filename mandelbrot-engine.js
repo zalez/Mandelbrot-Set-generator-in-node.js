@@ -120,6 +120,8 @@ exports.render = function (size, re, im, ppu, max, opt) {
    * 2: Subdivide areas, then check if the circumference is in the set.
    * 3: Both subdivision and known bulb check.
    */
+  process.stdout.write("Rendering Mandelbrot Set at " + re + " + " + im " * i with " + ppu " pixels per unit.\n");
+  process.stdout.write("  Image size: " + size + ", optimization level: " + opt + "\n");
 
   switch (opt) {
     case 0:

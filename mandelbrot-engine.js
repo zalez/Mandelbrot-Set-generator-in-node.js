@@ -208,7 +208,7 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
   var tim = minim + starty * inc;      // Top imaginary.
   var bim = tim + (subsize - 1) * inc; // Bottom imaginary.
 
-  // Treat the lower order levels as special cases to save on overhead.
+  // Treat the lower subsizes as special cases to save on overhead.
   switch (subsize) {
 
     // Special case: If we're just a 2x2 subtile, just render.
@@ -314,15 +314,15 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
       // If we need to fill out the inner part, subdivide into squares of size 4 and 2.
       if (touche) {
         // Big 4x4 box on the top left of the inner rectangle.
-        render_opt(re, im, ppu, max, size, startx + 1, starty + 1, 2, result, iterator);
+        render_opt(re, im, ppu, max, size, startx + 1, starty + 1, 4, result, iterator);
         // Two 2x2 boxes to the top and middle right of the 4x4 box.
-        render_opt(re, im, ppu, max, size, startx + 5, starty + 1, 1, result, iterator);
-        render_opt(re, im, ppu, max, size, startx + 5, starty + 3, 1, result, iterator);
+        render_opt(re, im, ppu, max, size, startx + 5, starty + 1, 2, result, iterator);
+        render_opt(re, im, ppu, max, size, startx + 5, starty + 3, 2, result, iterator);
         // One 2x2 box at the bottom right corner
-        render_opt(re, im, ppu, max, size, startx + 5, starty + 5, 1, result, iterator);
+        render_opt(re, im, ppu, max, size, startx + 5, starty + 5, 2, result, iterator);
         // Two 2x2 boxes at the bottom middle and left.
-        render_opt(re, im, ppu, max, size, startx + 3, starty + 5, 1, result, iterator);
-        render_opt(re, im, ppu, max, size, startx + 1, starty + 5, 1, result, iterator);
+        render_opt(re, im, ppu, max, size, startx + 3, starty + 5, 2, result, iterator);
+        render_opt(re, im, ppu, max, size, startx + 1, starty + 5, 2, result, iterator);
       }
 
       return; 

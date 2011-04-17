@@ -210,8 +210,12 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
 
   // Treat the lower subsizes as special cases to save on overhead.
   switch (subsize) {
+    // Subsize 1: Render a single pixel.
+    case 1:
+      result[starty * size + startx] = iterator(lre, tim, max) / (max + 1);
+      return;
 
-    // Special case: If we're just a 2x2 subtile, just render.
+    // Special case: If we're just a 2x2 subtile, render all.
     case 2:
       var pos = starty * size + startx;
       result[pos++] = iterator(lre, tim, max) / (max + 1); // Top left pixel.
@@ -348,10 +352,10 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
       // If there was any iteration different from 0, we have work to do.
       if (i < subsize - 1) {
         // Split up the subtile into 4 quadrants and recurse.
-        render_opt(re, im, ppu, max, size, startx, starty, subsize / 2, result, iterator);
-        render_opt(re, im, ppu, max, size, startx + (subsize >> 1), starty, subsize / 2, result, iterator);
-        render_opt(re, im, ppu, max, size, startx, starty + (subsize >> 1), subsize / 2, result, iterator);
-        render_opt(re, im, ppu, max, size, startx + (subsize >> 1), starty + (subsize >> 1), subsize / 2, result, iterator);
+        render_opt(re, im, ppu, max, size, startx, starty, subsize >> 1, result, iterator);
+        render_opt(re, im, ppu, max, size, startx + (subsize >> 1), starty, subsize >> 1, result, iterator);
+        render_opt(re, im, ppu, max, size, startx, starty + (subsize >> 1), subsize >> 1, result, iterator);
+        render_opt(re, im, ppu, max, size, startx + (subsize >> 1), starty + (subsize >> 1), subsize >> 1, result, iterator);
       }
 
       return;

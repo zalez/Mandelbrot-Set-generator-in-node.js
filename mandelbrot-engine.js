@@ -190,15 +190,15 @@ function walk_around(minre, minim, inc, max, size, startx, starty, subsize, resu
   // We draw 4 lines simultaneously to minimize loop overhead.
   var pos1 = starty * size + startx;
   var pos2 = pos1 + subsize - 1;
-  var pos3 = pos2 + size * (subsize -1);
+  var pos3 = pos2 + size * (subsize - 1);
   var pos4 = pos3 - subsize + 1;
   var zre1 = minre;
-  var zre2 = minre + subsize * inc;
+  var zre2 = minre + (subsize - 1) * inc;
   var zre3 = zre2;
   var zre4 = minre;
   var zim1 = minim;
   var zim2 = minim;
-  var zim3 = minim + subsize * inc;
+  var zim3 = minim + (subsize - 1) * inc;
   var zim4 = zim3;
   var touche = 0;
 

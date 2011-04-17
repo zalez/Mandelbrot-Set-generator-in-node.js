@@ -138,50 +138,46 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result) {
   var tim = minim + starty * inc;      // Top imaginary.
   var bim = tim + (subsize - 1) * inc; // Bottom imaginary.
 
+  // Treat the lower order levels as special cases to save on overhead.
+  switch (order) {
+
   // Special case: If we're just a 2x2 subtile, just render.
-  if (order == 1) {
-    var pos = starty * size + startx;
-    result[pos++] = iterate(lre, tim, max) / (max + 1); // Top left pixel.
-    result[pos] = iterate(rre, tim, max) / (max + 1); // Top right pixel.
-    pos += size;
-    result[pos-- ] = iterate(rre, bim, max) / (max + 1); // Bottom right pixel.
-    result[pos] = iterate(lre, bim, max) / (max + 1); // Bottom left pixel.
-    return;
-  } else {
-    // Walk the circumference of the buffer, then figure out if all values were equal.
+    case 1:
+      var pos = starty * size + startx;
+      result[pos++] = iterate(lre, tim, max) / (max + 1); // Top left pixel.
+      result[pos] = iterate(rre, tim, max) / (max + 1); // Top right pixel.
+      pos += size;
+      result[pos-- ] = iterate(rre, bim, max) / (max + 1); // Bottom right pixel.
+      result[pos] = iterate(lre, bim, max) / (max + 1); // Bottom left pixel.
+      return;
+    default:
+      // Walk the circumference of the buffer, then figure out if all values were equal.
 
-    // Test all four edges simultaneously.
-    for (var i = 0; i < subsize - 1; i++) { // No need to go all the way, as the corner's already covered elsewhere.
-      // Upper edge
-      if (iterate(lre + i * inc, tim, max)) {
-        break;
+      // Test all four edges simultaneously.
+      for (var i = 0; i < subsize - 1; i++) { // No need to go all the way, as the corner's already covered elsewhere.
+        // Upper edge
+        if (iterate(lre + i * inc, tim, max)) { break; }
+
+        // Right edge
+        if (iterate(rre, tim + i * inc, max)) { break; }
+
+        // Bottom edge
+        if (iterate(rre - i * inc, bim, max)) { break; }
+
+        // Left edge
+        if (iterate(lre, bim - i * inc, max)) { break; }
       }
 
-      // Right edge
-      if (iterate(rre, tim + i * inc, max)) {
-        break;
+      // If there was any iteration different from 0, we have work to do.
+      if (i < subsize - 1) {
+        // Split up the subtile into 4 quadrants and recurse.
+        render_opt(re, im, ppu, max, size, startx, starty, order - 1, result);
+        render_opt(re, im, ppu, max, size, startx + (subsize >> 1), starty, order - 1, result);
+        render_opt(re, im, ppu, max, size, startx, starty + (subsize >> 1), order - 1, result);
+        render_opt(re, im, ppu, max, size, startx + (subsize >> 1), starty + (subsize >> 1), order - 1, result);
       }
 
-      // Bottom edge
-      if (iterate(rre - i * inc, bim, max)) {
-        break;
-      }
-
-      // Left edge
-      if (iterate(lre, bim - i * inc, max)) {
-        break;
-      }
+      return;
     }
-
-    // If there was any iteration different from 0, we have work to do.
-    if (i < subsize - 1) {
-      // Split up the subtile into 4 quadrants and recurse.
-      render_opt(re, im, ppu, max, size, startx, starty, order - 1, result);
-      render_opt(re, im, ppu, max, size, startx + (subsize >> 1), starty, order - 1, result);
-      render_opt(re, im, ppu, max, size, startx, starty + (subsize >> 1), order - 1, result);
-      render_opt(re, im, ppu, max, size, startx + (subsize >> 1), starty + (subsize >> 1), order - 1, result);
-    }
-
-    return;
   }
 }

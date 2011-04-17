@@ -121,7 +121,7 @@ exports.render = function (size, re, im, ppu, max, opt) {
    * 3: Both subdivision and known bulb check.
    */
   process.stdout.write("Rendering Mandelbrot Set at " + re + " + " + im + " * i with " + ppu + " pixels per unit.\n");
-  process.stdout.write("Image size: " + size + ", maximum iteration level: " + max + " optimization level: " + opt + "\n");
+  process.stdout.write("Image size: " + size + ", maximum iteration level: " + max + ", optimization level: " + opt + "\n");
 
   switch (opt) {
     case 0:
@@ -326,10 +326,19 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
 
       if (walk_around(lre, tim, inc, max, size, startx, starty, subsize, result, iterator)) {
         var new_subsize = (subsize - 2) >> 1;
-        render_opt(re, im, ppu, max, size, startx + 1, starty + 1, new_subsize, result, iterator);
-        render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1, new_subsize, result, iterator);
-        render_opt(re, im, ppu, max, size, startx + 1, starty + 1 + new_subsize, new_subsize, result, iterator);
-        render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1 + new_subsize, new_subsize, result, iterator);
+        // Need to account for special case of an uneven new subsize.
+        if (new_subsize >> 1 < subsize) {
+          // Render two bigger quadrants and two smaller. The two bigger ones will overlap, but that's life.
+          render_opt(re, im, ppu, max, size, startx + 1, starty + 1, new_subsize + 1, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 2 + new_subsize, starty + 1, new_subsize, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 1, starty + 1 + new_subsize, new_subsize + 1, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 2 + new_subsize, new_subsize, result, iterator);
+        } else {
+          render_opt(re, im, ppu, max, size, startx + 1, starty + 1, new_subsize, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1, new_subsize, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 1, starty + 1 + new_subsize, new_subsize, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1 + new_subsize, new_subsize, result, iterator);
+        }
       }
 
       return;

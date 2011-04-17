@@ -201,7 +201,61 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result) {
       }
 
       return;
-      
+
+    // The 8x8 case is interesting. We draw the circumference, then the remaining inner part
+    // can be subdivided into a 4x4 and 5 2x2 parts, if rendering is necessary.
+    case 3:
+      // Walk the circumference of the buffer, then figure out if we need to draw the inside.
+      // We draw 4 lines simultaneously to minimize loop overhead.
+      var pos1 = starty * size + startx;
+      var pos2 = pos0 + subsize - 1;
+      var pos3 = pos2 + size * (subsize -1);
+      var pos4 = pos3 - subsize + 1;
+      var zre1 = lre;
+      var zre2 = rre;
+      var zre3 = rre;
+      var zre4 = lre;
+      var zim1 = tim;
+      var zim2 = tim;
+      var zim3 = bim;
+      var zim4 = bim;
+      var touche = 0;
+
+      for (var i = 0; i < subsize - 1; i++) { // No need to go all the way, as the corner's already covered elsewhere.
+        // Upper edge
+        if (result(pos1++) = iterate(zre1, zim1, max)) touche = 1;
+        zre1 += inc;
+
+        // Right edge
+        if (result(pos2) = iterate(zre2, zim2, max)) touche = 1;
+        zim += inc;
+        pos2 += size;
+
+        // Bottom edge
+        if (result(pos3--) = iterate(zre3, zim3, max)) touche = 1;
+        zre3 -= inc;
+
+        // Left edge
+        if (result(pos4) = iterate(zre4, zim4, max)) touche = 1;
+        zim -= inc;
+        pos4 -= size;
+      }
+
+      // If we need to fill out the inner part, subdivide into squares of size 4 and 2.
+      if (touche) {
+        // Big 4x4 box on the top left of the inner rectangle.
+        render_opt(re, im, ppu, max, size, startx + 1, starty + 1, 2, result);
+        // Two 2x2 boxes to the top and middle right of the 4x4 box.
+        render_opt(re, im, ppu, max, size, startx + 5, starty + 1, 1, result);
+        render_opt(re, im, ppu, max, size, startx + 5, starty + 3, 1, result);
+        // One 2x2 box at the bottom right corner
+        render_opt(re, im, ppu, max, size, startx + 5, starty + 5, 1, result);
+        // Two 2x2 boxes at the bottom middle and left.
+        render_opt(re, im, ppu, max, size, startx + 3, starty + 5, 1, result);
+        render_opt(re, im, ppu, max, size, startx + 1, starty + 5, 1, result);
+      }
+
+      return; 
 
     default:
       // Walk the circumference of the buffer, then figure out if all values were equal.

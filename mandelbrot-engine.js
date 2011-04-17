@@ -115,24 +115,25 @@ exports.render = function (size, re, im, ppu, max, opt) {
 
   /*
    * Four levels of optimization:
-   * 0: No optimization.
-   * 1: Check for known bulbs.
-   * 2: Subdivide areas, then check if the circumference is in the set.
-   * 3: Both subdivision and known bulb check.
+   * 0: Use default (= 4).
+   * 1: No optimization.
+   * 2: Check for known bulbs.
+   * 3: Subdivide areas, then check if the circumference is in the set.
+   * 4: Both subdivision and known bulb check.
    */
   process.stdout.write("Rendering Mandelbrot Set at " + re + " + " + im + " * i with " + ppu + " pixels per unit.\n");
   process.stdout.write("Image size: " + size + ", maximum iteration level: " + max + ", optimization level: " + opt + "\n");
 
   switch (opt) {
-    case 0:
+    case 1:
       render_basic(re, im, ppu, max, size, result, iterate_basic);
       return result;
 
-    case 1:
+    case 2:
       render_basic(re, im, ppu, max, size, result, iterate_opt);
       return result;
 
-    case 2:
+    case 3:
       // The subdivision algorithm assumes that the buffer has been zeroed.
       for (var i = 0; i < size * size; i++) {
         result[i] = 0.0;
@@ -140,7 +141,7 @@ exports.render = function (size, re, im, ppu, max, opt) {
       render_opt(re, im, ppu, max, size, 0, 0, size, result, iterate_basic);
       return result;
 
-    case 3:
+    default:
       // The subdivision algorithm assumes that the buffer has been zeroed.
       for (var i = 0; i < size * size; i++) {
         result[i] = 0.0;

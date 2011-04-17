@@ -21,7 +21,7 @@ const PXPERUNIT = 150;   // How much units in the complex plane are covered by o
 const MAX_ITER = 300;
 const COLORS = MAX_ITER * 10;
 const OPT = 3; // Whether to use the optimized subseparation algorithm
-const MAX_OPT = 3;
+const MAX_OPT = 4;
 
 // Modules we want to use.
 var connect = require('connect');

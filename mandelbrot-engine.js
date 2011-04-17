@@ -328,7 +328,7 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
       // Walk the circumference of the buffer, then figure out if we need to draw the inside.
 
       // If we need to fill out the inner part, subdivide into squares of size 4 and 2.
-      if (walk_around(minre, minim, inc, max, size, startx, starty, subsize, result, iterator)) {
+      if (walk_around(lre, tim, inc, max, size, startx, starty, subsize, result, iterator)) {
         // Big 4x4 box on the top left of the inner rectangle.
         render_opt(re, im, ppu, max, size, startx + 1, starty + 1, 4, result, iterator);
         // Two 2x2 boxes to the top and middle right of the 4x4 box.
@@ -346,7 +346,7 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
     default:
       // Walk the circumference of the buffer, then figure out if all values were equal.
 
-      if (walk_around(minre, minim, inc, max, size, startx, starty, subsize, result, iterator)) {
+      if (walk_around(lre, tim, inc, max, size, startx, starty, subsize, result, iterator)) {
         // Split up the subtile into 4 quadrants and recurse.
         render_opt(re, im, ppu, max, size, startx, starty, subsize >> 1, result, iterator);
         render_opt(re, im, ppu, max, size, startx + (subsize >> 1), starty, subsize >> 1, result, iterator);

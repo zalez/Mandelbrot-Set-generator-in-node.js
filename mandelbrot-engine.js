@@ -208,7 +208,7 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result) {
       // Walk the circumference of the buffer, then figure out if we need to draw the inside.
       // We draw 4 lines simultaneously to minimize loop overhead.
       var pos1 = starty * size + startx;
-      var pos2 = pos0 + subsize - 1;
+      var pos2 = pos1 + subsize - 1;
       var pos3 = pos2 + size * (subsize -1);
       var pos4 = pos3 - subsize + 1;
       var zre1 = lre;

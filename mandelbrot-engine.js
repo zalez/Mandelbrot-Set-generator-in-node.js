@@ -7,6 +7,50 @@
  *
  */
 
+/*
+ * Find out whether this complex number is in the mandelbrot set or not.
+ * cr: Real part of complex number c to iterate with.
+ * ci: Imaginary part of complex number c to iterate with.
+ *
+ * Returns a value mu, which is the number of iterations needed to escape the e
+ * (or 0 if the formula never escaped), plus some extra fractional value to all
+ * smooth coloring.
+ *
+ * Simple, basic implementation without any optimizations.
+ */
+function iterate_basic(cr, ci, max) {
+  var zr = 0;
+  var zi = 0;
+  var t  = 0; // A temporary store.
+  var m2 = 0; // The modulo of the complex number z, squared.
+  var zr2 = 0; // Real part of z, squared. Will be reused in this variable late
+  var zi2 = 0; // Imaginary part of z, squared.
+
+  // Iterate through all pixels.
+  for (var i = 0; i < max; i++) {
+    // z = z^2 ...
+    t = zr2  - zi2;
+    zi = 2 * zr * zi;
+    zr = t;
+
+    // ... + c    
+    zr += cr;
+    zi += ci;
+
+    // To be reused in the test and the next iteration.
+    zr2 = zr * zr;
+    zi2 = zi * zi;
+
+    // Test if we escaped the equation
+    m2 = zr2 + zi2
+    if (m2 > 4) { // Mandelbrot escape radius is 2, hence 4 since we compare to
+      return i + 1.0 - Math.log(Math.log(Math.sqrt(m2))) / Math.LN2;
+    }
+  }
+
+  return 0;
+}
+
 // Find out whether this complex number is in the mandelbrot set or not.
 // cr: Real part of complex number c to iterate with.
 // ci: Imaginary part of complex number c to iterate with.
@@ -14,7 +58,7 @@
 // Returns a value mu, which is the number of iterations needed to escape the e
 // (or 0 if the formula never escaped), plus some extra fractional value to all
 // smooth coloring.
-function iterate(cr, ci, max) {
+function iterate_opt(cr, ci, max) {
   var zr = 0;
   var zi = 0;
   var t  = 0; // A temporary store.
@@ -69,16 +113,38 @@ exports.render = function (size, re, im, ppu, max, opt) {
   // Create the result array and fill it with zeroes.
   var result = new Array(size * size);
 
-  // Call the normal or the optimized version
-  if (opt) {
-    for (var i = 0; i < size * size; i++) {
-      result[i] = 0.0;
-    }
-    render_opt(re, im, ppu, max, size, 0, 0, 9, result);
-  } else {
-    render_norm(re, im, ppu, max, size, result);
-  }
-  return result;
+  /*
+   * Four levels of optimization:
+   * 0: No optimization.
+   * 1: Check for known bulbs.
+   * 2: Subdivide areas, then check if the circumference is in the set.
+   * 3: Both subdivision and known bulb check.
+   */
+
+  switch (opt)
+    case 0:
+      render_basic(re, im, ppu, max, size, result, iterate_basic);
+      return result;
+
+    case 1:
+      render_basic(re, im, ppu, max, size, result, iterate_opt);
+      return result;
+
+    case 2:
+      // The subdivision algorithm assumes that the buffer has been zeroed.
+      for (var i = 0; i < size * size; i++) {
+        result[i] = 0.0;
+      }
+      render_opt(re, im, ppu, max, size, 0, 0, 9, result, iterate_basic);
+      return result;
+
+    case 3:
+      // The subdivision algorithm assumes that the buffer has been zeroed.
+      for (var i = 0; i < size * size; i++) {
+        result[i] = 0.0;
+      }
+      render_opt(re, im, ppu, max, size, 0, 0, 9, result, iterate_opt);
+      return result;
 }
 
 /*
@@ -91,7 +157,7 @@ exports.render = function (size, re, im, ppu, max, opt) {
  *
  * Returns: An xsize * ysize array with iteration results.
  */
-function render_norm(re, im, ppu, max, size, result) {
+function render_basic(re, im, ppu, max, size, result, iterator) {
   var minre = re - size / ppu / 2;
   var minim = im - size / ppu / 2;
   var inc = 1 / ppu;
@@ -105,7 +171,7 @@ function render_norm(re, im, ppu, max, size, result) {
     zim = minim + y * inc;
     for (x = 0; x < size; x++) {
       zre = minre + x * inc;
-      result[pos++] = iterate(zre, zim, max) / (max + 1); // Normalized result in [0..1)
+      result[pos++] = iterator(zre, zim, max) / (max + 1); // Normalized result in [0..1)
     }
   }
 
@@ -129,7 +195,7 @@ function render_norm(re, im, ppu, max, size, result) {
  * buffer is a pre-allocated buffer for the whole tile. We assume that the buffer has been
  * zeroed from the beginning.
  */
-function render_opt(re, im, ppu, max, size, startx, starty, order, result) {
+function render_opt(re, im, ppu, max, size, startx, starty, order, result, iterator) {
   var inc = 1 / ppu; // increment per pixel.
   var subsize = 1 << order;
 
@@ -149,11 +215,11 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result) {
     // Special case: If we're just a 2x2 subtile, just render.
     case 1:
       var pos = starty * size + startx;
-      result[pos++] = iterate(lre, tim, max) / (max + 1); // Top left pixel.
-      result[pos] = iterate(rre, tim, max) / (max + 1); // Top right pixel.
+      result[pos++] = iterator(lre, tim, max) / (max + 1); // Top left pixel.
+      result[pos] = iterator(rre, tim, max) / (max + 1); // Top right pixel.
       pos += size;
-      result[pos-- ] = iterate(rre, bim, max) / (max + 1); // Bottom right pixel.
-      result[pos] = iterate(lre, bim, max) / (max + 1); // Bottom left pixel.
+      result[pos-- ] = iterator(rre, bim, max) / (max + 1); // Bottom right pixel.
+      result[pos] = iterator(lre, bim, max) / (max + 1); // Bottom left pixel.
       return;
 
     // Special case: 4x4.
@@ -164,45 +230,45 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result) {
       var zim = tim;
 
       // Walk the 4x4 circumference by hand.
-      if (result[pos++] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos++] = iterator(zre, zim, max) / (max + 1)) touche = 1;
       zre += inc;
-      if (result[pos++] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos++] = iterator(zre, zim, max) / (max + 1)) touche = 1;
       zre += inc;
-      if (result[pos++] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos++] = iterator(zre, zim, max) / (max + 1)) touche = 1;
       zre = rre;
-      if (result[pos] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos] = iterator(zre, zim, max) / (max + 1)) touche = 1;
       zim += inc;
       pos += size;
-      if (result[pos] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos] = iterator(zre, zim, max) / (max + 1)) touche = 1;
       zim += inc;
       pos += size;
-      if (result[pos] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos] = iterator(zre, zim, max) / (max + 1)) touche = 1;
       zim = bim;
       pos += size;
-      if (result[pos--] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos--] = iterator(zre, zim, max) / (max + 1)) touche = 1;
       zre -= inc;
-      if (result[pos--] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos--] = iterator(zre, zim, max) / (max + 1)) touche = 1;
       zre -= inc;
-      if (result[pos--] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos--] = iterator(zre, zim, max) / (max + 1)) touche = 1;
       zre == lre;
-      if (result[pos] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos] = iterator(zre, zim, max) / (max + 1)) touche = 1;
       pos -= size;
       zim -= inc;
-      if (result[pos] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos] = iterator(zre, zim, max) / (max + 1)) touche = 1;
       pos -= size;
       zim -= inc;
-      if (result[pos++] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos++] = iterator(zre, zim, max) / (max + 1)) touche = 1;
       // Fill the rectangle only if needed.
       if (touche) {
         zre += inc;
-        result[pos++] = iterate(zre, zim, max) / (max + 1);
+        result[pos++] = iterator(zre, zim, max) / (max + 1);
         zre += inc;
-        result[pos] = iterate(zre, zim, max) / (max + 1);
+        result[pos] = iterator(zre, zim, max) / (max + 1);
         zim += inc;
         pos += size;
-        result[pos--] = iterate(zre, zim, max) / (max + 1);
+        result[pos--] = iterator(zre, zim, max) / (max + 1);
         zre -= inc;
-        result[pos] = iterate(zre, zim, max) / (max + 1);
+        result[pos] = iterator(zre, zim, max) / (max + 1);
       }
 
       return;
@@ -228,20 +294,20 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result) {
 
       for (var i = 0; i < subsize - 1; i++) { // No need to go all the way, as the corner's already covered elsewhere.
         // Upper edge
-        if (result[pos1++] = iterate(zre1, zim1, max) / (max + 1)) touche = 1;
+        if (result[pos1++] = iterator(zre1, zim1, max) / (max + 1)) touche = 1;
         zre1 += inc;
 
         // Right edge
-        if (result[pos2] = iterate(zre2, zim2, max) / (max + 1)) touche = 1;
+        if (result[pos2] = iterator(zre2, zim2, max) / (max + 1)) touche = 1;
         zim2 += inc;
         pos2 += size;
 
         // Bottom edge
-        if (result[pos3--] = iterate(zre3, zim3, max) / (max + 1)) touche = 1;
+        if (result[pos3--] = iterator(zre3, zim3, max) / (max + 1)) touche = 1;
         zre3 -= inc;
 
         // Left edge
-        if (result[pos4] = iterate(zre4, zim4, max) / (max + 1)) touche = 1;
+        if (result[pos4] = iterator(zre4, zim4, max) / (max + 1)) touche = 1;
         zim4 -= inc;
         pos4 -= size;
       }
@@ -268,16 +334,16 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result) {
       // Test all four edges simultaneously.
       for (var i = 0; i < subsize - 1; i++) { // No need to go all the way, as the corner's already covered elsewhere.
         // Upper edge
-        if (iterate(lre + i * inc, tim, max)) break;
+        if (iterator(lre + i * inc, tim, max)) break;
 
         // Right edge
-        if (iterate(rre, tim + i * inc, max)) break;
+        if (iterator(rre, tim + i * inc, max)) break;
 
         // Bottom edge
-        if (iterate(rre - i * inc, bim, max)) break;
+        if (iterator(rre - i * inc, bim, max)) break;
 
         // Left edge
-        if (iterate(lre, bim - i * inc, max)) break;
+        if (iterator(lre, bim - i * inc, max)) break;
       }
 
       // If there was any iteration different from 0, we have work to do.

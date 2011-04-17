@@ -9,10 +9,8 @@
 // Constants.
 
 // Image constants.
-const X_SIZE = 512; // Default value
-const Y_SIZE = 512; // Default value
-const MAX_X_SIZE = 10000;
-const MAX_Y_SIZE = 10000;
+const SIZE = 512; // Default value
+const MAX_SIZE = 10000;
 
 // Which subset to render?
 const RE_CENTER = -0.75; // X-Center of the picture will represent this value on the real axis.
@@ -37,15 +35,10 @@ function show_image(req, res) {
   var params = url.parse(req.url, true);
 
   // Check parameters and determine final values
-  var xsize = Number(params.query.xsize) || X_SIZE;
-  if (xsize == Number.NaN) {xsize = X_SIZE;}
-  if (xsize > MAX_X_SIZE) { xsize = MAX_X_SIZE;}
-  if (xsize < 0) {xsize = X_SIZE;}
-  
-  var ysize = Number(params.query.ysize) || Y_SIZE;
-  if (ysize == Number.NaN) {ysize = X_SIZE;}
-  if (ysize > MAX_Y_SIZE) {ysize = MAX_Y_SIZE;}
-  if (ysize < 0) {ysize = Y_SIZE;}
+  var size = Number(params.query.size) || SIZE;
+  if (size == Number.NaN) {size = SIZE;}
+  if (size > MAX_SIZE) { size = MAX_SIZE;}
+  if (size < 0) {size = SIZE;}
   
   var ppu = Number(params.query.ppu) || PXPERUNIT;
   if (ppu == Number.NaN) {ppu = PXPERUNIT;}
@@ -60,18 +53,18 @@ function show_image(req, res) {
   if (max < 0) {max = OPT;}
 
   // Render a Mandelbrot set into a result array
-  var result = mandelbrot.render(xsize, ysize, RE_CENTER, IM_CENTER, ppu, max, opt);
+  var result = mandelbrot.render(size, RE_CENTER, IM_CENTER, ppu, max, opt);
 
   // Create a colormap.
   var map = colormap.colormap(COLORS);
 
   // Create an image buffer.
-  var image = new Buffer(xsize * ysize * 3);
+  var image = new Buffer(size * size * 3);
 
   // Fill the image buffer with the result from the Mandelbrot set, mapped to the colormap.
   var pos = 0;
   var color = [];
-  for (i = 0; i < xsize * ysize; i++) {
+  for (i = 0; i < size * size; i++) {
     index=Math.floor(result[i]*COLORS);
     color = map[index];
     image[pos++] = color[0];
@@ -80,7 +73,7 @@ function show_image(req, res) {
   }
 
   // Convert the image into PNG format.
-  var png_image = new png(image, xsize, ysize, 'rgb');
+  var png_image = new png(image, size, size, 'rgb');
   var png_file = png_image.encodeSync();
 
   // Return the image to the browser.

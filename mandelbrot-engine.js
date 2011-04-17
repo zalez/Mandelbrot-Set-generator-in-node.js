@@ -65,18 +65,18 @@ function iterate(cr, ci, max) {
 /*
  * Set up a buffer, then render the Mandelbrot set into it.
  */
-exports.render = function (xsize, ysize, re, im, ppu, max, opt) {
+exports.render = function (size, re, im, ppu, max, opt) {
   // Create the result array and fill it with zeroes.
-  var result = new Array(xsize * ysize);
+  var result = new Array(size * size);
 
   // Call the normal or the optimized version
   if (opt) {
-    for (var i = 0; i < xsize * ysize; i++) {
+    for (var i = 0; i < size * size; i++) {
       result[i] = 0.0;
     }
-    render_opt(re, im, ppu, max, xsize, 0, 0, 9, result);
+    render_opt(re, im, ppu, max, size, 0, 0, 9, result);
   } else {
-    render_norm(xsize, ysize, re, im, ppu, max, result);
+    render_norm(re, im, ppu, max, size, result);
   }
   return result;
 }
@@ -91,9 +91,9 @@ exports.render = function (xsize, ysize, re, im, ppu, max, opt) {
  *
  * Returns: An xsize * ysize array with iteration results.
  */
-function render_norm(xsize, ysize, re, im, ppu, max, result) {
-  var minre = re - xsize / ppu / 2;
-  var minim = im - ysize / ppu / 2;
+function render_norm(re, im, ppu, max, size, result) {
+  var minre = re - size / ppu / 2;
+  var minim = im - size / ppu / 2;
   var inc = 1 / ppu;
 
   var zre = 0;
@@ -101,9 +101,9 @@ function render_norm(xsize, ysize, re, im, ppu, max, result) {
 
   var pos = 0;
 
-  for (y = 0; y < ysize; y++) {
+  for (y = 0; y < size; y++) {
     zim = minim + y * inc;
-    for (x = 0; x < xsize; x++) {
+    for (x = 0; x < size; x++) {
       zre = minre + x * inc;
       result[pos++] = iterate(zre, zim, max) / (max + 1); // Normalized result in [0..1)
     }

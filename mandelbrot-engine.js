@@ -150,22 +150,73 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result) {
       result[pos-- ] = iterate(rre, bim, max) / (max + 1); // Bottom right pixel.
       result[pos] = iterate(lre, bim, max) / (max + 1); // Bottom left pixel.
       return;
+
+    // Special case: 4x4.
+    case 2:
+      var pos = starty * size + startx;
+      var touche = 0;
+      var zre = lre;
+      var zim = tim;
+
+      // Walk the 4x4 circumference by hand.
+      if (result[pos++] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      zre += inc;
+      if (result[pos++] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      zre += inc;
+      if (result[pos++] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      zre = rre;
+      if (result[pos] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      zim += inc;
+      pos += size;
+      if (result[pos] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      zim += inc;
+      pos += size;
+      if (result[pos] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      zim = bim;
+      pos += size;
+      if (result[pos--] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      zre -= inc;
+      if (result[pos--] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      zre == lre;
+      if (result[pos] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      pos -= size;
+      zim -= inc;
+      if (result[pos] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      pos -= size;
+      zim -= inc;
+      if (result[pos++] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      // Fill the rectangle only if needed.
+      if (touche) {
+        zre += inc;
+        result[pos++] = iterate(zre, zim, max) / (max + 1);
+        zre += inc;
+        result[pos] = iterate(zre, zim, max) / (max + 1);
+        zim += inc;
+        pos += size;
+        result[pos--] = iterate(zre, zim, max) / (max + 1);
+        zre -= inc;
+        result[pos] = iterate(zre, zim, max) / (max + 1);
+      }
+
+      return;
+      
+
     default:
       // Walk the circumference of the buffer, then figure out if all values were equal.
 
       // Test all four edges simultaneously.
       for (var i = 0; i < subsize - 1; i++) { // No need to go all the way, as the corner's already covered elsewhere.
         // Upper edge
-        if (iterate(lre + i * inc, tim, max)) { break; }
+        if (iterate(lre + i * inc, tim, max)) break;
 
         // Right edge
-        if (iterate(rre, tim + i * inc, max)) { break; }
+        if (iterate(rre, tim + i * inc, max)) break;
 
         // Bottom edge
-        if (iterate(rre - i * inc, bim, max)) { break; }
+        if (iterate(rre - i * inc, bim, max)) break;
 
         // Left edge
-        if (iterate(lre, bim - i * inc, max)) { break; }
+        if (iterate(lre, bim - i * inc, max)) break;
       }
 
       // If there was any iteration different from 0, we have work to do.

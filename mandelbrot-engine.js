@@ -316,15 +316,15 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result, itera
       // If we need to fill out the inner part, subdivide into squares of size 4 and 2.
       if (touche) {
         // Big 4x4 box on the top left of the inner rectangle.
-        render_opt(re, im, ppu, max, size, startx + 1, starty + 1, 2, result);
+        render_opt(re, im, ppu, max, size, startx + 1, starty + 1, 2, result, iterator);
         // Two 2x2 boxes to the top and middle right of the 4x4 box.
-        render_opt(re, im, ppu, max, size, startx + 5, starty + 1, 1, result);
-        render_opt(re, im, ppu, max, size, startx + 5, starty + 3, 1, result);
+        render_opt(re, im, ppu, max, size, startx + 5, starty + 1, 1, result, iterator);
+        render_opt(re, im, ppu, max, size, startx + 5, starty + 3, 1, result, iterator);
         // One 2x2 box at the bottom right corner
-        render_opt(re, im, ppu, max, size, startx + 5, starty + 5, 1, result);
+        render_opt(re, im, ppu, max, size, startx + 5, starty + 5, 1, result, iterator);
         // Two 2x2 boxes at the bottom middle and left.
-        render_opt(re, im, ppu, max, size, startx + 3, starty + 5, 1, result);
-        render_opt(re, im, ppu, max, size, startx + 1, starty + 5, 1, result);
+        render_opt(re, im, ppu, max, size, startx + 3, starty + 5, 1, result, iterator);
+        render_opt(re, im, ppu, max, size, startx + 1, starty + 5, 1, result, iterator);
       }
 
       return; 
@@ -350,10 +350,10 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result, itera
       // If there was any iteration different from 0, we have work to do.
       if (i < subsize - 1) {
         // Split up the subtile into 4 quadrants and recurse.
-        render_opt(re, im, ppu, max, size, startx, starty, order - 1, result);
-        render_opt(re, im, ppu, max, size, startx + (subsize >> 1), starty, order - 1, result);
-        render_opt(re, im, ppu, max, size, startx, starty + (subsize >> 1), order - 1, result);
-        render_opt(re, im, ppu, max, size, startx + (subsize >> 1), starty + (subsize >> 1), order - 1, result);
+        render_opt(re, im, ppu, max, size, startx, starty, order - 1, result, iterator);
+        render_opt(re, im, ppu, max, size, startx + (subsize >> 1), starty, order - 1, result, iterator);
+        render_opt(re, im, ppu, max, size, startx, starty + (subsize >> 1), order - 1, result, iterator);
+        render_opt(re, im, ppu, max, size, startx + (subsize >> 1), starty + (subsize >> 1), order - 1, result, iterator);
       }
 
       return;

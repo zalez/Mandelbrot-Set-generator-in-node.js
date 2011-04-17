@@ -223,20 +223,20 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result) {
 
       for (var i = 0; i < subsize - 1; i++) { // No need to go all the way, as the corner's already covered elsewhere.
         // Upper edge
-        if (result[pos1++] = iterate(zre1, zim1, max)) touche = 1;
+        if (result[pos1++] = iterate(zre1, zim1, max) / (max + 1)) touche = 1;
         zre1 += inc;
 
         // Right edge
-        if (result[pos2] = iterate(zre2, zim2, max)) touche = 1;
+        if (result[pos2] = iterate(zre2, zim2, max) / (max + 1)) touche = 1;
         zim2 += inc;
         pos2 += size;
 
         // Bottom edge
-        if (result[pos3--] = iterate(zre3, zim3, max)) touche = 1;
+        if (result[pos3--] = iterate(zre3, zim3, max) / (max + 1)) touche = 1;
         zre3 -= inc;
 
         // Left edge
-        if (result[pos4] = iterate(zre4, zim4, max)) touche = 1;
+        if (result[pos4] = iterate(zre4, zim4, max) / (max + 1)) touche = 1;
         zim4 -= inc;
         pos4 -= size;
       }

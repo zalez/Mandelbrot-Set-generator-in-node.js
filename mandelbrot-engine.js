@@ -135,7 +135,7 @@ exports.render = function (size, re, im, ppu, max, opt) {
       for (var i = 0; i < size * size; i++) {
         result[i] = 0.0;
       }
-      render_opt(re, im, ppu, max, size, 0, 0, 9, result, iterate_basic);
+      render_opt(re, im, ppu, max, size, 0, 0, size, result, iterate_basic);
       return result;
 
     case 3:
@@ -143,7 +143,7 @@ exports.render = function (size, re, im, ppu, max, opt) {
       for (var i = 0; i < size * size; i++) {
         result[i] = 0.0;
       }
-      render_opt(re, im, ppu, max, size, 0, 0, 9, result, iterate_opt);
+      render_opt(re, im, ppu, max, size, 0, 0, size, result, iterate_opt);
       return result;
   }
 }

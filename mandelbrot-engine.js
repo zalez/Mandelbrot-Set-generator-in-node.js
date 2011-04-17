@@ -179,6 +179,52 @@ function render_basic(re, im, ppu, max, size, result, iterator) {
   return;
 }
 
+
+/*
+ * Walk the circumference of a quadratic area of the mandelbrot set and compute the iterations.
+ * Return 0 if all results were 0, 1 otherwise.
+ * This will be used to determine if a quadratic area is contained in the Mandelbrot set. Its
+ * inner part doesn't need to be rendered if the circumference is completelty part of it.
+ */
+function walk_around(minre, minim, inc, max, size, startx, starty, subsize, result, iterator) {
+  // We draw 4 lines simultaneously to minimize loop overhead.
+  var pos1 = starty * size + startx;
+  var pos2 = pos1 + subsize - 1;
+  var pos3 = pos2 + size * (subsize -1);
+  var pos4 = pos3 - subsize + 1;
+  var zre1 = minre;
+  var zre2 = minre + subsize * inc;
+  var zre3 = zre2;
+  var zre4 = minre;
+  var zim1 = minim;
+  var zim2 = minim;
+  var zim3 = minim + subsize * inc;
+  var zim4 = zim3;
+  var touche = 0;
+
+  for (var i = 0; i < subsize - 1; i++) { // No need to go all the way, the corner's covered elsewhere.
+    // Upper edge
+    if (result[pos1++] = iterator(zre1, zim1, max) / (max + 1)) touche = 1;
+    zre1 += inc;
+
+    // Right edge
+    if (result[pos2] = iterator(zre2, zim2, max) / (max + 1)) touche = 1;
+    zim2 += inc;
+    pos2 += size;
+
+    // Bottom edge
+    if (result[pos3--] = iterator(zre3, zim3, max) / (max + 1)) touche = 1;
+    zre3 -= inc;
+
+    // Left edge
+    if (result[pos4] = iterator(zre4, zim4, max) / (max + 1)) touche = 1;
+    zim4 -= inc;
+    pos4 -= size;
+  }
+
+  return touche;
+}
+
 /*
  * Here's a different approach: Segment the picture into quadrants, then apply some
  * Optimization by figuring out if the circumference of quadrants is inside the mandelbrot
@@ -232,7 +278,7 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
       var zre = lre;
       var zim = tim;
 
-      // Walk the 4x4 circumference by hand.
+      // Walk the 4x4 circumference by hand. Faster than a subroutine and/or loop.
       if (result[pos++] = iterator(zre, zim, max) / (max + 1)) touche = 1;
       zre += inc;
       if (result[pos++] = iterator(zre, zim, max) / (max + 1)) touche = 1;
@@ -280,43 +326,9 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
     // can be subdivided into a 4x4 and 5 2x2 parts, if rendering is necessary.
     case 8:
       // Walk the circumference of the buffer, then figure out if we need to draw the inside.
-      // We draw 4 lines simultaneously to minimize loop overhead.
-      var pos1 = starty * size + startx;
-      var pos2 = pos1 + subsize - 1;
-      var pos3 = pos2 + size * (subsize -1);
-      var pos4 = pos3 - subsize + 1;
-      var zre1 = lre;
-      var zre2 = rre;
-      var zre3 = rre;
-      var zre4 = lre;
-      var zim1 = tim;
-      var zim2 = tim;
-      var zim3 = bim;
-      var zim4 = bim;
-      var touche = 0;
-
-      for (var i = 0; i < subsize - 1; i++) { // No need to go all the way, as the corner's already covered elsewhere.
-        // Upper edge
-        if (result[pos1++] = iterator(zre1, zim1, max) / (max + 1)) touche = 1;
-        zre1 += inc;
-
-        // Right edge
-        if (result[pos2] = iterator(zre2, zim2, max) / (max + 1)) touche = 1;
-        zim2 += inc;
-        pos2 += size;
-
-        // Bottom edge
-        if (result[pos3--] = iterator(zre3, zim3, max) / (max + 1)) touche = 1;
-        zre3 -= inc;
-
-        // Left edge
-        if (result[pos4] = iterator(zre4, zim4, max) / (max + 1)) touche = 1;
-        zim4 -= inc;
-        pos4 -= size;
-      }
 
       // If we need to fill out the inner part, subdivide into squares of size 4 and 2.
-      if (touche) {
+      if (walk_around(minre, minim, inc, max, size, startx, starty, subsize, result, iterator)) {
         // Big 4x4 box on the top left of the inner rectangle.
         render_opt(re, im, ppu, max, size, startx + 1, starty + 1, 4, result, iterator);
         // Two 2x2 boxes to the top and middle right of the 4x4 box.
@@ -334,23 +346,7 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
     default:
       // Walk the circumference of the buffer, then figure out if all values were equal.
 
-      // Test all four edges simultaneously.
-      for (var i = 0; i < subsize - 1; i++) { // No need to go all the way, as the corner's already covered elsewhere.
-        // Upper edge
-        if (iterator(lre + i * inc, tim, max)) break;
-
-        // Right edge
-        if (iterator(rre, tim + i * inc, max)) break;
-
-        // Bottom edge
-        if (iterator(rre - i * inc, bim, max)) break;
-
-        // Left edge
-        if (iterator(lre, bim - i * inc, max)) break;
-      }
-
-      // If there was any iteration different from 0, we have work to do.
-      if (i < subsize - 1) {
+      if (walk_around(minre, minim, inc, max, size, startx, starty, subsize, result, iterator)) {
         // Split up the subtile into 4 quadrants and recurse.
         render_opt(re, im, ppu, max, size, startx, starty, subsize >> 1, result, iterator);
         render_opt(re, im, ppu, max, size, startx + (subsize >> 1), starty, subsize >> 1, result, iterator);

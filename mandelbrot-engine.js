@@ -142,7 +142,8 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result) {
   if (order == 1) {
     var pos = starty * size + startx;
     result[pos++] = iterate(lre, tim, max) / (max + 1); // Top left pixel.
-    result[pos+=size] = iterate(rre, tim, max) / (max + 1); // Top right pixel.
+    result[pos] = iterate(rre, tim, max) / (max + 1); // Top right pixel.
+    pos += size;
     result[pos-- ] = iterate(rre, bim, max) / (max + 1); // Bottom right pixel.
     result[pos] = iterate(lre, bim, max) / (max + 1); // Bottom left pixel.
     return;

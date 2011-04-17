@@ -140,16 +140,16 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result) {
     var pos = starty * size + startx;
     result[pos++] = iterate(minre, tim, max) / (max + 1); // Top left pixel.
     result[pos+=size] = iterate(minre + inc, tim, max) / (max + 1); // Top right pixel.
-    result[pos-- ] = iterate(minre + inc, tim + inc, max) / (max + 1); // Top left pixel.
-    result[pos] = iterate(minre, tim + inc, max) / (max + 1); // Top left pixel.
+    result[pos-- ] = iterate(minre + inc, tim + inc, max) / (max + 1); // Bottom right pixel.
+    result[pos] = iterate(minre, tim + inc, max) / (max + 1); // Bottom left pixel.
     return;
   } else {
     // Walk the circumference of the buffer, then figure out if all values were equal.
 
     // Figure out the real and imaginary values for the 4 corners of our subtile.
-    var lre = minre + x * inc;           // Left real.
+    var lre = minre + startx * inc;      // Left real.
     var rre = lre + (subsize - 1) * inc; // Right real.
-    var tim = minim + y * inc;           // Top imaginary.
+    var tim = minim + starty * inc;      // Top imaginary.
     var bim = tim + (subsize - 1) * inc; // Bottom imaginary.
 
     // Test all four edges simultaneously.

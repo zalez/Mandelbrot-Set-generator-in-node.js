@@ -176,9 +176,9 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result) {
     if (i < subsize - 1) {
       // Split up the subtile into 4 quadrants and recurse.
       render_opt(re, im, ppu, max, size, startx, starty, order - 1, result);
-      render_opt(re, im, ppu, max, size, startx + subsize >> 1, starty, order - 1, result);
-      render_opt(re, im, ppu, max, size, startx, starty + subsize >> 1, order - 1, result);
-      render_opt(re, im, ppu, max, size, startx + subsize >> 1, starty + subsize >> 1, order - 1, result);
+      render_opt(re, im, ppu, max, size, startx + (subsize >> 1), starty, order - 1, result);
+      render_opt(re, im, ppu, max, size, startx, starty + (subsize >> 1), order - 1, result);
+      render_opt(re, im, ppu, max, size, startx + (subsize >> 1), starty + (subsize >> 1), order - 1, result);
     }
 
     return;

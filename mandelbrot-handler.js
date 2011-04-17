@@ -37,22 +37,22 @@ function show_image(req, res) {
 
   // Check parameters and determine final values
   var size = Number(params.query.size) || SIZE;
-  if (size == Number.NaN) {size = SIZE;}
-  if (size > MAX_SIZE) { size = MAX_SIZE;}
-  if (size < 0) {size = SIZE;}
+  if (size == Number.NaN) size = SIZE;
+  if (size > MAX_SIZE) size = MAX_SIZE;
+  if (size < 0) size = SIZE;
   
   var ppu = Number(params.query.ppu) || PXPERUNIT;
-  if (ppu == Number.NaN) {ppu = PXPERUNIT;}
-  if (ppu < 0) {ppu = PXPERUNIT;}
+  if (ppu == Number.NaN) ppu = PXPERUNIT;
+  if (ppu < 0) ppu = PXPERUNIT;
   
   var max = Number(params.query.max) || MAX_ITER;
-  if (max == Number.NaN) {max = MAX_ITER;}
-  if (max < 0) {max = MAX_ITER;}
+  if (max == Number.NaN) max = MAX_ITER;
+  if (max < 0) max = MAX_ITER;
   
   var opt = Number(params.query.opt) || OPT;
-  if (max == Number.NaN) {max = OPT;}
-  if (max < 0) {max = OPT;}
-  if (max > MAX_OPT) {max = OPT;}
+  if (opt == Number.NaN) opt = OPT;
+  if (opt < 0) opt = OPT;
+  if (opt > MAX_OPT) opt = OPT;
 
   // Render a Mandelbrot set into a result array
   var result = mandelbrot.render(size, RE_CENTER, IM_CENTER, ppu, max, opt);

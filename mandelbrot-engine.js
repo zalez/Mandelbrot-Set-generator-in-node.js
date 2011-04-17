@@ -191,14 +191,12 @@ function render_basic(re, im, ppu, max, size, result, iterator) {
  * re, im, ppu, max as usual.
  * size is the size of the whole tile.
  * startx, starty are the top left coordinates of the subtile to look at.
- * order is the order of the subtile. It's the exponent of 2 that yields the size of the
- * subtile: 2 is a 2x2 tile, 3 is 8x8 and so on.
+ * subsize is the size of the subtile.
  * buffer is a pre-allocated buffer for the whole tile. We assume that the buffer has been
  * zeroed from the beginning.
  */
-function render_opt(re, im, ppu, max, size, startx, starty, order, result, iterator) {
+function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, iterator) {
   var inc = 1 / ppu; // increment per pixel.
-  var subsize = 1 << order;
 
   // Minimum real and imaginary values for the whole master tile.
   var minre = re - size / ppu / 2;
@@ -211,10 +209,10 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result, itera
   var bim = tim + (subsize - 1) * inc; // Bottom imaginary.
 
   // Treat the lower order levels as special cases to save on overhead.
-  switch (order) {
+  switch (subsize) {
 
     // Special case: If we're just a 2x2 subtile, just render.
-    case 1:
+    case 2:
       var pos = starty * size + startx;
       result[pos++] = iterator(lre, tim, max) / (max + 1); // Top left pixel.
       result[pos] = iterator(rre, tim, max) / (max + 1); // Top right pixel.
@@ -224,7 +222,7 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result, itera
       return;
 
     // Special case: 4x4.
-    case 2:
+    case 4:
       var pos = starty * size + startx;
       var touche = 0;
       var zre = lre;
@@ -276,7 +274,7 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result, itera
 
     // The 8x8 case is interesting. We draw the circumference, then the remaining inner part
     // can be subdivided into a 4x4 and 5 2x2 parts, if rendering is necessary.
-    case 3:
+    case 8:
       // Walk the circumference of the buffer, then figure out if we need to draw the inside.
       // We draw 4 lines simultaneously to minimize loop overhead.
       var pos1 = starty * size + startx;
@@ -350,10 +348,10 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result, itera
       // If there was any iteration different from 0, we have work to do.
       if (i < subsize - 1) {
         // Split up the subtile into 4 quadrants and recurse.
-        render_opt(re, im, ppu, max, size, startx, starty, order - 1, result, iterator);
-        render_opt(re, im, ppu, max, size, startx + (subsize >> 1), starty, order - 1, result, iterator);
-        render_opt(re, im, ppu, max, size, startx, starty + (subsize >> 1), order - 1, result, iterator);
-        render_opt(re, im, ppu, max, size, startx + (subsize >> 1), starty + (subsize >> 1), order - 1, result, iterator);
+        render_opt(re, im, ppu, max, size, startx, starty, subsize / 2, result, iterator);
+        render_opt(re, im, ppu, max, size, startx + (subsize >> 1), starty, subsize / 2, result, iterator);
+        render_opt(re, im, ppu, max, size, startx, starty + (subsize >> 1), subsize / 2, result, iterator);
+        render_opt(re, im, ppu, max, size, startx + (subsize >> 1), starty + (subsize >> 1), subsize / 2, result, iterator);
       }
 
       return;

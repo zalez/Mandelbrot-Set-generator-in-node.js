@@ -260,6 +260,10 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
 
   // Treat the lower subsizes as special cases to save on overhead.
   switch (subsize) {
+    case 1:
+      result[starty * size + startx] = iterator(lre, tim, max) / (max + 1);
+      return;
+
     // Special case: If we're just a 2x2 subtile, render all.
     case 2:
       var pos = starty * size + startx;

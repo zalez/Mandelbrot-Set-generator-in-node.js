@@ -275,6 +275,38 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
       result[pos] = iterator(lre, bim, max) / (max + 1); // Bottom left pixel.
       return;
 
+    // Special case: 3x3.
+    case 3:
+      var pos = starty * size + startx;
+      var touche = 0;
+      var zre = lre;
+      var zim = tim;
+
+      // Walk the 3x3 circumference by hand. Faster than a subroutine and/or loop.
+      if (result[pos++] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      zre += inc;
+      if (result[pos++] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      zre += inc;
+      if (result[pos] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      zim += inc;
+      pos += size;
+      if (result[pos] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      zim += inc;
+      pos += size;
+      if (result[pos--] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      zre -= inc;
+      if (result[pos--] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      zre -= inc;
+      if (result[pos] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      pos -= size;
+      zim -= inc;
+      if (result[pos++] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      // Fill the rectangle only if needed.
+      if (touche) {
+        zre += inc;
+        result[pos] = iterator(zre, zim, max) / (max + 1);
+      }
+
     // Special case: 4x4.
     case 4:
       var pos = starty * size + startx;

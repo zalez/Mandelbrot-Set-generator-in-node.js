@@ -141,7 +141,7 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result) {
   // Treat the lower order levels as special cases to save on overhead.
   switch (order) {
 
-  // Special case: If we're just a 2x2 subtile, just render.
+    // Special case: If we're just a 2x2 subtile, just render.
     case 1:
       var pos = starty * size + startx;
       result[pos++] = iterate(lre, tim, max) / (max + 1); // Top left pixel.
@@ -178,6 +178,5 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result) {
       }
 
       return;
-    }
   }
 }

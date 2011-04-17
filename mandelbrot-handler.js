@@ -20,7 +20,7 @@ const PXPERUNIT = 150;   // How much units in the complex plane are covered by o
 // Other iteration parameters.
 const MAX_ITER = 300;
 const COLORS = MAX_ITER * 10;
-const OPT = 1; // Whether to use the optimized subseparation algorithm
+const OPT = 3; // Whether to use the optimized subseparation algorithm
 const MAX_OPT = 3;
 
 // Modules we want to use.
@@ -49,7 +49,7 @@ function show_image(req, res) {
   if (max == Number.NaN) max = MAX_ITER;
   if (max < 0) max = MAX_ITER;
   
-  var opt = Number(params.query.opt) || OPT;
+  var opt = Number(params.query.opt);
   if (opt == Number.NaN) opt = OPT;
   if (opt < 0) opt = OPT;
   if (opt > MAX_OPT) opt = OPT;

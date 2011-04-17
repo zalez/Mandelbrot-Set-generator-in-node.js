@@ -330,9 +330,9 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
         if (new_subsize >> 1 < subsize) {
           // Render two bigger quadrants and two smaller. The two bigger ones will overlap, but that's life.
           render_opt(re, im, ppu, max, size, startx + 1, starty + 1, new_subsize + 1, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 2 + new_subsize, starty + 1, new_subsize, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 1, starty + 1 + new_subsize, new_subsize + 1, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 2 + new_subsize, new_subsize, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + new_subsize + 1, starty + 1, new_subsize, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 1, starty + 2 + new_subsize, new_subsize, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1 + new_subsize, new_subsize + 1, result, iterator);
         } else {
           render_opt(re, im, ppu, max, size, startx + 1, starty + 1, new_subsize, result, iterator);
           render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1, new_subsize, result, iterator);

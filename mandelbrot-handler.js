@@ -18,7 +18,7 @@ const IM_CENTER = 0.0;   // Y-Center of the picture will represent this value on
 const PXPERUNIT = 150;   // How much units in the complex plane are covered by one pixel?
 
 // Other iteration parameters.
-const MAX_ITER = 1000;
+const MAX_ITER = 300;
 const COLORS = MAX_ITER * 10;
 const OPT = 1; // Whether to use the optimized subseparation algorithm
 

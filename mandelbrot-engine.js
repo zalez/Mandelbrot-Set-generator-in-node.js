@@ -65,14 +65,19 @@ function iterate(cr, ci, max) {
 /*
  * Set up a buffer, then render the Mandelbrot set into it.
  */
-exports.render = function (xsize, ysize, re, im, ppu, max) {
+exports.render = function (xsize, ysize, re, im, ppu, max, opt) {
   // Create the result array and fill it with zeroes.
   var result = new Array(xsize * ysize);
-  for (var i = 0; i < xsize * ysize; i++) {
-    result[i] = 0.0;
+
+  // Call the normal or the optimized version
+  if (opt) {
+    for (var i = 0; i < xsize * ysize; i++) {
+      result[i] = 0.0;
+    }
+    render_opt(re, im, ppu, max, xsize, 0, 0, 9, result);
+  } else {
+    render_norm(xsize, ysize, re, im, ppu, max, result);
   }
-  // render_norm(xsize, ysize, re, im, ppu, max, result);
-  render_opt(re, im, ppu, max, xsize, 0, 0, 9, result);
   return result;
 }
 

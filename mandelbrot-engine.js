@@ -228,7 +228,7 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result) {
 
         // Right edge
         if (result[pos2] = iterate(zre2, zim2, max)) touche = 1;
-        zim += inc;
+        zim2 += inc;
         pos2 += size;
 
         // Bottom edge
@@ -237,7 +237,7 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result) {
 
         // Left edge
         if (result[pos4] = iterate(zre4, zim4, max)) touche = 1;
-        zim -= inc;
+        zim4 -= inc;
         pos4 -= size;
       }
 

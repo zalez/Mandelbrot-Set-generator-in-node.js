@@ -322,36 +322,15 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
 
       return;
 
-    // The 8x8 case is interesting. We draw the circumference, then the remaining inner part
-    // can be subdivided into a 4x4 and 5 2x2 parts, if rendering is necessary.
-    case 8:
-      // Walk the circumference of the buffer, then figure out if we need to draw the inside.
-
-      // If we need to fill out the inner part, subdivide into squares of size 4 and 2.
-      if (walk_around(lre, tim, inc, max, size, startx, starty, subsize, result, iterator)) {
-        // Big 4x4 box on the top left of the inner rectangle.
-        render_opt(re, im, ppu, max, size, startx + 1, starty + 1, 4, result, iterator);
-        // Two 2x2 boxes to the top and middle right of the 4x4 box.
-        render_opt(re, im, ppu, max, size, startx + 5, starty + 1, 2, result, iterator);
-        render_opt(re, im, ppu, max, size, startx + 5, starty + 3, 2, result, iterator);
-        // One 2x2 box at the bottom right corner
-        render_opt(re, im, ppu, max, size, startx + 5, starty + 5, 2, result, iterator);
-        // Two 2x2 boxes at the bottom middle and left.
-        render_opt(re, im, ppu, max, size, startx + 3, starty + 5, 2, result, iterator);
-        render_opt(re, im, ppu, max, size, startx + 1, starty + 5, 2, result, iterator);
-      }
-
-      return; 
-
     default:
       // Walk the circumference of the buffer, then figure out if all values were equal.
 
       if (walk_around(lre, tim, inc, max, size, startx, starty, subsize, result, iterator)) {
-        // Split up the subtile into 4 quadrants and recurse.
-        render_opt(re, im, ppu, max, size, startx, starty, subsize >> 1, result, iterator);
-        render_opt(re, im, ppu, max, size, startx + (subsize >> 1), starty, subsize >> 1, result, iterator);
-        render_opt(re, im, ppu, max, size, startx, starty + (subsize >> 1), subsize >> 1, result, iterator);
-        render_opt(re, im, ppu, max, size, startx + (subsize >> 1), starty + (subsize >> 1), subsize >> 1, result, iterator);
+        var new_subsize = subsize >> 1;
+        render_opt(re, im, ppu, max, size, startx + 1, starty + 1, new_subsize, result, iterator);
+        render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1, new_subsize, result, iterator);
+        render_opt(re, im, ppu, max, size, startx + 1, starty + 1 + new_subsize, new_subsize, result, iterator);
+        render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1 + new_subsize, new_subsize, result, iterator);
       }
 
       return;

@@ -21,6 +21,7 @@ const PXPERUNIT = 150;   // How much units in the complex plane are covered by o
 const MAX_ITER = 300;
 const COLORS = MAX_ITER * 10;
 const OPT = 1; // Whether to use the optimized subseparation algorithm
+const MAX_OPT = 3;
 
 // Modules we want to use.
 var connect = require('connect');
@@ -51,6 +52,7 @@ function show_image(req, res) {
   var opt = Number(params.query.opt) || OPT;
   if (max == Number.NaN) {max = OPT;}
   if (max < 0) {max = OPT;}
+  if (max > MAX_OPT) {max = OPT;}
 
   // Render a Mandelbrot set into a result array
   var result = mandelbrot.render(size, RE_CENTER, IM_CENTER, ppu, max, opt);

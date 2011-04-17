@@ -121,7 +121,7 @@ exports.render = function (size, re, im, ppu, max, opt) {
    * 3: Both subdivision and known bulb check.
    */
 
-  switch (opt)
+  switch (opt) {
     case 0:
       render_basic(re, im, ppu, max, size, result, iterate_basic);
       return result;
@@ -145,6 +145,7 @@ exports.render = function (size, re, im, ppu, max, opt) {
       }
       render_opt(re, im, ppu, max, size, 0, 0, 9, result, iterate_opt);
       return result;
+  }
 }
 
 /*

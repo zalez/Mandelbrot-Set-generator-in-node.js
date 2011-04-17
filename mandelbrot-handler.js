@@ -49,7 +49,7 @@ function show_image(req, res) {
   if (max == Number.NaN) max = MAX_ITER;
   if (max < 0) max = MAX_ITER;
   
-  var opt = Number(params.query.opt);
+  var opt = Number(params.query.opt) || OPT;
   if (opt == Number.NaN) opt = OPT;
   if (opt < 0) opt = OPT;
   if (opt > MAX_OPT) opt = OPT;

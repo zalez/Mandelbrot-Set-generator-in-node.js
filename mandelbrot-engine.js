@@ -177,6 +177,8 @@ function render_opt(re, im, ppu, max, size, startx, starty, order, result) {
       if (result[pos--] = iterate(zre, zim, max) / (max + 1)) touche = 1;
       zre -= inc;
       if (result[pos--] = iterate(zre, zim, max) / (max + 1)) touche = 1;
+      zre -= inc;
+      if (result[pos--] = iterate(zre, zim, max) / (max + 1)) touche = 1;
       zre == lre;
       if (result[pos] = iterate(zre, zim, max) / (max + 1)) touche = 1;
       pos -= size;

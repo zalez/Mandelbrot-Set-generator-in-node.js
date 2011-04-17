@@ -240,6 +240,8 @@ function walk_around(minre, minim, inc, max, size, startx, starty, subsize, resu
  * subsize is the size of the subtile.
  * buffer is a pre-allocated buffer for the whole tile. We assume that the buffer has been
  * zeroed from the beginning.
+ *
+ * Assumptions: Size must be an even number, and the tiles are of course quadratic.
  */
 function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, iterator) {
   var inc = 1 / ppu; // increment per pixel.
@@ -256,11 +258,6 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
 
   // Treat the lower subsizes as special cases to save on overhead.
   switch (subsize) {
-    // Subsize 1: Render a single pixel.
-    case 1:
-      result[starty * size + startx] = iterator(lre, tim, max) / (max + 1);
-      return;
-
     // Special case: If we're just a 2x2 subtile, render all.
     case 2:
       var pos = starty * size + startx;
@@ -326,7 +323,7 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
       // Walk the circumference of the buffer, then figure out if all values were equal.
 
       if (walk_around(lre, tim, inc, max, size, startx, starty, subsize, result, iterator)) {
-        var new_subsize = subsize >> 1;
+        var new_subsize = (subsize - 2) >> 1;
         render_opt(re, im, ppu, max, size, startx + 1, starty + 1, new_subsize, result, iterator);
         render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1, new_subsize, result, iterator);
         render_opt(re, im, ppu, max, size, startx + 1, starty + 1 + new_subsize, new_subsize, result, iterator);

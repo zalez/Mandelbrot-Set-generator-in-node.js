@@ -45,7 +45,7 @@ function iterate_basic(cr, ci, max) {
     m2 = zr2 + zi2
     if (m2 > 4) { // Mandelbrot escape radius is 2, hence 4 since we compare to
       // Return smoothed escape value.
-      return (i - Math.log(Math.log(Math.sqrt(m2))/Math.LN2)/Math.LN2) / max; // Normalized to 0..1
+      return (i - (Math.log(Math.log(Math.sqrt(m2))/Math.LN2)/Math.LN2)) / max; // Normalized to 0..1
     }
   }
 
@@ -101,7 +101,7 @@ function iterate_opt(cr, ci, max) {
     m2 = zr2 + zi2
     if (m2 > 4) { // Mandelbrot escape radius is 2, hence 4 since we compare to
       // Return smoothed escape value.
-      return (i - Math.log(Math.log(Math.sqrt(m2))/Math.LN2)/Math.LN2) / max; // Normalized to 0..1
+      return (i - (Math.log(Math.log(Math.sqrt(m2))/Math.LN2)/Math.LN2)) / max; // Normalized to 0..1
     }
   }
 

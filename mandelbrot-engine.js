@@ -308,6 +308,7 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
         zre += inc;
         result[pos] = iterator(zre, zim, max) / (max + 1);
       }
+      return;
 
     // Special case: 4x4.
     case 4:

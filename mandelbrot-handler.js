@@ -63,7 +63,7 @@ function show_image(req, res) {
   if (opt < 0) opt = OPT;
   if (opt > MAX_OPT) opt = OPT;
 
-  var rendersize = site * RENDERSCALE;
+  var rendersize = size * RENDERSCALE;
 
   // Render a Mandelbrot set into a result array
   var result = mandelbrot.render(rendersize, RE_CENTER, IM_CENTER, ppu, max, opt);

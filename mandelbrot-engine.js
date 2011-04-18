@@ -370,7 +370,7 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
         var new_subsize = 0;
         // Figure out how to best subdivide the remainder.
         if ((subsize - 2) % 2 == 0) { // We can divide the remainder evenly
-          new_subsize = (subsize - 2) / 2;
+          new_subsize = (subsize - 2) >> 1;
           render_opt(re, im, ppu, max, size, startx + 1, starty + 1, new_subsize, result, iterator);
           render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1, new_subsize, result, iterator);
           render_opt(re, im, ppu, max, size, startx + 1, starty + 1 + new_subsize, new_subsize, result, iterator);

@@ -24,6 +24,7 @@ const OPT = 3; // Whether to use the optimized subseparation algorithm
 const MAX_OPT = 4;
 
 // We'll render at a much higher size than the image we produce, so we can get antialiasing.
+const AA = 0; // Whether to perform anti-aliasing or not.
 const AA_FACTOR = 3;
 
 // Modules we want to use.
@@ -60,9 +61,16 @@ function show_image(req, res) {
   if (opt == Number.NaN) opt = OPT;
   if (opt < 0) opt = OPT;
   if (opt > MAX_OPT) opt = OPT;
+  
+  var aa = Number(params.query.aa) || AA;
+  if (aa == Number.NaN) aa = AA;
+  if (aa < 0) aa = AA;
+  if (aa > 1) aa = AA;
 
   // Render a Mandelbrot set into a result array
-  var rendersize = size * AA_FACTOR
+  if (aa) {
+    var rendersize = size * AA_FACTOR;
+  }
   var result = mandelbrot.render(rendersize, RE_CENTER, IM_CENTER, ppu, max, opt);
 
   // Create a colormap.
@@ -83,7 +91,11 @@ function show_image(req, res) {
   }
 
   // Resize the image using a Gaussian filter to provide high quality anti-aliasing.
-  clean_image = Resize.resize3to1(image, rendersize);
+  if (aa) {
+    clean_image = Resize.resize3to1(image, rendersize);
+  } else {
+    clean_image = image;
+  }
 
   // Convert the image into PNG format.
   var png_image = new Png(clean_image, size, size, 'rgb');

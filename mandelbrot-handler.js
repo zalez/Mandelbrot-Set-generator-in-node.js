@@ -91,6 +91,7 @@ function show_image(req, res) {
     }
     if (index < 0) {
       process.stdout.write("Warning: Index = " + index + "\n");
+      index = 0;
     }
     color = map[index];
     image[pos++] =

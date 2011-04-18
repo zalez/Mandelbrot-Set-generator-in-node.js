@@ -28,7 +28,7 @@ var connect = require('connect');
 var mandelbrot = require('mandelbrot-engine.js');
 var colormap = require('colormap.js');
 
-var png = require ('png').Png;
+var Png = require ('png').Png;
 
 var url = require ('url')
 

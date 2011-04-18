@@ -62,7 +62,7 @@ function iterate_basic(cr, ci, max) {
       m2 = zr2 + zi2
 
       // Return smoothed escape value.
-      return i - (Math.log(Math.log(Math.sqrt(m2)))) / Math.LN2;
+      return i + 2 - (Math.log(Math.log(Math.sqrt(m2)))) / Math.LN2;
     }
   }
 
@@ -100,7 +100,7 @@ function iterate_opt(cr, ci, max) {
   }
 
   // Ok, we'll have to go through the whole iteration thing.
-  for (var i = 0; i < max; i++) {
+  for (var i = 0; i <= max; i++) {
     // z = z^2 ...
     t = zr2  - zi2;
     zi = 2 * zr * zi;
@@ -135,7 +135,7 @@ function iterate_opt(cr, ci, max) {
       m2 = zr2 + zi2
 
       // Return smoothed escape value.
-      return i - (Math.log(Math.log(Math.sqrt(m2)))) / Math.LN2;
+      return i + 2 - (Math.log(Math.log(Math.sqrt(m2)))) / Math.LN2;
     }
   }
 

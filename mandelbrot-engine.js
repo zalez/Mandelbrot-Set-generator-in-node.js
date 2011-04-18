@@ -27,7 +27,7 @@ function iterate_basic(cr, ci, max) {
   var zi2 = 0; // Imaginary part of z, squared.
 
   // Iterate through all pixels.
-  for (var i = 0; i <= max; i++) {
+  for (var i = 0; i < max; i++) {
     // z = z^2 ...
     t = zr2  - zi2;
     zi = 2 * zr * zi;
@@ -83,7 +83,7 @@ function iterate_opt(cr, ci, max) {
   }
 
   // Ok, we'll have to go through the whole iteration thing.
-  for (var i = 0; i <= max; i++) {
+  for (var i = 0; i < max; i++) {
     // z = z^2 ...
     t = zr2  - zi2;
     zi = 2 * zr * zi;

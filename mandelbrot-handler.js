@@ -82,7 +82,7 @@ function show_image(req, res) {
 
   // Return the image to the browser.
   res.writeHead(200, { "Content-Type": "image/png" });
-  res.end(png_file.toString(), 'binary');
+  res.end(png_file.toString('binary'), 'binary');
 }
 
 exports.handler = connect.router(function(app) {

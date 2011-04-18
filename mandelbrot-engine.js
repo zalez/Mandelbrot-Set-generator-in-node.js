@@ -389,11 +389,11 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
         } else { // A generic uneven subsize.
           // Render 1 pixel stripes at bottom and right, then subdivide by 2.
           for (var i = 1; i < subsize - 2; i++) {
-            result[(starty + subsize - 2) * size + startx + i] = iterator(lre + i * inc, tim + inc, max) / (max + 1);
+            result[(starty + subsize - 2) * size + startx + i] = iterator(lre + i * inc, bim - inc, max) / (max + 1);
             result[(starty + i) * size + startx + subsize - 2] = iterator(lre + (subsize - 2) * inc, tim + i * inc, max) / (max + 1);
           }
            
-          var new_subsize = (subsize - 3) >> 1;
+          new_subsize = (subsize - 3) >> 1;
           render_opt(re, im, ppu, max, size, startx + 1, starty + 1, new_subsize, result, iterator);
           render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1, new_subsize, result, iterator);
           render_opt(re, im, ppu, max, size, startx + 1, starty + 1 + new_subsize, new_subsize, result, iterator);

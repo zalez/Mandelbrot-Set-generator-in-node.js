@@ -346,6 +346,7 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
       pos -= size;
       zim -= inc;
       if (result[pos++] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+
       // Fill the rectangle only if needed.
       if (touche) {
         zre += inc;
@@ -365,22 +366,39 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
       // Walk the circumference of the buffer, then figure out if all values were equal.
 
       if (walk_around(lre, tim, inc, max, size, startx, starty, subsize, result, iterator)) {
-        var new_subsize = (subsize - 2) >> 1;
-        // Need to account for special case of an uneven new subsize.
-        if (new_subsize >> 1 < subsize) {
-          // Render two bigger quadrants and two smaller. The two bigger ones will overlap, but that's life.
-          render_opt(re, im, ppu, max, size, startx + 1, starty + 1, new_subsize + 1, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 2 + new_subsize, starty + 1, new_subsize, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 1, starty + 2 + new_subsize, new_subsize, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1 + new_subsize, new_subsize + 1, result, iterator);
-        } else {
+
+        var new_subsize = 0;
+        // Figure out how to best subdivide the remainder.
+        if ((subsize - 2) % 2 == 0) { // We can divide the remainder evenly
+          new_subsize = subsize / 2;
           render_opt(re, im, ppu, max, size, startx + 1, starty + 1, new_subsize, result, iterator);
           render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1, new_subsize, result, iterator);
           render_opt(re, im, ppu, max, size, startx + 1, starty + 1 + new_subsize, new_subsize, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1 + new_subsize, new_subsize, result, iterator);A
+        } else if ((subsize - 2) % 3 == 0) { // We can subdivide by 3.
+          new_subsize = subsize / 3;
+          render_opt(re, im, ppu, max, size, startx + 1, starty + 1, new_subsize, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1, new_subsize, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 1 + 2 * new_subsize, starty + 1, new_subsize, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 1, starty + 1 + new_subsize, new_subsize, result, iterator);
           render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1 + new_subsize, new_subsize, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 1 + 2 * new_subsize, starty + 1 + new_subsize, new_subsize, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 1, starty + 1 * 2 * new_subsize, new_subsize, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1 * 2 * new_subsize, new_subsize, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 1 + 2 * new_subsize, starty + 1 * 2 * new_subsize, new_subsize, result, iterator);
+        } else { // A generic uneven subsize.
+          // Render 1 pixel stripes at bottom and right, then subdivide by 2.
+          for (var i = 1; i < subsize - 3; i++) {
+            result[(starty + 1) * size + startx + i] = iterator(lre + i * inc, tim + inc, max) / (max + 1);
+            result[(starty + i) * size + startx + subsize - 2] = iterator(lre + (subsize - 2) * inc, tim + i * inc, max) / (max + 1);
+          }
+           
+          var new_subsize = (subsize - 3) >> 1;
+          render_opt(re, im, ppu, max, size, startx + 1, starty + 1, new_subsize, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1, new_subsize, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 1, starty + 1 + new_subsize, new_subsize, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1 + new_subsize, new_subsize, result, iterator);A
         }
-      }
-
-      return;
+        return;
   }
 }

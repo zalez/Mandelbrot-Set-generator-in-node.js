@@ -68,7 +68,7 @@ function show_image(req, res) {
   // Fill the image buffer with the result from the Mandelbrot set, mapped to the colormap.
   var pos = 0;
   var color = [];
-  for (i = 0; i < rendersize * rendersize; i++) {
+  for (i = 0; i < size * size; i++) {
     index=Math.floor(result[i]*COLORS);
     color = map[index];
     image[pos++] = color[0];

@@ -376,7 +376,7 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
           render_opt(re, im, ppu, max, size, startx + 1, starty + 1 + new_subsize, new_subsize, result, iterator);
           render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1 + new_subsize, new_subsize, result, iterator);A
         } else if ((subsize - 2) % 3 == 0) { // We can subdivide by 3.
-          new_subsize = subsize / 3;
+          new_subsize = (subsize - 2) / 3;
           render_opt(re, im, ppu, max, size, startx + 1, starty + 1, new_subsize, result, iterator);
           render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1, new_subsize, result, iterator);
           render_opt(re, im, ppu, max, size, startx + 1 + 2 * new_subsize, starty + 1, new_subsize, result, iterator);

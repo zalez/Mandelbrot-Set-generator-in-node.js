@@ -27,7 +27,7 @@ function iterate_basic(cr, ci, max) {
   var zi2 = 0; // Imaginary part of z, squared.
 
   // Iterate through all pixels.
-  for (var i = 0; i < max; i++) {
+  for (var i = 0; i <= max; i++) {
     // z = z^2 ...
     t = zr2  - zi2;
     zi = 2 * zr * zi;
@@ -45,7 +45,7 @@ function iterate_basic(cr, ci, max) {
     m2 = zr2 + zi2
     if (m2 > 4) { // Mandelbrot escape radius is 2, hence 4 since we compare to
       // Return smoothed escape value.
-      return i + 1 - Math.log(Math.log(Math.sqrt(m2))) / Math.log(2);
+      return (i + 1 - Math.log(Math.log(Math.sqrt(m2))) / Math.log(2)) / max; // Normalized to 0..1
     }
   }
 
@@ -101,7 +101,7 @@ function iterate_opt(cr, ci, max) {
     m2 = zr2 + zi2
     if (m2 > 4) { // Mandelbrot escape radius is 2, hence 4 since we compare to
       // Return smoothed escape value.
-      return i + 1 - Math.log(Math.log(Math.sqrt(m2))) / Math.log(2);
+      return (i + 1 - Math.log(Math.log(Math.sqrt(m2))) / Math.log(2)) / max; // Normalized to 0..1
     }
   }
 
@@ -177,7 +177,7 @@ function render_basic(re, im, ppu, max, size, result, iterator) {
     zim = minim + y * inc;
     for (x = 0; x < size; x++) {
       zre = minre + x * inc;
-      result[pos++] = iterator(zre, zim, max) / (max + 1); // Normalized result in [0..1)
+      result[pos++] = iterator(zre, zim, max);
     }
   }
 
@@ -209,20 +209,20 @@ function walk_around(minre, minim, inc, max, size, startx, starty, subsize, resu
 
   for (var i = 0; i < subsize - 1; i++) { // No need to go all the way, the corner's covered elsewhere.
     // Upper edge
-    if (result[pos1++] = iterator(zre1, zim1, max) / (max + 1)) touche = 1;
+    if (result[pos1++] = iterator(zre1, zim1, max)) touche = 1;
     zre1 += inc;
 
     // Right edge
-    if (result[pos2] = iterator(zre2, zim2, max) / (max + 1)) touche = 1;
+    if (result[pos2] = iterator(zre2, zim2, max)) touche = 1;
     zim2 += inc;
     pos2 += size;
 
     // Bottom edge
-    if (result[pos3--] = iterator(zre3, zim3, max) / (max + 1)) touche = 1;
+    if (result[pos3--] = iterator(zre3, zim3, max)) touche = 1;
     zre3 -= inc;
 
     // Left edge
-    if (result[pos4] = iterator(zre4, zim4, max) / (max + 1)) touche = 1;
+    if (result[pos4] = iterator(zre4, zim4, max)) touche = 1;
     zim4 -= inc;
     pos4 -= size;
   }
@@ -266,17 +266,17 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
   // Treat the lower subsizes as special cases to save on overhead.
   switch (subsize) {
     case 1:
-      result[starty * size + startx] = iterator(lre, tim, max) / (max + 1);
+      result[starty * size + startx] = iterator(lre, tim, max);
       return;
 
     // Special case: If we're just a 2x2 subtile, render all.
     case 2:
       var pos = starty * size + startx;
-      result[pos++] = iterator(lre, tim, max) / (max + 1); // Top left pixel.
-      result[pos] = iterator(rre, tim, max) / (max + 1); // Top right pixel.
+      result[pos++] = iterator(lre, tim, max); // Top left pixel.
+      result[pos] = iterator(rre, tim, max); // Top right pixel.
       pos += size;
-      result[pos-- ] = iterator(rre, bim, max) / (max + 1); // Bottom right pixel.
-      result[pos] = iterator(lre, bim, max) / (max + 1); // Bottom left pixel.
+      result[pos-- ] = iterator(rre, bim, max); // Bottom right pixel.
+      result[pos] = iterator(lre, bim, max); // Bottom left pixel.
       return;
 
     // Special case: 3x3.
@@ -287,28 +287,28 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
       var zim = tim;
 
       // Walk the 3x3 circumference by hand. Faster than a subroutine and/or loop.
-      if (result[pos++] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos++] = iterator(zre, zim, max)) touche = 1;
       zre += inc;
-      if (result[pos++] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos++] = iterator(zre, zim, max)) touche = 1;
       zre += inc;
-      if (result[pos] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos] = iterator(zre, zim, max)) touche = 1;
       zim += inc;
       pos += size;
-      if (result[pos] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos] = iterator(zre, zim, max)) touche = 1;
       zim += inc;
       pos += size;
-      if (result[pos--] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos--] = iterator(zre, zim, max)) touche = 1;
       zre -= inc;
-      if (result[pos--] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos--] = iterator(zre, zim, max)) touche = 1;
       zre -= inc;
-      if (result[pos] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos] = iterator(zre, zim, max)) touche = 1;
       pos -= size;
       zim -= inc;
-      if (result[pos++] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos++] = iterator(zre, zim, max)) touche = 1;
       // Fill the rectangle only if needed.
       if (touche) {
         zre += inc;
-        result[pos] = iterator(zre, zim, max) / (max + 1);
+        result[pos] = iterator(zre, zim, max);
       }
       return;
 
@@ -320,46 +320,46 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
       var zim = tim;
 
       // Walk the 4x4 circumference by hand. Faster than a subroutine and/or loop.
-      if (result[pos++] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos++] = iterator(zre, zim, max)) touche = 1;
       zre += inc;
-      if (result[pos++] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos++] = iterator(zre, zim, max)) touche = 1;
       zre += inc;
-      if (result[pos++] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos++] = iterator(zre, zim, max)) touche = 1;
       zre = rre;
-      if (result[pos] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos] = iterator(zre, zim, max)) touche = 1;
       zim += inc;
       pos += size;
-      if (result[pos] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos] = iterator(zre, zim, max)) touche = 1;
       zim += inc;
       pos += size;
-      if (result[pos] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos] = iterator(zre, zim, max)) touche = 1;
       zim = bim;
       pos += size;
-      if (result[pos--] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos--] = iterator(zre, zim, max)) touche = 1;
       zre -= inc;
-      if (result[pos--] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos--] = iterator(zre, zim, max)) touche = 1;
       zre -= inc;
-      if (result[pos--] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos--] = iterator(zre, zim, max)) touche = 1;
       zre == lre;
-      if (result[pos] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos] = iterator(zre, zim, max)) touche = 1;
       pos -= size;
       zim -= inc;
-      if (result[pos] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos] = iterator(zre, zim, max)) touche = 1;
       pos -= size;
       zim -= inc;
-      if (result[pos++] = iterator(zre, zim, max) / (max + 1)) touche = 1;
+      if (result[pos++] = iterator(zre, zim, max)) touche = 1;
 
       // Fill the rectangle only if needed.
       if (touche) {
         zre += inc;
-        result[pos++] = iterator(zre, zim, max) / (max + 1);
+        result[pos++] = iterator(zre, zim, max);
         zre += inc;
-        result[pos] = iterator(zre, zim, max) / (max + 1);
+        result[pos] = iterator(zre, zim, max);
         zim += inc;
         pos += size;
-        result[pos--] = iterator(zre, zim, max) / (max + 1);
+        result[pos--] = iterator(zre, zim, max);
         zre -= inc;
-        result[pos] = iterator(zre, zim, max) / (max + 1);
+        result[pos] = iterator(zre, zim, max);
       }
 
       return;
@@ -391,8 +391,8 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
         } else { // A generic uneven subsize.
           // Render 1 pixel stripes at bottom and right, then subdivide by 2.
           for (var i = 1; i < subsize - 1; i++) {
-            result[(starty + subsize - 2) * size + startx + i] = iterator(lre + i * inc, bim - inc, max) / (max + 1);
-            result[(starty + i) * size + startx + subsize - 2] = iterator(lre + (subsize - 2) * inc, tim + i * inc, max) / (max + 1);
+            result[(starty + subsize - 2) * size + startx + i] = iterator(lre + i * inc, bim - inc, max);
+            result[(starty + i) * size + startx + subsize - 2] = iterator(lre + (subsize - 2) * inc, tim + i * inc, max);
           }
            
           new_subsize = (subsize - 3) >> 1;

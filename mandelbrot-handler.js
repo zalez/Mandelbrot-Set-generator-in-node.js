@@ -23,12 +23,17 @@ const COLORS = MAX_ITER * 10;
 const OPT = 3; // Whether to use the optimized subseparation algorithm
 const MAX_OPT = 4;
 
+// We'll render at a much higher size than the image we produce, so we can get antialiasing.
+const AA_FACTOR = 3;
+
 // Modules we want to use.
 var connect = require('connect');
 var mandelbrot = require('mandelbrot-engine.js');
 var colormap = require('colormap.js');
 
 var Png = require ('png').Png;
+
+var Resize = require ('resize.js');
 
 var url = require ('url')
 
@@ -57,18 +62,19 @@ function show_image(req, res) {
   if (opt > MAX_OPT) opt = OPT;
 
   // Render a Mandelbrot set into a result array
-  var result = mandelbrot.render(size, RE_CENTER, IM_CENTER, ppu, max, opt);
+  var rendersize = size * AA_FACTOR
+  var result = mandelbrot.render(rendersize, RE_CENTER, IM_CENTER, ppu, max, opt);
 
   // Create a colormap.
   var map = colormap.colormap(COLORS);
 
   // Create an image buffer.
-  var image = new Buffer(size * size * 3);
+  var image = new Buffer(rendersize * rendersize * 3);
 
   // Fill the image buffer with the result from the Mandelbrot set, mapped to the colormap.
   var pos = 0;
   var color = [];
-  for (i = 0; i < size * size; i++) {
+  for (i = 0; i < rendersize * rendersize; i++) {
     index=Math.floor(result[i]*COLORS);
     color = map[index];
     image[pos++] = color[0];
@@ -76,8 +82,11 @@ function show_image(req, res) {
     image[pos++] = color[2];
   }
 
+  // Resize the image using a Gaussian filter to provide high quality anti-aliasing.
+  clean_image = Resize.resize3to1(image, rendersize);
+
   // Convert the image into PNG format.
-  var png_image = new Png(image, size, size, 'rgb');
+  var png_image = new Png(clean_image, size, size, 'rgb');
   var png_file = png_image.encodeSync();
 
   // Return the image to the browser.

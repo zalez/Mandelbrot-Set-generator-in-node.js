@@ -70,6 +70,8 @@ function show_image(req, res) {
   // Render a Mandelbrot set into a result array
   if (aa) {
     var rendersize = size * AA_FACTOR;
+  } else {
+    var rendersize = size;
   }
   var result = mandelbrot.render(rendersize, RE_CENTER, IM_CENTER, ppu, max, opt);
 

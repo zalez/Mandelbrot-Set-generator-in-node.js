@@ -87,9 +87,12 @@ function show_image(req, res) {
   for (i = 0; i < rendersize * rendersize; i++) {
     index=Math.floor(result[i]*COLORS);
     color = map[index];
-    image[pos++] = color[0];
-    image[pos++] = color[1];
-    image[pos++] = color[2];
+    image[pos++] =
+      color[0];
+    image[pos++] = 
+      color[1];
+    image[pos++] = 
+      color[2];
   }
 
   // Resize the image using a Gaussian filter to provide high quality anti-aliasing.

@@ -259,7 +259,7 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
   var tim = minim + starty * inc;      // Top imaginary.
   var bim = tim + (subsize - 1) * inc; // Bottom imaginary.
 
-  process.stdout.write("Subsize: " + subsize + "\n");
+  // process.stdout.write("Subsize: " + subsize + "\n");
 
   // Treat the lower subsizes as special cases to save on overhead.
   switch (subsize) {

@@ -80,7 +80,7 @@ function show_image(req, res) {
   var ctx = canvas.getContext('2d');
   ctx.clearRect(0,0,rendersize,rendersize);
 
-  var image = canvas.data();
+  var image = canvas.data;
 
   // Fill the image buffer with the result from the Mandelbrot set, mapped to the colormap.
   var pos = 0;

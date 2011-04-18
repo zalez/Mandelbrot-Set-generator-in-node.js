@@ -85,7 +85,13 @@ function show_image(req, res) {
   var pos = 0;
   var color = [];
   for (i = 0; i < rendersize * rendersize; i++) {
-    index=Math.floor(result[i]*(COLORS - 1));
+    index=Math.floor(result[i]*(COLORS));
+    if (index >= COLORS) {
+      process.stdout.write("Warning: Index = " + index + "\n");
+    }
+    if (index < 0) {
+      process.stdout.write("Warning: Index = " + index + "\n");
+    }
     color = map[index];
     image[pos++] =
       color[0];

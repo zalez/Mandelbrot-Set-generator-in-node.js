@@ -70,10 +70,12 @@ function show_image(req, res) {
   // Render a Mandelbrot set into a result array
   if (aa) {
     var rendersize = size * AA_FACTOR;
+    var renderppu = ppu * AA_FACTOR;
   } else {
     var rendersize = size;
+    var renderppu = ppu
   }
-  var result = mandelbrot.render(rendersize, RE_CENTER, IM_CENTER, ppu, max, opt);
+  var result = mandelbrot.render(rendersize, RE_CENTER, IM_CENTER, renderppu, max, opt);
 
   // Create a colormap.
   var map = colormap.colormap(COLORS);
@@ -110,14 +112,13 @@ function show_image(req, res) {
 
   // Resize the image using a Gaussian filter to provide high quality anti-aliasing.
   if (aa) {
-    //clean_image = Resize.resize3to1(image, rendersize);
-    clean_image = image;
+    clean_image = Resize.resize3to1(image, rendersize);
   } else {
     clean_image = image;
   }
 
   // Convert the image into PNG format.
-  var png_image = new Png(clean_image, rendersize, rendersize, 'rgb');
+  var png_image = new Png(clean_image, size, size, 'rgb');
   var png_file = png_image.encodeSync();
 
   // Return the image to the browser.

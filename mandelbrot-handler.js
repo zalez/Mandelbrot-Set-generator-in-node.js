@@ -91,7 +91,7 @@ function show_image(req, res) {
   var pos = 0;
   var color = [];
   for (i = 0; i < rendersize * rendersize; i++) {
-    index=Math.floor(result[i] / maxval *(COLORS));
+    index=Math.floor(result[i] / (maxval + 1) * COLORS);
     if (index >= COLORS) {
       process.stdout.write("Warning: Index = " + index + "\n");
     }

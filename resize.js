@@ -34,6 +34,6 @@ exports.resize3to1 = function (image, size) {
     }
   }
 
-  return image;
+  return newimage;
 }
 

@@ -36,55 +36,58 @@ exports.resize3to1 = function (image, size) {
   var j = 0; // index for the source buffer.
   var r = 0, g = 0, b = 0; 
 
-  for (var i = 0; i < newsize * newsize;) {
-    j = i * 3 * 3; // Corresponding position in source array.
+  for (var y = 0; y < newsize; y++) {
+    for (var x = 0; x < newsize; x++) {
+      j = y * size * 3 + x * 3; // Corresponding position in source array.
+      i = y * newsize * 3 + x * 3; // Corresponding position in destination array.
 
-    // top row, red, green and blue.
-    r = image[j++] * kernel[0]; // top left red
-    g = image[j++] * kernel[0]; // top left green
-    b = image[j++] * kernel[0]; // top left blue
+      // top row, red, green and blue.
+      r = image[j++] * kernel[0]; // top left red
+      g = image[j++] * kernel[0]; // top left green
+      b = image[j++] * kernel[0]; // top left blue
 
-    r += image[j++] * kernel[1]; // top center red
-    g += image[j++] * kernel[1]; // top center green
-    b += image[j++] * kernel[1]; // ...and so on.
+      r += image[j++] * kernel[1]; // top center red
+      g += image[j++] * kernel[1]; // top center green
+      b += image[j++] * kernel[1]; // ...and so on.
 
-    r += image[j++] * kernel[2];
-    g += image[j++] * kernel[2];
-    b += image[j]   * kernel[2];
+      r += image[j++] * kernel[2];
+      g += image[j++] * kernel[2];
+      b += image[j]   * kernel[2];
 
-    // middle row
-    j += size * 3; // Skip to next line in the source image
+      // middle row
+      j += size * 3; // Skip to next line in the source image
 
-    b += image[j--] * kernel[5];
-    g += image[j--] * kernel[5];
-    r += image[j--] * kernel[5];
+      b += image[j--] * kernel[5];
+      g += image[j--] * kernel[5];
+      r += image[j--] * kernel[5];
 
-    b += image[j--] * kernel[4];
-    g += image[j--] * kernel[4];
-    r += image[j--] * kernel[4];
+      b += image[j--] * kernel[4];
+      g += image[j--] * kernel[4];
+      r += image[j--] * kernel[4];
 
-    b += image[j--] * kernel[3];
-    g += image[j--] * kernel[3];
-    r += image[j]   * kernel[3];
+      b += image[j--] * kernel[3];
+      g += image[j--] * kernel[3];
+      r += image[j]   * kernel[3];
 
-    // bottom row
-    j += size * 3; // Skip again to next source line
+      // bottom row
+      j += size * 3; // Skip again to next source line
+  
+      r += image[j++] * kernel[6];
+      g += image[j++] * kernel[6];
+      b += image[j++] * kernel[6];
 
-    r += image[j++] * kernel[6];
-    g += image[j++] * kernel[6];
-    b += image[j++] * kernel[6];
+      r += image[j++] * kernel[7];
+      g += image[j++] * kernel[7];
+      b += image[j++] * kernel[7];
 
-    r += image[j++] * kernel[7];
-    g += image[j++] * kernel[7];
-    b += image[j++] * kernel[7];
+      r += image[j++] * kernel[8];
+      g += image[j++] * kernel[8];
+      b += image[j]   * kernel[8];
 
-    r += image[j++] * kernel[8];
-    g += image[j++] * kernel[8];
-    b += image[j]   * kernel[8];
-
-    newimage[i++] = Math.floor(r);
-    newimage[i++] = Math.floor(g);
-    newimage[i++] = Math.floor(b);
+      newimage[i++] = Math.floor(r);
+      newimage[i++] = Math.floor(g);
+      newimage[i++] = Math.floor(b);
+    }
   }
 
   return newimage;

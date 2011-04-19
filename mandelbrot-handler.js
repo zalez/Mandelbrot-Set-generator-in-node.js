@@ -117,7 +117,7 @@ function show_image(req, res) {
   }
 
   // Convert the image into PNG format.
-  var png_image = new Png(clean_image, size, size, 'rgb');
+  var png_image = new Png(clean_image, rendersize, rendersize, 'rgb');
   var png_file = png_image.encodeSync();
 
   // Return the image to the browser.

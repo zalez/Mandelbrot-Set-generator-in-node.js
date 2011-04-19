@@ -24,7 +24,7 @@ exports.resize3to1 = function (image, size) {
   for (var y = 0; y < newsize; y++) {
     for (var x = 0; x < newsize; x++) {
       i = y * newsize * 3 + x * 3;  // Index into the new array. * 3 due to rgb tuples.
-      j = y * newsize * 3 + x * 3;  // Index into the new array. * 3 due to rgb tuples.
+      j = y * size * 3 + x * 3; 
 
       newimage[i++] = image[j++];
       newimage[i++] = image[j++];

@@ -20,6 +20,8 @@ exports.resize3to1 = function (image, size) {
   var newsize = size / 3;
   var newstride = newsize * 3; // rgb
   var newimage = new Buffer(newsize * newstride);
+  
+  return image;
 
   // Apply the Gauss filter
   var i = 0, j = 0;
@@ -34,6 +36,5 @@ exports.resize3to1 = function (image, size) {
     }
   }
 
-  return image;
 }
 

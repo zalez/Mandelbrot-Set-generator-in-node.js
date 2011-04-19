@@ -110,7 +110,7 @@ function show_image(req, res) {
 
   // Resize the image using a Gaussian filter to provide high quality anti-aliasing.
   if (aa) {
-    clean_image = Resize.resize3to1(image, rendersize);
+    //clean_image = Resize.resize3to1(image, rendersize);
     clean_image = image;
   } else {
     clean_image = image;

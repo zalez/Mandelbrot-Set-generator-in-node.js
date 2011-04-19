@@ -16,7 +16,7 @@
  * Returns: A node.js Buffer with the result image, 1/3 of the size.
  */
 exports.resize3to1 = function (image, size) {
-  var newsize = size / 3;
+  var newsize = Math.floor(size / 3);
   var newimage = new Buffer(newsize * newsize * 3);
 
   // Apply the Gauss filter

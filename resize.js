@@ -16,15 +16,17 @@
  * Returns: A node.js Buffer with the result image, 1/3 of the size.
  */
 exports.resize3to1 = function (image, size) {
-  var newsize = Math.floor(size / 3);
-  var newimage = new Buffer(newsize * newsize * 3);
+  var stride = size * 3; // Due to rgb
+  var newsize = size / 3;
+  var newstride = newsize * 3; // rgb
+  var newimage = new Buffer(newsize * newstride);
 
   // Apply the Gauss filter
   var i = 0, j = 0;
   for (var y = 0; y < newsize; y++) {
     for (var x = 0; x < newsize; x++) {
-      i = y * newsize * 3 + x * 3;  // Index into the new array. * 3 due to rgb tuples.
-      j = y * size * 3 + x * 3; 
+      i = y * newstride + x * 3;  // Index into the new array. * 3 due to rgb tuples.
+      j = y * stride + x * 3 * 3; 
 
       newimage[i++] = image[j++];
       newimage[i++] = image[j++];

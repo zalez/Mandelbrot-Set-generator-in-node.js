@@ -26,9 +26,9 @@ exports.resize3to1 = function (image, size) {
       i = y * newsize * 3 + x * 3;  // Index into the new array. * 3 due to rgb tuples.
       j = y * size * 3 + x * 3 * 3; // Index into the old array. * 3 due to rgb tuples and * 3 due to 3x size.
 
-      newimage[i++] = image[j++];
-      newimage[i++] = image[j++];
-      newimage[i] = image[j];
+      newimage[i++] = 255;
+      newimage[i++] = 10;
+      newimage[i] = 10;
     }
   }
 

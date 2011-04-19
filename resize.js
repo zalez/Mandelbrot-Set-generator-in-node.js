@@ -16,7 +16,7 @@
  * Returns: A node.js Buffer with the result image, 1/3 of the size.
  */
 exports.resize3to1 = function (image, size) {
-  var stride = size * 3; // Due to rgb
+  var stride = size * 3 * 3; // Due to rgb and 3 x size in both dimensions
   var newsize = size / 3;
   var newstride = newsize * 3; // rgb
   var newimage = new Buffer(newsize * newstride);

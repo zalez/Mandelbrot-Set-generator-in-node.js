@@ -33,12 +33,12 @@ exports.resize3to1 = function (image, size) {
   var newsize = size / 3;
   var newimage = Buffer(newsize * newsize * 3);
 
-  var j = 0; // index for the source buffer.
+  var i = 0; j = 0; // index for the source buffer.
   var r = 0, g = 0, b = 0; 
 
   for (var y = 0; y < newsize; y++) {
     for (var x = 0; x < newsize; x++) {
-      j = y * size * 3 + x * 3; // Corresponding position in source array.
+      j = y * size * 3 + x * 3 * 3; // Corresponding position in source array.
       i = y * newsize * 3 + x * 3; // Corresponding position in destination array.
 
       // top row, red, green and blue.

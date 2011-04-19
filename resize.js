@@ -17,7 +17,7 @@
  */
 exports.resize3to1 = function (image, size) {
   var newsize = size / 3;
-  var newimage = new Buffer(newsize);
+  var newimage = new Buffer(newsize * newsize * 3);
 
   // Apply the Gauss filter
   var i = 0, j = 0;

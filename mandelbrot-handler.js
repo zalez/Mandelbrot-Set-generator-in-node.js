@@ -81,11 +81,17 @@ function show_image(req, res) {
   // Create an image buffer.
   var image = new Buffer(rendersize * rendersize * 3);
 
+  // Before we map the mandelbrot set, we need to determine the highest value.
+  var maxval = 0;
+  for (i = 0; i < rendersize * rendersize; i++) {
+    if (result[i] > maxval) maxval = result[i];
+  }
+
   // Fill the image buffer with the result from the Mandelbrot set, mapped to the colormap.
   var pos = 0;
   var color = [];
   for (i = 0; i < rendersize * rendersize; i++) {
-    index=Math.floor(result[i]*(COLORS));
+    index=Math.floor(result[i] / maxval *(COLORS));
     if (index >= COLORS) {
       process.stdout.write("Warning: Index = " + index + "\n");
     }

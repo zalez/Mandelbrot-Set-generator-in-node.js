@@ -48,18 +48,18 @@ exports.resize3to1 = function (image, size) {
       // Apply Gauss kernel vertically
       j = y * stride + x * 3 * 3; 
 
-      r += image[j] * gauss[0];
-      g += image[j] * gauss[0];
+      r += image[j++] * gauss[0];
+      g += image[j++] * gauss[0];
       b += image[j] * gauss[0];
 
-      j += stride;
-      r += image[j] * gauss[1];
-      g += image[j] * gauss[1];
+      j += stride - 2;
+      r += image[j++] * gauss[1];
+      g += image[j++] * gauss[1];
       b += image[j] * gauss[1];
 
-      j += stride;
-      r += image[j] * gauss[0];
-      g += image[j] * gauss[0];
+      j += stride - 2;
+      r += image[j++] * gauss[0];
+      g += image[j++] * gauss[0];
       b += image[j] * gauss[0];
 
       // Write the new value down

@@ -37,7 +37,7 @@ exports.resize3to1 = function (image, size) {
   var r = 0, g = 0, b = 0; 
 
   for (var i = 0; i < newsize * newsize;) {
-    j = i * 3 * 3; // The first 3 is for the 3x size, the second for rgb.
+    j = i * 3 * 3; // Corresponding position in source array.
 
     // top row, red, green and blue.
     r = image[j++] * kernel[0]; // top left red
@@ -53,7 +53,7 @@ exports.resize3to1 = function (image, size) {
     b += image[j]   * kernel[2];
 
     // middle row
-    j += size // Skip to next line in the source image
+    j += size * 3; // Skip to next line in the source image
 
     b += image[j--] * kernel[5];
     g += image[j--] * kernel[5];
@@ -68,7 +68,7 @@ exports.resize3to1 = function (image, size) {
     r += image[j]   * kernel[3];
 
     // bottom row
-    j += size // Skip again to next source line
+    j += size * 3; // Skip again to next source line
 
     r += image[j++] * kernel[6];
     g += image[j++] * kernel[6];

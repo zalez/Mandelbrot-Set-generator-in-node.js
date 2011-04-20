@@ -115,7 +115,7 @@ exports.resize3to1 = function (image, size) {
  * size:  The size of the source image.
  * n: The factor to shrink the image by.
  *
- * Returns: A node.js Buffer with the result image, 1/5 of the size.
+ * Returns: A node.js Buffer with the result image, 1/n of the size.
  */
 exports.resizento1 = function (image, size, n) {
   var stride = size * 3;
@@ -123,15 +123,15 @@ exports.resizento1 = function (image, size, n) {
   var newimage = new Buffer(newsize * newsize * 3);
   var kernel = gauss(n, 0.5);
 
-  var i = 0, j = 0, r = 0, g = 0, b = 0;
+  var i = 0, j = 0, r = 0, g = 0, b = 0, m = 0;
   for (var y = 0; y < newsize; y++) {
     for (var x = 0; x < newsize; x++) {
-      r = 0; g = 0; b = 0;
+      r = 0; g = 0; b = 0; m = 0;
       for (var k = 0; k < n; k++) {
         for (var l = 0; l < n ; l++) {
-          r += image[j++] * kernel[k * n + l];
-          g += image[j++] * kernel[k * n + l];
-          b += image[j++] * kernel[k * n + l];
+          r += image[j++] * kernel[m];
+          g += image[j++] * kernel[m];
+          b += image[j++] * kernel[m++];
         }
         j += stride - n * 3;
       }

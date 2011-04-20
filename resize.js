@@ -23,7 +23,7 @@ function gauss(n, s) {
     for (var j = 0; j < n; j++) {
       y = i - center;
       x = j - center;
-      kernel[y * n + x] = (1/(2 * Math.PI * (s*s))) * Math.exp(- ((x*x+y*y)/(2*s*s)));
+      kernel[i * n + j] = (1/(2 * Math.PI * (s*s))) * Math.exp(- ((x*x+y*y)/(2*s*s)));
     }
   }
   return kernel;

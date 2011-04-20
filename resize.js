@@ -18,7 +18,7 @@ function gauss(n, s) {
   var kernel = new Array(n * n);
   var center = n/2; 
   var x = 0, y = 0;
-  sum = 0;
+  var sum = 0;
 
   for (var i = 0; i < n; i++) {
     for (var j = 0; j < n; j++) {
@@ -31,9 +31,8 @@ function gauss(n, s) {
   }
 
   // Normalize the kernel.
-  norm = sum / (n*n);
   for (var i = 0; i < n * n; i++) {
-    kernel[i] = kernel[i] / norm;
+    kernel[i] = kernel[i] / sum;
   }
 
   return kernel;

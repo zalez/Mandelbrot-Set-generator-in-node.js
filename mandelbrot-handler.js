@@ -115,10 +115,10 @@ function show_image(req, res) {
       clean_image = image;
       break;
     case 1:
-      clean_image = Resize.resize3to1(image, rendersize);
+      clean_image = Resize.resizento1(image, rendersize, 3);
       break;
     case 2:
-      clean_image = Resize.resize5to1(image, rendersize);
+      clean_image = Resize.resizento1(image, rendersize, 5);
   }
 
   // Convert the image into PNG format.

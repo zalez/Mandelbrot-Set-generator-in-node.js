@@ -108,26 +108,27 @@ exports.resize3to1 = function (image, size) {
 }
 
 /*
- * Resize a quadratic image to a fifth of its size using a supplied kernel. Assumes that the
- * Image is quadratic and that the size is dividable by five.
+ * Resize a quadratic image to an nth of its size using a supplied kernel. Assumes that the
+ * Image is quadratic and that the size is dividable by n.
  *
  * image: A node.js Buffer containing the source image in rgb notation.
  * size:  The size of the source image.
+ * n: The factor to shrink the image by.
  *
  * Returns: A node.js Buffer with the result image, 1/5 of the size.
  */
-exports.resize5to1 = function (image, size) {
-  var stride = size * 5;
-  var newsize = size / 5;
+exports.resizento1 = function (image, size, n) {
+  var stride = size * n;
+  var newsize = size / n;
   var newimage = new Buffer(newsize * newsize * 3);
-  var kernel = gauss(5, 0.5);
+  var kernel = gauss(n, 0.5);
 
   var i = 0, j = 0, r = 0, g = 0, b = 0;
   for (var y = 0; y < newsize; y++) {
     for (var x = 0; x < newsize; x++) {
       r = 0; g = 0; b = 0;
-      for (var k = 0; k < 5; k++) {
-        for (var l = 0; l < 5 ; l++) {
+      for (var k = 0; k < n; k++) {
+        for (var l = 0; l < n ; l++) {
           r += image[j++] * kernel[k * 5 + l];
           g += image[j++] * kernel[k * 5 + l];
           b += image[j++] * kernel[k * 5 + l];
@@ -141,10 +142,10 @@ exports.resize5to1 = function (image, size) {
       newimage[i++] = b;
 
       // Bring the j index to the next pixel
-      j -= stride << 2;
+      j -= stride * (n - 1);
     }
     // Bring the j index to the next row
-    j += stride << 2;
+    j += stride * (n - 1);
   }
 
   return newimage;

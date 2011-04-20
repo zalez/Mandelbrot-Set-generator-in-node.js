@@ -83,7 +83,7 @@ exports.resize3to1 = function (image, size) {
       j -= newstride << 1;
     }
     // Bring the j index to the next row
-    j += newstride << 1;
+    j += newstride;
   }
 
   return newimage;

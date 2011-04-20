@@ -131,7 +131,7 @@ function show_image(req, res) {
       clean_image = Resize.resizento1(image, rendersize, 5, Resize.gauss(5, 0.5));
       break;
     case 4:
-      clean_image = Resize.resizento1(image, rendersize, 5, Resize.mitchell(3, 1/3, 1/3));
+      clean_image = Resize.resizento1(image, rendersize, 5, Resize.mitchell(5, 1/3, 1/3));
       break;
   }
 

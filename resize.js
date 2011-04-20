@@ -30,10 +30,10 @@ exports.resize3to1 = function (image, size) {
 
   // Apply the Gauss filter
   var i = 0, j = 0, r = 0, g = 0, b = 0;
-  for (var y = 0; y < newsize + 2; y++) {
+  for (var y = 0; y < newsize; y++) {
     for (var x = 0; x < newsize; x++) {
       i = y * newstride + x * 3;  // Index into the new array. * 3 due to rgb tuples.
-      j = y * stride + x * 3 * 3; 
+      j = y * stride + x * 3 * 3;
 
       // Apply Gauss kernel
 
@@ -45,23 +45,23 @@ exports.resize3to1 = function (image, size) {
       g += image[j++] * gauss[1];
       b += image[j++] * gauss[1];
 
-      r += image[j] * gauss[2];
-      g += image[j] * gauss[2];
+      r += image[j++] * gauss[2];
+      g += image[j++] * gauss[2];
       b += image[j] * gauss[2];
 
       j += stride;
 
-      r += image[j--] * gauss[5];
-      g += image[j--] * gauss[5];
       b += image[j--] * gauss[5];
+      g += image[j--] * gauss[5];
+      r += image[j--] * gauss[5];
 
-      r += image[j--] * gauss[4];
-      g += image[j--] * gauss[4];
       b += image[j--] * gauss[4];
+      g += image[j--] * gauss[4];
+      r += image[j--] * gauss[4];
 
+      b += image[j--] * gauss[3];
+      g += image[j--] * gauss[3];
       r += image[j] * gauss[3];
-      g += image[j] * gauss[3];
-      b += image[j] * gauss[3];
 
       j += stride;
 
@@ -73,8 +73,8 @@ exports.resize3to1 = function (image, size) {
       g += image[j++] * gauss[7];
       b += image[j++] * gauss[7];
 
-      r += image[j] * gauss[8];
-      g += image[j] * gauss[8];
+      r += image[j++] * gauss[8];
+      g += image[j++] * gauss[8];
       b += image[j] * gauss[8];
 
       // Write the new value down

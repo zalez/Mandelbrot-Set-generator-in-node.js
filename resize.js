@@ -118,7 +118,7 @@ exports.resize3to1 = function (image, size) {
  * Returns: A node.js Buffer with the result image, 1/5 of the size.
  */
 exports.resizento1 = function (image, size, n) {
-  var stride = size * n;
+  var stride = size * 3;
   var newsize = size / n;
   var newimage = new Buffer(newsize * newsize * 3);
   var kernel = gauss(n, 0.5);

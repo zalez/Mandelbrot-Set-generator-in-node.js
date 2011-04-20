@@ -12,6 +12,7 @@ function gauss(n, s) {
   var center = n/2; 
   var x = 0, y = 0;
   var sum = 0;
+  var sample = 0;
 
   for (var i = 0; i < n; i++) {
     for (var j = 0; j < n; j++) {
@@ -30,6 +31,54 @@ function gauss(n, s) {
 
   return kernel;
 }
+
+// Compute the n x n Mitchell-Netravali filter kernel with parameters b and c.
+function mitchell(n, b, c) {
+  var kernel = new Array(n * n);
+  var center = n / 2;
+  var x = 0, y = 0;
+  var sum = 0;
+  var m = 0;
+  var sample = 0;
+
+  for (var i = 0; i < n; i++) {
+    for (var j = 0; j < n; j++) {
+      y = i - center;
+      x = j - center;
+
+      // First pass, horizontal.
+      m = Math.abs(x); // Modulus of x
+      if (m < 1) {
+        sample = ((12 - 9 * b - 6 * c) * m * m * m + (-18 + 12 * b + 6 * c) * m * m) / 6;
+      } else if (m < 2) {
+        sample = ((-b - 6 * c) * m * m * m + (6 * b + 30 * c) * m * m) / 6;
+      } else {
+        sample = 0;
+      }
+
+      // Second pass, vertical.
+      m = Math.abs(y); // Modulus of y
+      if (m < 1) {
+        sample += ((12 - 9 * b - 6 * c) * m * m * m + (-18 + 12 * b + 6 * c) * m * m) / 6;
+      } else if (m < 2) {
+        sample += ((-b - 6 * c) * m * m * m + (6 * b + 30 * c) * m * m) / 6;
+      } else {
+        sample += 0;
+      }
+
+      sum += sample;
+      kernel[i * n + j] = sample;
+    }
+  }
+
+  // Normalize the kernel.
+  for (var i = 0; i < n * n; i++) {
+    kernel[i] = kernel[i] / sum;
+  }
+
+  return kernel;
+}
+
 
 /*
  * Resize a quadratic image to a third of its size using a Gaussian kernel. Assumes that the
@@ -121,7 +170,8 @@ exports.resizento1 = function (image, size, n) {
   var stride = size * 3;
   var newsize = size / n;
   var newimage = new Buffer(newsize * newsize * 3);
-  var kernel = gauss(n, 0.5);
+//  var kernel = gauss(n, 0.5);
+  var kernel = mitchell(n, 1/3, 1/3);
 
   var i = 0, j = 0, r = 0, g = 0, b = 0, m = 0;
   for (var y = 0; y < newsize; y++) {

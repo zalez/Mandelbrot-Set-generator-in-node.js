@@ -133,7 +133,7 @@ exports.resizento1 = function (image, size, n) {
           g += image[j++] * kernel[k * 5 + l];
           b += image[j++] * kernel[k * 5 + l];
         }
-        j += stride - 15;
+        j += stride - n * 3;
       }
 
       // Write the new values down

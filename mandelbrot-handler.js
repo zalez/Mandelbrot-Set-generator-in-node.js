@@ -24,8 +24,13 @@ const OPT = 3; // Whether to use the optimized subseparation algorithm
 const MAX_OPT = 4;
 
 // We'll render at a much higher size than the image we produce, so we can get antialiasing.
-const AA = 0; // 0: No anti-aliasing. 1: 3x3 anti-aliasing with Gaussian filter, 2: 5x5 AA.
-const MAX_AA = 2;
+// 0: No antialiasing.
+// 1: 3x3 anti-aliasing with Gaussian filter.
+// 2: 3x3 anti-aliasing with Mitchell-Netravali filter.
+// 3: 5x5 anti-aliasing with Gaussian filter.
+// 4: 5x5 anti-aliasing with Mitchell-Netravali filter.
+const AA = 0;
+const MAX_AA = 4;
 
 // Modules we want to use.
 var connect = require('connect');
@@ -74,10 +79,12 @@ function show_image(req, res) {
       var renderppu = ppu;
       break;
     case 1:
+    case 2:
       var rendersize = size * 3;
       var renderppu = ppu * 3;
       break;
-    case 2:
+    case 3:
+    case 4:
       var rendersize = size * 5;
       var renderppu = ppu * 5;
   }
@@ -115,10 +122,17 @@ function show_image(req, res) {
       clean_image = image;
       break;
     case 1:
-      clean_image = Resize.resizento1(image, rendersize, 3);
+      clean_image = Resize.resizento1(image, rendersize, 3, Resize.gauss(3, 0.5));
       break;
     case 2:
-      clean_image = Resize.resizento1(image, rendersize, 5);
+      clean_image = Resize.resizento1(image, rendersize, 3, Resize.mitchell(3, 1/3, 1/3));
+      break;
+    case 3:
+      clean_image = Resize.resizento1(image, rendersize, 3, Resize.gauss(5, 0.5));
+      break;
+    case 4:
+      clean_image = Resize.resizento1(image, rendersize, 3, Resize.mitchell(3, 1/3, 1/3));
+      break;
   }
 
   // Convert the image into PNG format.

@@ -23,10 +23,9 @@ const gauss = [
  * Returns: A node.js Buffer with the result image, 1/3 of the size.
  */
 exports.resize3to1 = function (image, size) {
-  var stride = size * 3 * 3; // Due to rgb and 3 x size in both dimensions
+  var stride = size * 3;
   var newsize = size / 3;
-  var newstride = newsize * 3; // rgb
-  var newimage = new Buffer(newsize * newstride);
+  var newimage = new Buffer(newsize * newsize * 3);
 
   // Apply the Gauss filter
   var i = 0, j = 0, r = 0, g = 0, b = 0;
@@ -80,10 +79,10 @@ exports.resize3to1 = function (image, size) {
       newimage[i++] = b;
 
       // Bring the j index to the next pixel
-      j -= newstride << 1;
+      j -= stride << 1;
     }
     // Bring the j index to the next row
-    j += newstride;
+    j += stride << 1;
   }
 
   return newimage;

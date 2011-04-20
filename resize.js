@@ -31,9 +31,9 @@ function gauss(n, s) {
   }
 
   // Normalize the kernel.
-  var factor = 1 / sample;
+  norm = sum / (n*n);
   for (var i = 0; i < n * n; i++) {
-    kernel[i] = kernel[i] * factor;
+    kernel[i] = kernel[i] / norm;
   }
 
   return kernel;

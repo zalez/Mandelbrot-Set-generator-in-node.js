@@ -32,9 +32,6 @@ exports.resize3to1 = function (image, size) {
   var i = 0, j = 0, r = 0, g = 0, b = 0;
   for (var y = 0; y < newsize; y++) {
     for (var x = 0; x < newsize; x++) {
-      //i = y * newstride + x * 3;  // Index into the new array. * 3 due to rgb tuples.
-      //j = y * stride + x * 3 * 3;
-
       // Apply Filter kernel
 
       r = image[j++] * gauss[0];
@@ -86,7 +83,6 @@ exports.resize3to1 = function (image, size) {
       j -= stride << 1;
     }
     // Bring the j index to the next row
-    j += stride;
   }
 
   return newimage;

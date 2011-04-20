@@ -18,14 +18,24 @@ function gauss(n, s) {
   var kernel = new Array(n * n);
   var center = n/2; 
   var x = 0, y = 0;
+  sum = 0;
 
   for (var i = 0; i < n; i++) {
     for (var j = 0; j < n; j++) {
       y = i - center;
       x = j - center;
-      kernel[i * n + j] = (1/(2 * Math.PI * (s*s))) * Math.exp(- ((x*x+y*y)/(2*s*s)));
+      sample = (1/(2 * Math.PI * (s*s))) * Math.exp(- ((x*x+y*y)/(2*s*s)));
+      sum += sample;
+      kernel[i * n + j] = sample;
     }
   }
+
+  // Normalize the kernel.
+  var factor = 1 / sample;
+  for (var i = 0; i < n * n; i++) {
+    kernel[i] = kernel[i] * factor;
+  }
+
   return kernel;
 }
 

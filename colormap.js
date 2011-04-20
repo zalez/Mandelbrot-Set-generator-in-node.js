@@ -12,9 +12,9 @@ exports.colormap = function (size) {
   for (var i = 0; i < size; i++) {
     j = i / size;
     colormap[i] = [
-      Math.floor((Math.sin(((j * 2) + 0.0) * Math.PI) + 1) * 255 / 2),
-      Math.floor((Math.sin(((j * 3) + 0.5) * Math.PI) + 1) * 255 / 2),
-      Math.floor((Math.sin(((j * 4) + 1.0) * Math.PI) + 1) * 255 / 2)
+      Math.floor((Math.sin(((j * 4) + 0.0) * Math.PI) + 1) * 255 / 2),
+      Math.floor((Math.sin(((j * 8) + 0.0) * Math.PI) + 1) * 255 / 2),
+      Math.floor((Math.sin(((j * 16) + 0.0) * Math.PI) + 1) * 255 / 2)
     ];
   }
 

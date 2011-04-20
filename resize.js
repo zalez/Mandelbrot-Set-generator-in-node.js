@@ -142,7 +142,7 @@ exports.resizento1 = function (image, size, n) {
       newimage[i++] = b;
 
       // Bring the j index to the next pixel
-      j -= stride * (n - 1);
+      j -= stride * n - n * 3;
     }
     // Bring the j index to the next row
     j += stride * (n - 1);

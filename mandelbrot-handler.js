@@ -24,8 +24,8 @@ const OPT = 3; // Whether to use the optimized subseparation algorithm
 const MAX_OPT = 4;
 
 // We'll render at a much higher size than the image we produce, so we can get antialiasing.
-const AA = 0; // Whether to perform anti-aliasing or not.
-const AA_FACTOR = 3;
+const AA = 0; // 0: No anti-aliasing. 1: 3x3 anti-aliasing with Gaussian filter, 2: 5x5 AA.
+const MAX_AA = 2;
 
 // Modules we want to use.
 var connect = require('connect');
@@ -65,15 +65,21 @@ function show_image(req, res) {
   var aa = Number(params.query.aa) || AA;
   if (aa == Number.NaN) aa = AA;
   if (aa < 0) aa = AA;
-  if (aa > 1) aa = AA;
+  if (aa > MAX_AA) aa = MAX_AA;
 
   // Render a Mandelbrot set into a result array
-  if (aa) {
-    var rendersize = size * AA_FACTOR;
-    var renderppu = ppu * AA_FACTOR;
-  } else {
-    var rendersize = size;
-    var renderppu = ppu
+  switch (aa) {
+    case 0:
+      var rendersize = size;
+      var renderppu = ppu;
+      break;
+    case 1:
+      var rendersize = size * 3;
+      var renderppu = ppu * 3;
+      break;
+    case 2:
+      var rendersize = size * 5;
+      var renderppu = ppu * 5;
   }
   var result = mandelbrot.render(rendersize, RE_CENTER, IM_CENTER, renderppu, max, opt);
 
@@ -104,10 +110,15 @@ function show_image(req, res) {
   }
 
   // Resize the image using a Gaussian filter to provide high quality anti-aliasing.
-  if (aa) {
-    clean_image = Resize.resize3to1(image, rendersize);
-  } else {
-    clean_image = image;
+  switch (aa) {
+    case 0:
+      clean_image = image;
+      break;
+    case 1:
+      clean_image = Resize.resize3to1(image, rendersize);
+      break;
+    case 2:
+      clean_image = Resize.resize5to1(image, rendersize);
   }
 
   // Convert the image into PNG format.

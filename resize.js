@@ -129,9 +129,9 @@ exports.resizento1 = function (image, size, n) {
       r = 0; g = 0; b = 0;
       for (var k = 0; k < n; k++) {
         for (var l = 0; l < n ; l++) {
-          r += image[j++] * kernel[k * 5 + l];
-          g += image[j++] * kernel[k * 5 + l];
-          b += image[j++] * kernel[k * 5 + l];
+          r += image[j++] * kernel[k * n + l];
+          g += image[j++] * kernel[k * n + l];
+          b += image[j++] * kernel[k * n + l];
         }
         j += stride - n * 3;
       }

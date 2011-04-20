@@ -6,13 +6,6 @@
  * A simple image buffer resizing library in JavaScript.
  */
 
-// The Gauss Kernel, courtesy of http://www.embege.com/gauss/
-//const gauss = [
-//0.07511360795411207, 0.12384140315297386, 0.07511360795411207, 
-//0.12384140315297386, 0.20417995557165622, 0.12384140315297386, 
-//0.07511360795411207, 0.12384140315297386, 0.07511360795411207
-//]
-
 // Compute the n x n Gaussian kernel with sigma s, for use in applying the filter.
 function gauss(n, s) {
   var kernel = new Array(n * n);
@@ -148,10 +141,10 @@ exports.resize5to1 = function (image, size) {
       newimage[i++] = b;
 
       // Bring the j index to the next pixel
-      j -= stride << 1;
+      j -= stride << 2;
     }
     // Bring the j index to the next row
-    j += stride << 1;
+    j += stride << 2;
   }
 
   return newimage;

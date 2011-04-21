@@ -28,6 +28,7 @@ exports.gauss = function(n, s) {
   for (var i = 0; i < n * n; i++) {
     kernel[i] = kernel[i] / sum;
   }
+  process.stdout.write("Mitchell Normalization factor: " + sum + "\n");
 
   return kernel;
 }
@@ -75,6 +76,7 @@ exports.mitchell = function(n, b, c) {
   for (var i = 0; i < n * n; i++) {
     kernel[i] = kernel[i] / sum;
   }
+  process.stdout.write("Mitchell Normalization factor: " + sum + "\n");
 
   return kernel;
 }

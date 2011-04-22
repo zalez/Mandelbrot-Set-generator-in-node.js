@@ -98,7 +98,7 @@ function show_image(req, res) {
 
   Timer.start();
   // Create a colormap.
-  var map = colormap.colormap(COLORS);
+  var map = Colormap.colormap(COLORS);
 
   // Create an image buffer.
   var image = new Buffer(rendersize * rendersize * 3);
@@ -166,7 +166,7 @@ function show_image(req, res) {
   res.end(png_file.toString('binary'), 'binary');
 }
 
-exports.handler = connect.router(function(app) {
+exports.handler = Connect.router(function(app) {
   app.get('/', function(req, res) {
     res.writeHead(307, { "Location": "/mandelbrot/image.png" });
     res.end();

@@ -12,6 +12,6 @@ exports.start = function() {
 }
 
 exports.stop = function() {
-  elapsed = Date().now() - time;
+  elapsed = Date.now() - time;
   return elapsed;
 }

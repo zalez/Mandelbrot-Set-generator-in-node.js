@@ -53,6 +53,7 @@ function iterate_basic(cr, ci, max) {
 }
 
 // Find out whether this complex number is in the mandelbrot set or not.
+// Optimization: Test if the point is in the period 1 or 2 bulbs before iterating.
 // cr: Real part of complex number c to iterate with.
 // ci: Imaginary part of complex number c to iterate with.
 //
@@ -108,6 +109,108 @@ function iterate_opt(cr, ci, max) {
   return 0;
 }
 
+// Perform the iteration, test for the period 1 bulb to avoid calculation.
+// cr: Real part of complex number c to iterate with.
+// ci: Imaginary part of complex number c to iterate with.
+//
+// Returns a value mu, which is the number of iterations needed to escape the e
+// (or 0 if the formula never escaped), plus some extra fractional value to all
+// smooth coloring.
+function iterate_opt_1(cr, ci, max) {
+  var zr = 0;
+  var zi = 0;
+  var t  = 0; // A temporary store.
+  var m2 = 0; // The modulo of the complex number z, squared.
+  var zr2 = 0; // Real part of z, squared. Will be reused in this variable late
+  var zi2 = 0; // Imaginary part of z, squared.
+
+  // Before we iterate, we'll perform some tests for optimization purposes.
+
+  // Test if the point is within the cardioid bulb to avoid calculation...
+  var x4 = cr - 0.25;
+  var y2 = ci * ci;
+  var q = x4 * x4 + y2;
+  t = q * (q + x4);
+  if (t < y2 * 0.25) {
+    return 0;
+  }
+
+  // Ok, we'll have to go through the whole iteration thing.
+  for (var i = 1; i < max; i++) {
+    // z = z^2 ...
+    t = zr2  - zi2;
+    zi = 2 * zr * zi;
+    zr = t;
+
+    // ... + c    
+    zr += cr;
+    zi += ci;
+
+    // To be reused in the test and the next iteration.
+    zr2 = zr * zr;
+    zi2 = zi * zi;
+
+    // Test if we escaped the equation
+    m2 = zr2 + zi2
+    if (m2 > 4) { // Mandelbrot escape radius is 2, hence 4 since we compare to
+      // Return smoothed escape value.
+      return (i + 1 - (Math.log(Math.log(Math.sqrt(m2))) / Math.LN2));
+    }
+  }
+
+  return 0;
+}
+
+// Find out whether this complex number is in the mandelbrot set or not.
+// Optimization: Test if the point is in the period 2 bulb before iterating.
+// cr: Real part of complex number c to iterate with.
+// ci: Imaginary part of complex number c to iterate with.
+//
+// Returns a value mu, which is the number of iterations needed to escape the e
+// (or 0 if the formula never escaped), plus some extra fractional value to all
+// smooth coloring.
+function iterate_opt_2(cr, ci, max) {
+  var zr = 0;
+  var zi = 0;
+  var t  = 0; // A temporary store.
+  var m2 = 0; // The modulo of the complex number z, squared.
+  var zr2 = 0; // Real part of z, squared. Will be reused in this variable late
+  var zi2 = 0; // Imaginary part of z, squared.
+
+  // Before we iterate, we'll perform some tests for optimization purposes.
+
+  // Test if the point is in the period 2 bulb
+  var y2 = ci * ci;
+  if (((cr + 1) * (cr + 1) + y2) < (1 / 16)) {
+    return 0;
+  }
+
+  // Ok, we'll have to go through the whole iteration thing.
+  for (var i = 1; i < max; i++) {
+    // z = z^2 ...
+    t = zr2  - zi2;
+    zi = 2 * zr * zi;
+    zr = t;
+
+    // ... + c    
+    zr += cr;
+    zi += ci;
+
+    // To be reused in the test and the next iteration.
+    zr2 = zr * zr;
+    zi2 = zi * zi;
+
+    // Test if we escaped the equation
+    m2 = zr2 + zi2
+    if (m2 > 4) { // Mandelbrot escape radius is 2, hence 4 since we compare to
+      // Return smoothed escape value.
+      return (i + 1 - (Math.log(Math.log(Math.sqrt(m2))) / Math.LN2));
+    }
+  }
+
+  return 0;
+}
+
 /*
  * Set up a buffer, then render the Mandelbrot set into it.
  */
@@ -122,14 +225,17 @@ exports.render = function (size, re, im, ppu, max, opt) {
    * 2: Check for known bulbs.
    * 3: Subdivide areas, then check if the circumference is in the set.
    * 4: Both subdivision and known bulb check.
+   * 5: Adaptive rendering: Decompose the rendering area into known areas with specific choice
+   *    of optimization strategy. Easy areas render in basic mode, complex areas with more
+   *    optimization, mirror bottom image if top has been rendered already, etc.
    */
   switch (opt) {
     case 1:
-      render_basic(re, im, ppu, max, size, result, iterate_basic);
+      render_basic(re, im, ppu, max, 0, 0, size, size, result, iterate_basic, size);
       return result;
 
     case 2:
-      render_basic(re, im, ppu, max, size, result, iterate_opt);
+      render_basic(re, im, ppu, max, 0, 0, size, size, result, iterate_opt, size);
       return result;
 
     case 3:
@@ -140,42 +246,57 @@ exports.render = function (size, re, im, ppu, max, opt) {
       render_opt(re, im, ppu, max, size, 0, 0, size, result, iterate_basic);
       return result;
 
-    default:
+    case 4:
       // The subdivision algorithm assumes that the buffer has been zeroed.
       for (var i = 0; i < size * size; i++) {
         result[i] = 0.0;
       }
       render_opt(re, im, ppu, max, size, 0, 0, size, result, iterate_opt);
       return result;
+
+    default:
+      // The subdivision algorithm assumes that the buffer has been zeroed.
+      for (var i = 0; i < size * size; i++) {
+        result[i] = 0.0;
+      }
+      render_adaptive(re, im, ppu, max, size, 0, 0, size, size, result);
+      return result;
   }
 }
 
 /*
  * Our main function that does the work.
+ *
  * Arguments:
- * xsize, ysize: Image size.
  * re, im: Real and imaginary part of the center of the image.
  * ppu: Number of pixels in the image per unit in the complex plane (zoom factor).
  * max: Maximum value to iterate to.
+ * xsize, ysize: the size of the area to render.
+ * result: The Array to render into.
+ * iterator: A function that performy the Mandelbrot calculation.
+ * size: The x and y size of the final quadratic image. This allows to use the function to render
+ *   arbitrary parts of it.
  *
  * Returns: An xsize * ysize array with iteration results.
  */
-function render_basic(re, im, ppu, max, size, result, iterator) {
+function render_basic(re, im, ppu, max, startx, starty, xsize, ysize, result, iterator, size) {
   var minre = re - size / ppu / 2;
-  var minim = im - size / ppu / 2;
+  var maxim = im + size / ppu / 2;
   var inc = 1 / ppu;
+  var xextra = size - xsize;
 
   var zre = 0;
   var zim = 0;
 
-  var pos = 0;
+  var pos = starty * size + startx;
 
-  for (y = 0; y < size; y++) {
-    zim = minim + y * inc;
-    for (x = 0; x < size; x++) {
+  for (var y = starty; y < starty + ysize; y++) {
+    zim = maxim - y * inc;
+    for (var x = startx; x < startx + xsize; x++) {
       zre = minre + x * inc;
       result[pos++] = iterator(zre, zim, max);
     }
+    pos += xextra;
   }
 
   return;
@@ -401,4 +522,112 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
         return;
     }
   }
+}
+
+/*
+ * Subdivide the given subarea of the Mandelbrot set into quadratic regions that are as large as
+ * possible, then render them using the optimized quadratic method.
+ */
+function subdivide_quadratic(re, im, ppu, max, size, startx, starty, sizex, sizey, result, iterator) {
+  // Perhaps we're already quadratic?
+  if (sizex == sizey) {
+    render_opt(re, im, ppu, max, size, startx, starty, sizex, result, iterator);
+    return;
+  } else if (sizex > sizey) { // wider than tall
+    var subsize = sizey;
+    // Render all quadratic areas with size y
+    var x = 0;
+    for (x = startx; x < startx + sizex - subsize; x += subsize) {
+      render_opt(re, im, ppu, max, size, x, starty, subsize, result, iterator);
+    }
+    // Recurse over the rest, if necessary.
+    if (sizex % subsize) {
+      subdivide_quadratic(re, im, ppu, max, size,
+        x,
+        starty,
+        sizex % subsize,
+        sizey,
+        result, iterator
+      );
+    } else { // If there's no rest, then there's still one more left to render.
+      render_opt(re, im, ppu, max, size, x, starty, subsize, result, iterator);
+    }
+    return;
+  } else { // taller than wide
+    var subsize = sizex;
+    // Render all quadratic areas with size x
+    var y = 0;
+    for (y = starty; y < starty + sizey - subsize; y += subsize) {
+      render_opt(re, im, ppu, max, size, startx, y, subsize, result, iterator);
+    }
+    // Recurse over the rest, if necessary.
+    if (sizey % subsize) {
+      subdivide_quadratic(re, im, ppu, max, size,
+        startx,
+        y,
+        sizex,
+        sizey % subsize,
+        result, iterator
+      );
+    } else {
+      render_opt(re, im, ppu, max, size, startx, y, subsize, result, iterator);
+    }
+    return;
+  }
+}
+
+/*
+ * Render the Mandelbrot set using adaptive optimization: Decompose the image into areas,
+ * then select the right strategies for each area.
+ */
+function render_adaptive(re, im, ppu, max, size, startx, starty, sizex, sizey, result) {
+  // Subdivide the image into special areas with specific optimization strategies.
+  
+  var inc = 1 / ppu; // increment per pixel.
+
+  // Top left real and imaginary values for the whole tile.
+  var minre = re - size / ppu / 2;
+  var maxim = im + size / ppu / 2;
+
+  // Figure out the real and imaginary values for the 4 corners of our subtile.
+  var lre = minre + startx * inc;      // Left real.
+  var rre = lre + (sizex - 1) * inc; // Right real.
+  var tim = maxim - starty * inc;      // Top imaginary.
+  var bim = tim - (sizey - 1) * inc; // Bottom imaginary.
+
+  // Render everything outside im 1.2 .. 0 with the simplest algorithm.
+  // Nothing to test for here, so we can be quick and dumb.
+  if (tim > 1.2) {
+    // Find appropriate imaginary end value for the subarea to render.
+    if (bim <= 1.2) {
+      var newbim = 1.2;
+    } else {
+      var newbim = bim;
+    }
+
+    var newsizey = Math.floor((tim - newbim) / inc);
+    render_basic(re, im, ppu, max, startx, starty, sizex, newsizey, result, iterate_basic, size);
+  }
+
+  // Render the part that's between 1.2 and 1.0. The left part is still easy, but the right one
+  // may have some complexity. At least we don't have to test for period 1 or 2 bulbs.
+  if (tim > 1.0) {
+    if (tim > 1.2) { // already been there before
+      var newtim = 1.2; // the line belonging to 1.2 has already been rendered.
+    } else {
+      var newtim = tim;
+    }
+    var newstarty = (tim - newtim) / inc;
+
+    if (bim <= 1.0) {
+      newbim = 1.0;
+    } else {
+      newbim = bim;
+    }
+
+    var newsizey = Math.floor((newtim - newbim) / inc);
+    subdivide_quadratic(re, im, ppu, max, size, startx, newstarty, sizex, newsizey, result, iterate_basic);
+  }
+
+  return;
 }

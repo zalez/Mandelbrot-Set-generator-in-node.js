@@ -21,7 +21,7 @@ const PXPERUNIT = 150;   // How much units in the complex plane are covered by o
 const MAX_ITER = 300;
 const COLORS = MAX_ITER * 10;
 const OPT = 3; // Whether to use the optimized subseparation algorithm
-const MAX_OPT = 4;
+const MAX_OPT = 5;
 
 // We'll render at a much higher size than the image we produce, so we can get antialiasing.
 // 0: No antialiasing.
@@ -109,18 +109,17 @@ function show_image(req, res) {
     if (result[i] > maxval) maxval = result[i];
   }
 
+  // Compute the color normalization factor.
+  var f = COLORS/(maxval + 1);
+
   // Fill the image buffer with the result from the Mandelbrot set, mapped to the colormap.
   var pos = 0;
   var color = [];
   for (i = 0; i < rendersize * rendersize; i++) {
-    index=Math.floor(result[i] / (maxval + 1) * COLORS);
-    color = map[index];
-    image[pos++] =
-      color[0];
-    image[pos++] = 
-      color[1];
-    image[pos++] = 
-      color[2];
+    color = map[Math.floor(result[i] * f)];
+    image[pos++] = color[0];
+    image[pos++] = color[1];
+    image[pos++] = color[2];
   }
   elapsed = Timer.stop();
   totaltime += elapsed;
@@ -137,13 +136,13 @@ function show_image(req, res) {
       clean_image = Resize.resizento1(image, rendersize, 3, Resize.gauss(3, 0.5));
       break;
     case 2:
-      clean_image = Resize.resizento1(image, rendersize, 3, Resize.mitchell(3, 1/3, 1/3));
+      clean_image = Resize.resizento1(image, rendersize, 3, Resize.mitchell(3, 0.4, 0.3));
       break;
     case 3:
       clean_image = Resize.resizento1(image, rendersize, 5, Resize.gauss(5, 0.5));
       break;
     case 4:
-      clean_image = Resize.resizento1(image, rendersize, 5, Resize.mitchell(5, 1/3, 1/3));
+      clean_image = Resize.resizento1(image, rendersize, 5, Resize.mitchell(5, 0.4, 0.3));
       break;
   }
 

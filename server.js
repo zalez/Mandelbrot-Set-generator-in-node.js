@@ -23,4 +23,8 @@ var server = connect.createServer(
 server.use('/simplemandelbrot', simplemandelbrot.handler);
 server.use('/mandelbrot', mandelbrot.handler);
 
-server.listen(80);
+if (process.env.USER == "node") {
+  server.listen(80);
+} else {
+  server.listen(8000);
+}

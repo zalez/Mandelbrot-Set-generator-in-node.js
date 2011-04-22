@@ -82,6 +82,29 @@ exports.mitchell = function(n, b, c) {
 }
 
 /*
+ * Compute a simple lookup table that replaces multiplication with table lookups to speed
+ * up the convolution process.
+ *
+ * kernel: The filter kernel to use.
+ * n: The dimension of the kernel.
+ *
+ * Returns: A 2-dimensional array. The first dimension is the source value 0-255, the second
+ * is the table index in the kernel, the result is the multiplication of both.
+ */
+function filter_table(kernel, n) {
+  table = new Array(256);
+
+  for (var i = 0; i < 256; i++) {
+    table[i] = new Array(n*n);
+    for (var j = 0; j < n * n; j++) {
+      table[i][j] = i * kernel[j];
+    }
+  }
+  return table;
+}
+
+
+/*
  * Resize a quadratic image to an nth of its size using a supplied kernel. Assumes that the
  * Image is quadratic and that the size is dividable by n.
  *
@@ -96,6 +119,7 @@ exports.resizento1 = function (image, size, n, kernel) {
   var stride = size * 3;
   var newsize = size / n;
   var newimage = new Buffer(newsize * newsize * 3);
+  var table = filter_table(kernel, n);
 
   var i = 0, j = 0, r = 0, g = 0, b = 0, m = 0;
   for (var y = 0; y < newsize; y++) {
@@ -103,9 +127,12 @@ exports.resizento1 = function (image, size, n, kernel) {
       r = 0; g = 0; b = 0; m = 0;
       for (var k = 0; k < n; k++) {
         for (var l = 0; l < n ; l++) {
-          r += image[j++] * kernel[m];
-          g += image[j++] * kernel[m];
-          b += image[j++] * kernel[m++];
+//          r += image[j++] * kernel[m];
+//          g += image[j++] * kernel[m];
+//          b += image[j++] * kernel[m++];
+          r += table[image[j++]][m];
+          g += table[image[j++]][m];
+          b += table[image[j++]][m++];
         }
         j += stride - n * 3;
       }

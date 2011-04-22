@@ -33,20 +33,18 @@ const AA = 0;
 const MAX_AA = 4;
 
 // Modules we want to use.
-var connect = require('connect');
-var mandelbrot = require('mandelbrot-engine.js');
-var colormap = require('colormap.js');
-
+var Connect = require('connect');
+var Mandelbrot = require('mandelbrot-engine.js');
+var Colormap = require('colormap.js');
 var Png = require ('png').Png;
-
 var Resize = require ('resize.js');
-
-var url = require ('url')
+var Url = require ('url')
+var Timer = require('timer.js');
 
 // Show a Mandelbrot set image.
 function show_image(req, res) {
   // Extract parameters from the request
-  var params = url.parse(req.url, true);
+  var params = Url.parse(req.url, true);
 
   // Check parameters and determine final values
   var size = Number(params.query.size) || SIZE;
@@ -88,8 +86,17 @@ function show_image(req, res) {
       var rendersize = size * 5;
       var renderppu = ppu * 5;
   }
-  var result = mandelbrot.render(rendersize, RE_CENTER, IM_CENTER, renderppu, max, opt);
 
+  var totaltime = 0;
+  var elapsed = 0;
+
+  Timer.start();
+  var result = Mandelbrot.render(rendersize, RE_CENTER, IM_CENTER, renderppu, max, opt);
+  elapsed = Timer.stop();
+  totaltime += elapsed;
+  process.stdout.write("Mandelbrot set rendering time: " + elapsed + "ms\n");
+
+  Timer.start();
   // Create a colormap.
   var map = colormap.colormap(COLORS);
 
@@ -115,6 +122,11 @@ function show_image(req, res) {
     image[pos++] = 
       color[2];
   }
+  elapsed = Timer.stop();
+  totaltime += elapsed;
+  process.stdout.write("Color mapping time: " + elapsed + "ms\n");
+
+  Timer.start();
 
   // Resize the image using a Gaussian filter to provide high quality anti-aliasing.
   switch (aa) {
@@ -135,9 +147,19 @@ function show_image(req, res) {
       break;
   }
 
+  elapsed = Timer.stop();
+  totaltime += elapsed;
+  process.stdout.write("Image resizing/filtering time: " + elapsed + "ms\n");
+
+  Timer.start();
+
   // Convert the image into PNG format.
   var png_image = new Png(clean_image, size, size, 'rgb');
   var png_file = png_image.encodeSync();
+
+  elapsed = Timer.stop();
+  totaltime += elapsed;
+  process.stdout.write("PNG encoding time: " + elapsed + "ms\n");
 
   // Return the image to the browser.
   res.writeHead(200, { "Content-Type": "image/png" });

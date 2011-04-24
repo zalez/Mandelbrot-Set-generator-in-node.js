@@ -103,14 +103,8 @@ function show_image(req, res) {
   // Create an image buffer.
   var image = new Buffer(rendersize * rendersize * 3);
 
-  // Before we map the mandelbrot set, we need to determine the highest value.
-  var maxval = 0;
-  for (i = 0; i < rendersize * rendersize; i++) {
-    if (result[i] > maxval) maxval = result[i];
-  }
-
   // Compute the color normalization factor.
-  var f = COLORS/(maxval + 1);
+  var f = COLORS/(max + 1);
 
   // Fill the image buffer with the result from the Mandelbrot set, mapped to the colormap.
   var pos = 0;

@@ -690,6 +690,9 @@ function render_adaptive(re, im, ppu, max, size, startx, starty, sizex, sizey, r
     r1 = sizex - (0.5 - lre) / inc;
   }
 
+  var newstarty = 0;
+  var newsizey = 0;
+
   // Render everything outside im 1.2 .. 0 with the simplest algorithm.
   // No horizontal subdivision as everything is of equal complexity.
   // Nothing to test for here, so we can be quick and dumb.
@@ -701,7 +704,7 @@ function render_adaptive(re, im, ppu, max, size, startx, starty, sizex, sizey, r
       var newbim = bim;
     }
 
-    var newsizey = Math.floor((tim - newbim) / inc);
+    newsizey = Math.floor((tim - newbim) / inc);
     render_basic(re, im, ppu, max, startx, starty, sizex, newsizey, result, iterate_basic, size);
   }
 
@@ -713,14 +716,14 @@ function render_adaptive(re, im, ppu, max, size, startx, starty, sizex, sizey, r
     } else {
       var newtim = tim;
     }
-    var newstarty = (tim - newtim) / inc;
+    newstarty = Math.floor((tim - newtim) / inc);
 
     if (bim <= 1.0) {
       newbim = 1.0;
     } else {
       newbim = bim;
     }
-    var newsizey = Math.floor((newtim - newbim) / inc);
+    newsizey = Math.floor((newtim - newbim) / inc) + 1;
 
     // The left part is much easier, so we don't need optimization.
     if (lw + l2 + p2) {
@@ -732,26 +735,79 @@ function render_adaptive(re, im, ppu, max, size, startx, starty, sizex, sizey, r
     }
   }
 
-  // The part between 1.0 and 0 is where most of the action is. We'll distinguish 6 horizontal regions:
-  // Left of the whole set, left of the period 2 bulb (simple iteration), period 2 bulb, period 1 bulb,
-  // right of period 1 bulb, right of set.
+  // The part between 1.0 and 0 is where most of the action is. Each horizontal region will get its own
+  // version of an optimized rendering configuration.
 
-  // Find parameters for im within 1.0..0that we're supposed to render.
+  // Find parameters for im within 1.0..0 that we're supposed to render.
   if (tim > 0) {
     if (tim > 1.0) {
       var newtim = 1.0;
     } else {
       var newtim = tim;
     }
-    var newstarty = (tim - newtim) / inc;
+    newstarty = Math.floor((tim - newtim) / inc);
 
     if (bim <= 0) {
       newbim = 0;
     } else {
       newbim = bim;
     }
-    var newsizey = Math.floor((newtim - newbim) / inc);
-  } 
-    
+    newsizey = Math.floor((newtim - newbim) / inc) + 1;
+
+    // Render each horizontal subpart with its optimal settings.
+    if (lw) render_basic(re, im, ppu, max, lws, newstarty, lw, newsizey, result, iterate_basic, size);
+    if (l2) subdivide_quadratic(re, im, ppu, max, size, l2s, newstarty, l2, newsizey, result, iterate_basic);
+    if (p2) subdivide_quadratic(re, im, ppu, max, size, p2s, newstarty, p2, newsizey, result, iterate_opt_2);
+    if (p1) subdivide_quadratic(re, im, ppu, max, size, p1s, newstarty, p1, newsizey, result, iterate_opt_1);
+    if (r1) render_basic(re, im, ppu, max, r1s, newstarty, r1, newsizey, result, iterate_basic, size);
+  }
+
+  // Can we reuse something through mirroring?
+  if (tim > 0 && bim < 0) {
+    if (tim > -bim) {
+      newsizey = -bim / inc; // Vertical size of the mirrorable range
+    } else {
+      newsizey = tim / inc; 
+    }
+
+    var source = Math.floor(tim / inc - 1) * size;
+    var dest = Math.floor(tim / inc + 1) * size; 
+    for (var y = 0; y < newsizey - 1; y++) {
+      source += startx * 3;
+      dest += startx * 3;
+      for (var x = 0; x < sizex; x++) {
+        result[dest++] = result[source++];
+        result[dest++] = result[source++];
+        result[dest++] = result[source++];
+      }
+      dest += size - (startx + sizex) * 3;
+      source -= (size + (startx + sizex) * 3);
+    }
+  }
+
+  // Find parameters for im within 0..-1.0 that we need to render.
+  if (tim > -1.0 && tim < 1.0) { // Also test if we have mirrored this completely before
+    if (tim > 0) {
+      var newtim = 0 - tim; // Account for already mirrored part.
+    } else {
+      var newtim = tim;
+    }
+    newstarty = Math.floor((tim - newtim) / inc);
+
+    if (bim <= -1.0) {
+      newbim = -1.0;
+    } else {
+      newbim = bim;
+    }
+    newsizey = Math.floor((newtim - newbim) / inc) + 1;
+
+    // Render each horizontal subpart with its optimal settings.
+    if (lw) render_basic(re, im, ppu, max, lws, newstarty, lw, newsizey, result, iterate_basic, size);
+    if (l2) subdivide_quadratic(re, im, ppu, max, size, l2s, newstarty, l2, newsizey, result, iterate_basic);
+    if (p2) subdivide_quadratic(re, im, ppu, max, size, p2s, newstarty, p2, newsizey, result, iterate_opt_2);
+    if (p1) subdivide_quadratic(re, im, ppu, max, size, p1s, newstarty, p1, newsizey, result, iterate_opt_1);
+    if (r1) render_basic(re, im, ppu, max, r1s, newstarty, r1, newsizey, result, iterate_basic, size);
+  }
+
   return;
 }

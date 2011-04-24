@@ -581,8 +581,26 @@ function subdivide_quadratic(re, im, ppu, max, size, startx, starty, sizex, size
  * then select the right strategies for each area.
  */
 function render_adaptive(re, im, ppu, max, size, startx, starty, sizex, sizey, result) {
-  // Subdivide the image into special areas with specific optimization strategies.
-  
+  /* Subdivide the image into special areas with specific optimization strategies.
+   *
+   * Horizontal areas of interest:
+   * - Left of the whole set: Everything left of -2, variables start with lw.
+   * - Left of the period 2 bulb: Between -2 and -1.25, variables start with l2.
+   * - Within the period 2 bulb: Between -1.25 and -0.75, variables start with p2.
+   * - Within the period 1 bulb: Between -0.75 and 0.5, variables start with p1.
+   * - Right of the period 1 bulb: Everything right of 0.5, variables start with r1.
+   *
+   * Variables determine the width of the area within the area to render, and the start value.
+   * For instance, the start value for the piece to be rendered within the period 2 bulb would
+   * be p2s, and its width p2. If nothing needs to be rendered in the area, the width is 0.
+   *
+   * Figure out which parts touch our subset, then determine the appropriate real values for
+   * rendering the subareas.
+   */
+
+  /*
+   * Basic boundary values for re and im.
+   */
   var inc = 1 / ppu; // increment per pixel.
 
   // Top left real and imaginary values for the whole tile.
@@ -595,7 +613,85 @@ function render_adaptive(re, im, ppu, max, size, startx, starty, sizex, sizey, r
   var tim = maxim - starty * inc;      // Top imaginary.
   var bim = tim - (sizey - 1) * inc; // Bottom imaginary.
 
+  // Figure out values for left of the whole set. [..-2)
+  var lws = 0, lw = 0;
+  if (lre < -2) {
+    var lws = startx; // No need to test here.
+    if (rre > -2) lw = -2 / inc - lre / inc; else lw = sizex;
+  }
+
+  // Figure out values for left of the period 2 bulb. [-2..-1.25)
+  var l2s = 0, l2 = 0;
+  if (lre < -1.25) {
+    if (lre < -2) {
+      l2s = startx + (-2 - lre) / inc;
+      if (rre > -1.25) {
+        l2 = sizex - (rre - -1.25) / inc - (-2 - lre) / inc; // Subtract the left and right pieces out of scope.
+      } else {
+        l2 = sizex - (-2 - lre) / inc;
+      }
+    } else {
+      l2s = startx;
+      if (rre > -1.25) {
+        l2 = sizex - (rre - -1.25) / inc; // Subtract the left and right pieces out of scope.
+      } else {
+        l2 = sizex;
+      }
+    }
+  }
+
+  // Figure out values for within the period 2 bulb. [-1.25..-0.75)
+  var p2s = 0, p2 = 0;
+  if (lre < -0.75) {
+    if (lre < -1.25) {
+      p2s = startx + (-1.25 - lre) / inc;
+      if (rre > -0.75) {
+        p2 = sizex - (rre - -0.75) / inc - (-1.25 - lre) / inc; // Subtract the left and right pieces out of scope.
+      } else {
+        p2 = sizex - (-1.25 - lre) / inc;
+      }
+    } else {
+      p2s = startx;
+      if (rre > -0.75) {
+        p2 = sizex - (rre - -0.75) / inc; // Subtract the left and right pieces out of scope.
+      } else {
+        p2 = sizex;
+      }
+    }
+  }
+
+  // Figure out values for within the period 1 bulb. [-0.75..0.5)
+  var p1s = 0, p1 = 0;
+  if (lre < 0.5) {
+    if (lre < -0.75) {
+      p1s = startx + (-0.75 - lre) / inc;
+      if (rre > -0.5) {
+        p1 = sizex - (rre - 0.5) / inc - (-0.75 - lre) / inc; // Subtract the left and right pieces out of scope.
+      } else {
+        p1 = sizex - (-0.75 - lre) / inc;
+      }
+    } else {
+      p1s = startx;
+      if (rre > -0.5) {
+        p1 = sizex - (rre - 0.5) / inc; // Subtract the left and right pieces out of scope.
+      } else {
+        p1 = sizex;
+      }
+    }
+  }
+
+  // Figure out values for right of the period1 bulb. [0.5..]
+  var r1s = 0, r1 = 0;
+  if (lre > 0.5) {
+    r1s = startx;
+    r1 = sizex;
+  } else {
+    r1s = startx + (0.5 - lre) / inc;
+    r1 = sizex - (0.5 - lre) / inc;
+  }
+
   // Render everything outside im 1.2 .. 0 with the simplest algorithm.
+  // No horizontal subdivision as everything is of equal complexity.
   // Nothing to test for here, so we can be quick and dumb.
   if (tim > 1.2) {
     // Find appropriate imaginary end value for the subarea to render.
@@ -624,10 +720,38 @@ function render_adaptive(re, im, ppu, max, size, startx, starty, sizex, sizey, r
     } else {
       newbim = bim;
     }
-
     var newsizey = Math.floor((newtim - newbim) / inc);
-    subdivide_quadratic(re, im, ppu, max, size, startx, newstarty, sizex, newsizey, result, iterate_basic);
+
+    // The left part is much easier, so we don't need optimization.
+    if (lw + l2 + p2) {
+      render_basic(re, im, ppu, max, startx, newstarty, lw + l2 + p2, newsizey, result, iterate_basic, size);
+    }
+    // The right part can be slightly trickier, though subdivision with basic algorithm is sufficient here.
+    if (p1 + r1) {
+      subdivide_quadratic(re, im, ppu, max, size, p1s, newstarty, p1 + r1, newsizey, result, iterate_basic);
+    }
   }
 
+  // The part between 1.0 and 0 is where most of the action is. We'll distinguish 6 horizontal regions:
+  // Left of the whole set, left of the period 2 bulb (simple iteration), period 2 bulb, period 1 bulb,
+  // right of period 1 bulb, right of set.
+
+  // Find parameters for im within 1.0..0that we're supposed to render.
+  if (tim > 0) {
+    if (tim > 1.0) {
+      var newtim = 1.0;
+    } else {
+      var newtim = tim;
+    }
+    var newstarty = (tim - newtim) / inc;
+
+    if (bim <= 0) {
+      newbim = 0;
+    } else {
+      newbim = bim;
+    }
+    var newsizey = Math.floor((newtim - newbim) / inc);
+  } 
+    
   return;
 }

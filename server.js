@@ -25,8 +25,8 @@ server.use('/mandelbrot', mandelbrot.handler);
 
 process.stdout.write("User: " + process.env.LOGNAME + "\n");
 
-if (process.env.USER == "node") {
-  server.listen(80);
-} else {
+if (process.env.USER == "constantin") {
   server.listen(8000);
+} else {
+  server.listen(80);
 }

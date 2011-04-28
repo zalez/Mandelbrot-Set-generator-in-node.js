@@ -6,12 +6,32 @@
  * A simple image buffer resizing library in JavaScript.
  */
 
+/*
+ * Normalize the supplied filter kernel so the sum is equal to m.
+ *
+ * kernel: The kernel to normalize.
+ * n: The size of the kernel.
+ */
+function normalize_kernel(kernel, n) {
+  var sum = 0;
+  var i = 0;
+
+  // Figure out the current sum of the kernel.
+  for (i = 0; i < n * n; i++) {
+    sum += kernel[i];
+  }
+
+  // Resize the kernel to match the target sum.
+  for (i = 0; i < n * n; i++) {
+    kernel[i] = kernel[i] / sum;
+  }
+}
+
 // Compute the n x n Gaussian kernel with sigma s, for use in applying the filter.
 exports.gauss = function(n, s) {
   var kernel = new Array(n * n);
   var center = n/2; 
   var x = 0, y = 0;
-  var sum = 0;
   var sample = 0;
 
   for (var i = 0; i < n; i++) {
@@ -19,16 +39,11 @@ exports.gauss = function(n, s) {
       y = i - center;
       x = j - center;
       sample = (1/(2 * Math.PI * (s*s))) * Math.exp(- ((x*x+y*y)/(2*s*s)));
-      sum += sample;
       kernel[i * n + j] = sample;
     }
   }
 
-  // Normalize the kernel.
-  for (var i = 0; i < n * n; i++) {
-    kernel[i] = kernel[i] / sum;
-  }
-  process.stdout.write("Mitchell Normalization factor: " + sum + "\n");
+  normalize_kernel(kernel, n);
 
   return kernel;
 }
@@ -38,7 +53,6 @@ exports.mitchell = function(n, b, c) {
   var kernel = new Array(n * n);
   var center = n / 2;
   var x = 0, y = 0;
-  var sum = 0;
   var m = 0;
   var sample = 0;
 
@@ -67,16 +81,11 @@ exports.mitchell = function(n, b, c) {
         sample += 0;
       }
 
-      sum += sample;
       kernel[i * n + j] = sample;
     }
   }
 
-  // Normalize the kernel.
-  for (var i = 0; i < n * n; i++) {
-    kernel[i] = kernel[i] / sum;
-  }
-  process.stdout.write("Mitchell Normalization factor: " + sum + "\n");
+  normalize_kernel(kernel, n);
 
   return kernel;
 }
@@ -90,6 +99,8 @@ exports.mitchell = function(n, b, c) {
  *
  * Returns: A 2-dimensional array. The first dimension is the source value 0-255, the second
  * is the table index in the kernel, the result is the multiplication of both.
+ *
+ * This approach didn't help much with reducing filter time, so we're abandoning it.
  */
 function filter_table(kernel, n) {
   table = new Array(256);
@@ -119,7 +130,6 @@ exports.resizento1 = function (image, size, n, kernel) {
   var stride = size * 3;
   var newsize = size / n;
   var newimage = new Buffer(newsize * newsize * 3);
-  var table = filter_table(kernel, n);
 
   var i = 0, j = 0, r = 0, g = 0, b = 0, m = 0;
   for (var y = 0; y < newsize; y++) {
@@ -127,12 +137,9 @@ exports.resizento1 = function (image, size, n, kernel) {
       r = 0; g = 0; b = 0; m = 0;
       for (var k = 0; k < n; k++) {
         for (var l = 0; l < n ; l++) {
-//          r += image[j++] * kernel[m];
-//          g += image[j++] * kernel[m];
-//          b += image[j++] * kernel[m++];
-          r += table[image[j++]][m];
-          g += table[image[j++]][m];
-          b += table[image[j++]][m++];
+          r += image[j++] * kernel[m];
+          g += image[j++] * kernel[m];
+          b += image[j++] * kernel[m++];
         }
         j += stride - n * 3;
       }

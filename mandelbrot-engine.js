@@ -379,8 +379,6 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
   var tim = minim + starty * inc;      // Top imaginary.
   var bim = tim + (subsize - 1) * inc; // Bottom imaginary.
 
-  // process.stdout.write("Subsize: " + subsize + "\n");
-
   // Treat the lower subsizes as special cases to save on overhead.
   switch (subsize) {
     case 1:
@@ -393,7 +391,7 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
       result[pos++] = iterator(lre, tim, max); // Top left pixel.
       result[pos] = iterator(rre, tim, max); // Top right pixel.
       pos += size;
-      result[pos-- ] = iterator(rre, bim, max); // Bottom right pixel.
+      result[pos--] = iterator(rre, bim, max); // Bottom right pixel.
       result[pos] = iterator(lre, bim, max); // Bottom left pixel.
       return;
 
@@ -496,22 +494,20 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
           render_opt(re, im, ppu, max, size, startx + 1, starty + 1 + new_subsize, new_subsize, result, iterator);
           render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1 + new_subsize, new_subsize, result, iterator);
         } else if ((subsize - 2) % 3 == 0) { // We can subdivide by 3.
-          new_subsize = (subsize - 2) / 3;
+          new_subsize = Math.floor((subsize - 2) / 3); // Protect against float imprecision.
           render_opt(re, im, ppu, max, size, startx + 1, starty + 1, new_subsize, result, iterator);
           render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1, new_subsize, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 1 + 2 * new_subsize, starty + 1, new_subsize, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 1 + (new_subsize << 1), starty + 1, new_subsize, result, iterator);
           render_opt(re, im, ppu, max, size, startx + 1, starty + 1 + new_subsize, new_subsize, result, iterator);
           render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1 + new_subsize, new_subsize, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 1 + 2 * new_subsize, starty + 1 + new_subsize, new_subsize, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 1, starty + 1 + 2 * new_subsize, new_subsize, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1 + 2 * new_subsize, new_subsize, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 1 + 2 * new_subsize, starty + 1 + 2 * new_subsize, new_subsize, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 1 + (new_subsize << 1), starty + 1 + new_subsize, new_subsize, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 1, starty + 1 + (new_subsize << 1), new_subsize, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1 + (new_subsize << 1), new_subsize, result, iterator);
+          render_opt(re, im, ppu, max, size, startx + 1 + 2 * new_subsize, starty + 1 + (new_subsize << 1), new_subsize, result, iterator);
         } else { // A generic uneven subsize.
           // Render 1 pixel stripes at bottom and right, then subdivide by 2.
-          for (var i = 1; i < subsize - 1; i++) {
-            result[(starty + subsize - 2) * size + startx + i] = iterator(lre + i * inc, bim - inc, max);
-            result[(starty + i) * size + startx + subsize - 2] = iterator(lre + (subsize - 2) * inc, tim + i * inc, max);
-          }
+          render_hline(re, im, ppu, max, size, startx, starty + subsize - 2, subsize - 1, result, iterator);
+          render_vline(re, im, ppu, max, size, startx + subsize - 2, starty, subsize - 1, result, iterator);
            
           new_subsize = (subsize - 3) >> 1;
           render_opt(re, im, ppu, max, size, startx + 1, starty + 1, new_subsize, result, iterator);
@@ -522,6 +518,53 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
         return;
     }
   }
+}
+
+/*
+ * Render a horizontal line of pixels.
+ */
+function render_hline(re, im, ppu, max, size, startx, starty, sizex, result, iterator) {
+  var inc = 1 / ppu; // increment per pixel.
+
+  // Minimum real and imaginary values for the whole master tile.
+  var minre = re - size / ppu / 2;
+  var minim = im - size / ppu / 2;
+
+  // Figure out the real and imaginary values for the 4 corners of our subtile.
+  var lre = minre + startx * inc;      // Left real.
+  var tim = minim + starty * inc;      // Top imaginary.
+
+  var pos = starty * size + startx;
+  var zre = lre;
+  for (var x = startx; x < startx + sizex; x++) {
+    result[pos++] = iterator(zre, tim, max);
+    zre += inc; 
+  }
+  return;
+}
+
+/*
+ * Render a vertical line of pixels.
+ */
+function render_vline(re, im, ppu, max, size, startx, starty, sizey, result, iterator) {
+  var inc = 1 / ppu; // increment per pixel.
+
+  // Minimum real and imaginary values for the whole master tile.
+  var minre = re - size / ppu / 2;
+  var minim = im - size / ppu / 2;
+
+  // Figure out the real and imaginary values for the 4 corners of our subtile.
+  var lre = minre + startx * inc;      // Left real.
+  var tim = minim + starty * inc;      // Top imaginary.
+
+  var pos = starty * size + startx;
+  var zim = tim;
+  for (var y = starty; y < starty + sizey; y++) {
+    result[pos] = iterator(lre, zim, max);
+    pos += size;
+    zim += inc; 
+  }
+  return;
 }
 
 /*
@@ -613,27 +656,30 @@ function render_adaptive(re, im, ppu, max, size, startx, starty, sizex, sizey, r
   var tim = maxim - starty * inc;      // Top imaginary.
   var bim = tim - (sizey - 1) * inc; // Bottom imaginary.
 
+  // When computing values, we need to use Math.floor(... +0.5) to round to the nearest integer to get
+  // rid of minuscule float rounding errors.
+
   // Figure out values for left of the whole set. [..-2)
   var lws = 0, lw = 0;
   if (lre < -2) {
     var lws = startx; // No need to test here.
-    if (rre > -2) lw = -2 / inc - lre / inc; else lw = sizex;
+    if (rre > -2) lw = Math.floor(-2 / inc - lre / inc + 0.5); else lw = sizex;
   }
 
   // Figure out values for left of the period 2 bulb. [-2..-1.25)
   var l2s = 0, l2 = 0;
   if (lre < -1.25) {
     if (lre < -2) {
-      l2s = startx + (-2 - lre) / inc;
+      l2s = Math.floor(startx + (-2 - lre) / inc + 0.5);
       if (rre > -1.25) {
-        l2 = sizex - (rre - -1.25) / inc - (-2 - lre) / inc; // Subtract the left and right pieces out of scope.
+        l2 = Math.floor(sizex - (rre - -1.25) / inc - (-2 - lre) / inc + 0.5); // Subtract the left and right pieces out of scope.
       } else {
-        l2 = sizex - (-2 - lre) / inc;
+        l2 = Math.floor(sizex - (-2 - lre) / inc + 0.5);
       }
     } else {
       l2s = startx;
       if (rre > -1.25) {
-        l2 = sizex - (rre - -1.25) / inc; // Subtract the left and right pieces out of scope.
+        l2 = Math.floor(sizex - (rre - -1.25) / inc + 0.5); // Subtract the left and right pieces out of scope.
       } else {
         l2 = sizex;
       }
@@ -644,16 +690,16 @@ function render_adaptive(re, im, ppu, max, size, startx, starty, sizex, sizey, r
   var p2s = 0, p2 = 0;
   if (lre < -0.75) {
     if (lre < -1.25) {
-      p2s = startx + (-1.25 - lre) / inc;
+      p2s = Math.floor(startx + (-1.25 - lre) / inc + 0.5);
       if (rre > -0.75) {
-        p2 = sizex - (rre - -0.75) / inc - (-1.25 - lre) / inc; // Subtract the left and right pieces out of scope.
+        p2 = Math.floor(sizex - (rre - -0.75) / inc - (-1.25 - lre) / inc + 0.5); // Subtract the left and right pieces out of scope.
       } else {
-        p2 = sizex - (-1.25 - lre) / inc;
+        p2 = Math.floor(sizex - (-1.25 - lre) / inc + 0.5);
       }
     } else {
       p2s = startx;
       if (rre > -0.75) {
-        p2 = sizex - (rre - -0.75) / inc; // Subtract the left and right pieces out of scope.
+        p2 = Math.floor(sizex - (rre - -0.75) / inc + 0.5); // Subtract the left and right pieces out of scope.
       } else {
         p2 = sizex;
       }
@@ -664,16 +710,16 @@ function render_adaptive(re, im, ppu, max, size, startx, starty, sizex, sizey, r
   var p1s = 0, p1 = 0;
   if (lre < 0.5) {
     if (lre < -0.75) {
-      p1s = startx + (-0.75 - lre) / inc;
-      if (rre > -0.5) {
-        p1 = sizex - (rre - 0.5) / inc - (-0.75 - lre) / inc; // Subtract the left and right pieces out of scope.
+      p1s = Math.floor(startx + (-0.75 - lre) / inc + 0.5);
+      if (rre > 0.5) {
+        p1 = Math.floor(sizex - (rre - 0.5) / inc - (-0.75 - lre) / inc + 0.5); // Subtract the left and right pieces out of scope.
       } else {
-        p1 = sizex - (-0.75 - lre) / inc;
+        p1 = Math.floor(sizex - (-0.75 - lre) / inc + 0.5);
       }
     } else {
       p1s = startx;
-      if (rre > -0.5) {
-        p1 = sizex - (rre - 0.5) / inc; // Subtract the left and right pieces out of scope.
+      if (rre > 0.5) {
+        p1 = Math.floor(sizex - (rre - 0.5) / inc + 0.5); // Subtract the left and right pieces out of scope.
       } else {
         p1 = sizex;
       }
@@ -682,12 +728,12 @@ function render_adaptive(re, im, ppu, max, size, startx, starty, sizex, sizey, r
 
   // Figure out values for right of the period1 bulb. [0.5..]
   var r1s = 0, r1 = 0;
-  if (lre > 0.5) {
+  if (lre >= 0.5) {
     r1s = startx;
     r1 = sizex;
   } else {
-    r1s = startx + (0.5 - lre) / inc;
-    r1 = sizex - (0.5 - lre) / inc;
+    r1s = Math.floor(startx + (0.5 - lre) / inc + 0.5);
+    r1 = Math.floor(sizex - (0.5 - lre) / inc + 0.5);
   }
 
   var newstarty = 0;
@@ -704,7 +750,7 @@ function render_adaptive(re, im, ppu, max, size, startx, starty, sizex, sizey, r
       var newbim = bim;
     }
 
-    newsizey = Math.floor((tim - newbim) / inc);
+    newsizey = Math.floor((tim - newbim) / inc + 0.5);
     render_basic(re, im, ppu, max, startx, starty, sizex, newsizey, result, iterate_basic, size);
   }
 
@@ -716,14 +762,14 @@ function render_adaptive(re, im, ppu, max, size, startx, starty, sizex, sizey, r
     } else {
       var newtim = tim;
     }
-    newstarty = Math.floor((tim - newtim) / inc);
+    newstarty = Math.floor((tim - newtim) / inc + 0.5);
 
     if (bim <= 1.0) {
       newbim = 1.0;
     } else {
       newbim = bim;
     }
-    newsizey = Math.floor((newtim - newbim) / inc) + 1;
+    newsizey = Math.floor((newtim - newbim) / inc + 0.5) + 1;
 
     // The left part is much easier, so we don't need optimization.
     if (lw + l2 + p2) {
@@ -745,14 +791,14 @@ function render_adaptive(re, im, ppu, max, size, startx, starty, sizex, sizey, r
     } else {
       var newtim = tim;
     }
-    newstarty = Math.floor((tim - newtim) / inc);
+    newstarty = Math.floor((tim - newtim) / inc + 0.5);
 
     if (bim <= 0) {
       newbim = 0;
     } else {
       newbim = bim;
     }
-    newsizey = Math.floor((newtim - newbim) / inc) + 1;
+    newsizey = Math.floor((newtim - newbim) / inc + 0.5) + 1;
 
     // Render each horizontal subpart with its optimal settings.
     if (lw) render_basic(re, im, ppu, max, lws, newstarty, lw, newsizey, result, iterate_basic, size);
@@ -792,14 +838,14 @@ function render_adaptive(re, im, ppu, max, size, startx, starty, sizex, sizey, r
     } else {
       var newtim = tim;
     }
-    newstarty = Math.floor((tim - newtim) / inc);
+    newstarty = Math.floor((tim - newtim) / inc + 0.5);
 
     if (bim <= -1.0) {
       newbim = -1.0;
     } else {
       newbim = bim;
     }
-    newsizey = Math.floor((newtim - newbim) / inc) + 1;
+    newsizey = Math.floor((newtim - newbim) / inc + 0.5) + 1;
 
     // Render each horizontal subpart with its optimal settings.
     if (lw) render_basic(re, im, ppu, max, lws, newstarty, lw, newsizey, result, iterate_basic, size);

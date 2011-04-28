@@ -23,7 +23,7 @@ var server = connect.createServer(
 server.use('/simplemandelbrot', simplemandelbrot.handler);
 server.use('/mandelbrot', mandelbrot.handler);
 
-process.stdout.write("User: " + process.env.LOGNAME + "\n");
+process.stdout.write("Hello MUCOSUG!\n");
 
 if (process.env.USER == "constantin") {
   server.listen(8000);

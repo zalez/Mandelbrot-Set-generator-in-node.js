@@ -23,7 +23,7 @@ var server = connect.createServer(
 server.use('/simplemandelbrot', simplemandelbrot.handler);
 server.use('/mandelbrot', mandelbrot.handler);
 
-process.stdout.write("User: " + process.env.USER + "\n");
+process.stdout.write("User: " + process.env + "\n");
 
 if (process.env.USER == "node") {
   server.listen(80);

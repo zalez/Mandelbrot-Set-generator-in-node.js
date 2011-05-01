@@ -35,10 +35,8 @@ function updateImage() {
     url += key + "=" + model[key] + "&";
   }
 
-  // Truncate the last & if we added parameters.
-  if (url != imageBaseURL) {
-    url = url.substring(0, url.length - 1);
-  }
+  // Add a timestamp to the end of the URL to prevent caching.
+  url += "date=" + new Date().getTime();
 
   // Update the URL of the image. This will trigger a reload.
   image.src = url;

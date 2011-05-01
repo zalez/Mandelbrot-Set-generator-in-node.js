@@ -11,21 +11,31 @@ const aaValues = [
   "Best: 5x5 Antialiasing, Mitchell/Netravali filter"
 ];
 
-// This model carries the configuration of the Mandelbrot view to be rendered.
-var model = new Object ({
+// Default configuration of the Mandelbrot view to be rendered.
+const defaultModel = {
   size: 512,
   max: 100,
   ppu: 150,
   aa: 0
-});
+};
 
-var image = document.getElementById("mandelbrot_image");
-var controls = document.getElementById("mandelbrot_controls");
+var image;    // The <img> element that contains the Mandelbrot image.
+var controls; // The <div> element that containes the controls.
+var model;    // The Mandelbrot view configuration.
+
+function createImage() {
+  image = document.createElement("img");
+
+  image.alt = "The Mandelbrot Set";
+  document.getElementById("mandelbrot_image").addChild(image);
+  updateImage();
+}
 
 function createControls() {
-
   var form = document.createElement("form");
   var aaSelection,aaOption;
+
+  controls = document.getElementById("mandelbrot_controls");
 
   aaSelection = document.createElement("select");
 
@@ -41,8 +51,10 @@ function createControls() {
 }
 
 function init() {
+  model = new Object(defaultModel);
+
+  createImage();
   createControls();
-  updateImage();
 }
 
 function updateImage() {
@@ -56,4 +68,5 @@ function updateImage() {
   image.src = url;
 }
 
+document.write("<div id="mandelbrot-image"></div><div id="mandelbrot-controls"></div>\n");
 init();

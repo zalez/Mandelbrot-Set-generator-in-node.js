@@ -71,5 +71,5 @@ function updateImage() {
   image.src = url;
 }
 
-document.write("<div id=\"" + imageDivId + "\"></div><div id=\"" + controldDivId + "\"></div>\n");
+document.write("<div id=\"" + imageDivId + "\"></div><div id=\"" + controlsDivId + "\"></div>\n");
 init();

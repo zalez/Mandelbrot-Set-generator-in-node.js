@@ -50,7 +50,7 @@ function kernel_to_str(kernel) {
 // Compute the n x n Gaussian kernel with sigma s, for use in applying the filter.
 exports.gauss = function(n, s) {
   var kernel = new Array(n * n);
-  var center = n/2; 
+  var center = Math.floor(n / 2); 
   var x = 0, y = 0;
   var sample = 0;
 
@@ -73,7 +73,7 @@ exports.gauss = function(n, s) {
 // Compute the n x n Mitchell-Netravali filter kernel with parameters b and c.
 exports.mitchell = function(n, b, c) {
   var kernel = new Array(n * n);
-  var center = n / 2;
+  var center = Math.floor(n / 2);
   var x = 0, y = 0;
   var m = 0;
   var sample = 0;

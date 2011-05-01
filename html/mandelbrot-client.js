@@ -30,7 +30,7 @@ function createImage() {
   image = document.createElement("img");
 
   image.alt = "The Mandelbrot Set";
-  document.getElementById(imageDivId).addChild(image);
+  document.getElementById(imageDivId).appendChild(image);
   updateImage();
 }
 

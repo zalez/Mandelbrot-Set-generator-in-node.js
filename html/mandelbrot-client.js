@@ -68,5 +68,5 @@ function updateImage() {
   image.src = url;
 }
 
-document.write("<div id="mandelbrot-image"></div><div id="mandelbrot-controls"></div>\n");
+document.write("<div id=\"mandelbrot-image\"></div><div id=\"mandelbrot-controls\"></div>\n");
 init();

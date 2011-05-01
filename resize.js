@@ -65,6 +65,8 @@ exports.gauss = function(n, s) {
 
   normalize_kernel(kernel, n);
 
+  process.stdout.write(kernel_to_str(kernel));
+
   return kernel;
 }
 

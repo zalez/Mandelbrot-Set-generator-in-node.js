@@ -63,9 +63,8 @@ function init() {
 function updateImage() {
   var url = "http://constantin.no.de/mandelbrot/image.png?";
 
-  var keys = Object(model).keys();
-  for (var i = 0; i < keys.length; i++) {
-    url += keys[i] + "=" + model[keys[i]] + "&";
+  for (var key in model) {
+    url += key + "=" + model[key] + "&";
   }
 
   image.src = url;

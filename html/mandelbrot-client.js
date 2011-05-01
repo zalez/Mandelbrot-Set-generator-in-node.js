@@ -3,6 +3,9 @@
  */
 
 // Constants
+const imageDivId="mandelbrot-image";
+const controlsDivId="mandelbrot-controls";
+
 const aaValues = [
   "No Antialiasing",
   "Simple: 3x3 Antialiasing, Gaussian filter",
@@ -27,7 +30,7 @@ function createImage() {
   image = document.createElement("img");
 
   image.alt = "The Mandelbrot Set";
-  document.getElementById("mandelbrot_image").addChild(image);
+  document.getElementById(imageDivId).addChild(image);
   updateImage();
 }
 
@@ -35,7 +38,7 @@ function createControls() {
   var form = document.createElement("form");
   var aaSelection,aaOption;
 
-  controls = document.getElementById("mandelbrot_controls");
+  controls = document.getElementById(controlsDivId);
 
   aaSelection = document.createElement("select");
 
@@ -68,5 +71,5 @@ function updateImage() {
   image.src = url;
 }
 
-document.write("<div id=\"mandelbrot-image\"></div><div id=\"mandelbrot-controls\"></div>\n");
+document.write("<div id=\"" + imageDivId + "\"></div><div id=\"" + controldDivId + "\"></div>\n");
 init();

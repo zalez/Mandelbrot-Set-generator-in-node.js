@@ -86,9 +86,9 @@ exports.mitchell = function(n, b, c) {
       // First pass, horizontal.
       m = Math.abs(x); // Modulus of x
       if (m < 1) {
-        sample = ((12 - 9 * b - 6 * c) * m * m * m + (-18 + 12 * b + 6 * c) * m * m) / 6;
+        sample = ((12 - 9 * b - 6 * c) * m * m * m + (-18 + 12 * b + 6 * c) * m * m) + (6 - 2 * b);
       } else if (m < 2) {
-        sample = ((-b - 6 * c) * m * m * m + (6 * b + 30 * c) * m * m) / 6;
+        sample = ((-b - 6 * c) * m * m * m + (6 * b + 30 * c) * m * m);
       } else {
         sample = 0;
       }
@@ -96,14 +96,14 @@ exports.mitchell = function(n, b, c) {
       // Second pass, vertical.
       m = Math.abs(y); // Modulus of y
       if (m < 1) {
-        sample += ((12 - 9 * b - 6 * c) * m * m * m + (-18 + 12 * b + 6 * c) * m * m) / 6;
+        sample += ((12 - 9 * b - 6 * c) * m * m * m + (-18 + 12 * b + 6 * c) * m * m) + (6 - 2 * b);
       } else if (m < 2) {
-        sample += ((-b - 6 * c) * m * m * m + (6 * b + 30 * c) * m * m) / 6;
+        sample += ((-b - 6 * c) * m * m * m + (6 * b + 30 * c) * m * m);
       } else {
         sample += 0;
       }
 
-      kernel[i * n + j] = sample;
+      kernel[i * n + j] = sample / 6;
     }
   }
 

@@ -58,9 +58,11 @@ function createImage() {
 }
 
 // Update the anti-aliasing settings and trigger an update of the image.
-function updateAA(option) {
-  if (model.aa != option.value) {
-    model.aa = option.value;
+function updateAA(select) {
+  var value = select.form.aaSelect.options[select.form.aaSelect.selectedIndex].value;
+
+  if (model.aa != value) {
+    model.aa = value;
     updateImage();
   }
   return;
@@ -68,17 +70,19 @@ function updateAA(option) {
 
 // Create the DOM elements needed for the controls.
 function createControls() {
-  var form = document.createElement("form");
-  var aaSelection,aaOption;
-
   controls = document.getElementById(controlsDivId);
 
-  aaSelection = document.createElement("select");
+  var form = document.createElement("form");
+  form.name = "aaForm";
 
+  var aaSelection = document.createElement("select");
+  aaSelection.name = "aaSelect";
+  aaSelection.onchange="updateAA(this)";
+
+  var aaOption;
   for (var i = 0; i < aaValues.length; i++) {
     aaOption = document.createElement("option");
     aaOption.value = i;
-    aaOption.onchange = "updateAA(this);"
     aaOption.appendChild(document.createTextNode(aaValues[i]));
     aaSelection.appendChild(aaOption);
   }

@@ -77,7 +77,7 @@ function createControls() {
 
   var aaSelection = document.createElement("select");
   aaSelection.name = "aaSelect";
-  aaSelection.onchange = "updateAA(this)";
+  aaSelection.onchange = "updateAA(this);";
 
   var aaOption;
   for (var i = 0; i < aaValues.length; i++) {

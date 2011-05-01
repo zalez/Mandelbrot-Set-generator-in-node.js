@@ -27,6 +27,26 @@ function normalize_kernel(kernel, n) {
   }
 }
 
+/*
+ * Print the filter kernel for diagnostic purposes.
+ */
+function kernel_to_str(kernel) {
+  var n = Math.floor(Math.sqrt(kernel.length)+0.5);
+  var result = "";
+
+  for (var y = 0; y < n; y++) {
+    for (var x = 0; x < n; x++) {
+      result += kernel[y * n + x] + ", ";
+    }
+    // Strip the extra comma.
+    result = result.substr(0, result.length - 2);
+    result += "\n";
+  }
+
+  return result;
+}
+
+
 // Compute the n x n Gaussian kernel with sigma s, for use in applying the filter.
 exports.gauss = function(n, s) {
   var kernel = new Array(n * n);
@@ -86,6 +106,8 @@ exports.mitchell = function(n, b, c) {
   }
 
   normalize_kernel(kernel, n);
+
+  process.stdout.write(kernel_to_str(kernel));
 
   return kernel;
 }

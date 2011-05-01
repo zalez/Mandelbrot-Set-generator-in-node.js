@@ -70,11 +70,6 @@ function updateAA(select) {
 
 // Create the DOM elements needed for the controls.
 function createControls() {
-  controls = document.getElementById(controlsDivId);
-
-  var form = document.createElement("form");
-  form.name = "aaForm";
-
   var aaSelection = document.createElement("select");
   aaSelection.name = "aaSelect";
   aaSelection.onchange = updateAA;
@@ -87,7 +82,11 @@ function createControls() {
     aaSelection.appendChild(aaOption);
   }
 
+  var form = document.createElement("form");
+  form.name = "aaForm";
   form.appendChild(aaSelection);
+
+  controls = document.getElementById(controlsDivId);
   controls.appendChild(form);
 }
 

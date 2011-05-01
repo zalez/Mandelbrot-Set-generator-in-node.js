@@ -3,9 +3,9 @@
  */
 
 // Constants
-const imageDivId="mandelbrot-image";
-const controlsDivId="mandelbrot-controls";
-
+const imageDivId = "mandelbrot-image";
+const controlsDivId = "mandelbrot-controls";
+const imageBaseURL = "http://constantin.no.de/mandelbrot/image.png?";
 const aaValues = [
   "No Antialiasing",
   "Simple: 3x3 Antialiasing, Gaussian filter",
@@ -61,10 +61,15 @@ function init() {
 }
 
 function updateImage() {
-  var url = "http://constantin.no.de/mandelbrot/image.png?";
+  var url = imageBaseURL;
 
   for (var key in model) {
     url += key + "=" + model[key] + "&";
+  }
+
+  // Truncate the last & if we added parameters.
+  if (url != imageBaseURL) {
+    url = url.substring(0, url.length - 1);
   }
 
   image.src = url;

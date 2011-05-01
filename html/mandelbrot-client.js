@@ -59,7 +59,7 @@ function createImage() {
 
 // Update the anti-aliasing settings and trigger an update of the image.
 function updateAA(select) {
-  var value = select.form.aaSelect.options[select.form.aaSelect.selectedIndex].value;
+  var value = select.options[select.selectedIndex].value;
 
   if (model.aa != value) {
     model.aa = value;

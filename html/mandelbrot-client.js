@@ -54,7 +54,7 @@ function createControls() {
 }
 
 function init() {
-  model = new Object(defaultModel);
+  model = defaultModel;
 
   createImage();
   createControls();
@@ -63,7 +63,7 @@ function init() {
 function updateImage() {
   var url = "http://constantin.no.de/mandelbrot/image.png?";
 
-  var keys = model.keys();
+  var keys = Object(model).keys();
   for (var i = 0; i < keys.length; i++) {
     url += keys[i] + "=" + model[keys[i]] + "&";
   }

@@ -5,6 +5,8 @@
 // Constants
 const imageDivId = "mandelbrot-image";
 const controlsDivId = "mandelbrot-controls";
+const depthDisplayId = "depthDisplay";
+
 const imageBaseURL = "http://constantin.no.de/mandelbrot/image.png?";
 const aaValues = [
   "No Antialiasing",
@@ -78,6 +80,9 @@ function deeper() {
   model.max = model.max * 2;
   updateImage();
 
+  var depthDisplayElement = document.getElementById(maxDepthDisplay);
+  depthDisplayElement.replaceChild(document.createTextNode(model.max), depthDisplayElement.firstChild);
+
   return;
 }
 
@@ -108,7 +113,13 @@ function createControls() {
   // Increase Maximum number of recursions.
   var maxDepth = document.createElement("div");
   maxDepth.id="maxDepth";
-  maxDepth.appendChild(document.createTextNode("Maximum depth: " + model.max));
+  maxDepth.appendChild(document.createTextNode("Maximum depth: ");
+
+  var maxDepthDisplay = document.createElement("span");
+  maxDepthDisplay.id = depthDisplayId;
+  maxDepthDisplay.appendChild(document.createTextNode(model.max));
+  maxDepth.appendChild(maxDepthDisplay);
+  
   var maxDepthButton = document.createElement("input");
   maxDepthButton.type = "button";
   maxDepthButton.value = "Deeper";

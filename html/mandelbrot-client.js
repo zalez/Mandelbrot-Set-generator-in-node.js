@@ -74,6 +74,13 @@ function zoom() {
   return;
 }
 
+function deeper() {
+  model.max = model.max * 2;
+  updateImage();
+
+  return;
+}
+
 // Create the DOM elements needed for the controls.
 function createControls() {
   // Antialiasing controls: A popup menu with options.
@@ -85,6 +92,9 @@ function createControls() {
   for (var i = 0; i < aaValues.length; i++) {
     aaOption = document.createElement("option");
     aaOption.value = i;
+    if (i == model.aa) {
+      aaOption.selected = "selected";
+    }
     aaOption.appendChild(document.createTextNode(aaValues[i]));
     aaSelection.appendChild(aaOption);
   }

@@ -80,7 +80,7 @@ function deeper() {
   model.max = model.max * 2;
   updateImage();
 
-  var depthDisplayElement = document.getElementById(maxDepthDisplay);
+  var depthDisplayElement = document.getElementById(depthDisplayId);
   depthDisplayElement.replaceChild(document.createTextNode(model.max), depthDisplayElement.firstChild);
 
   return;

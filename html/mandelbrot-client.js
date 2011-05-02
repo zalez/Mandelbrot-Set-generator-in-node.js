@@ -18,6 +18,8 @@ const aaValues = [
 
 // Default configuration of the Mandelbrot view to be rendered.
 const defaultModel = {
+  re: -0.75,
+  im: 0.0,
   size: 512,
   max: 100,
   ppu: 150,

@@ -47,6 +47,12 @@ function show_image(req, res) {
   var params = Url.parse(req.url, true);
 
   // Check parameters and determine final values
+  var re_center = Number(params.query.re) || RE_CENTER;
+  if (re_center == Number.NaN) re_center = RE_CENTER;
+
+  var im_center = Number(params.query.im) || IM_CENTER;
+  if (im_center == Number.NaN) im_center = IM_CENTER;
+
   var size = Number(params.query.size) || SIZE;
   if (size == Number.NaN) size = SIZE;
   if (size > MAX_SIZE) size = MAX_SIZE;
@@ -91,7 +97,7 @@ function show_image(req, res) {
   var elapsed = 0;
 
   Timer.start();
-  var result = Mandelbrot.render(rendersize, RE_CENTER, IM_CENTER, renderppu, max, opt);
+  var result = Mandelbrot.render(rendersize, re_center, im_center, renderppu, max, opt);
   elapsed = Timer.stop();
   totaltime += elapsed;
   process.stdout.write("Mandelbrot set rendering time: " + elapsed + "ms\n");

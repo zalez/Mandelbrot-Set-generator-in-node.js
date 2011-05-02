@@ -76,6 +76,7 @@ function zoom() {
 
 // Create the DOM elements needed for the controls.
 function createControls() {
+  // Antialiasing controls: A popup menu with options.
   var aaSelection = document.createElement("select");
   aaSelection.name = "aaSelect";
   aaSelection.onchange = function() { updateAA(this); };
@@ -88,15 +89,27 @@ function createControls() {
     aaSelection.appendChild(aaOption);
   }
 
+  // Zoom button: 2x zoom at every press.
   var zoomButton = document.createElement("input");
   zoomButton.type = "button";
   zoomButton.value = "Zoom";
   zoomButton.onclick = function() { zoom(); };
 
+  // Increase Maximum number of recursions.
+  var maxDepth = document.createElement("div");
+  maxDepth.id="maxDepth";
+  maxDepth.appendChild(document.createTextNode("Maximum depth: " + model.max));
+  var maxDepthButton = document.createElement("input");
+  maxDepthButton.type = "button";
+  maxDepthButton.value = "Deeper";
+  maxDepthButton.onclick =  function() { deeper(); };
+  maxDepth.appendChild(maxDepthButton);
+
   var form = document.createElement("form");
   form.name = "aaForm";
   form.appendChild(aaSelection);
   form.appendChild(zoomButton);
+  form.appendChild(maxDepth);
 
   controls = document.getElementById(controlsDivId);
   controls.appendChild(form);

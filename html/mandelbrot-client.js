@@ -66,6 +66,14 @@ function updateAA(select) {
   return;
 }
 
+// Zoom deeper into the Mandelbrot Set.
+function zoom() {
+  model.ppu = model.ppu * 2;
+  updateImage();
+
+  return;
+}
+
 // Create the DOM elements needed for the controls.
 function createControls() {
   var aaSelection = document.createElement("select");
@@ -80,9 +88,15 @@ function createControls() {
     aaSelection.appendChild(aaOption);
   }
 
+  var zoomButton = document.createElement("input");
+  zoomButton.type = "button";
+  zoomButton.value = "Zoom";
+  zoomButton.onclick = function() { zoom(); };
+
   var form = document.createElement("form");
   form.name = "aaForm";
   form.appendChild(aaSelection);
+  form.appendChild(zoomButton);
 
   controls = document.getElementById(controlsDivId);
   controls.appendChild(form);

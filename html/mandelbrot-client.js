@@ -4,6 +4,7 @@
 
 // Constants
 const imageDivId = "mandelbrot-image";
+const imageId = "mandelbrot-image-element";
 const controlsDivId = "mandelbrot-controls";
 const depthDisplayId = "depthDisplay";
 
@@ -48,17 +49,6 @@ function updateImage() {
   return;
 }
 
-// Create the DOM elements needed to display the image.
-function createImage() {
-  image = document.createElement("img");
-
-  image.alt = "The Mandelbrot Set";
-  document.getElementById(imageDivId).appendChild(image);
-  updateImage();
-
-  return;
-}
-
 // Update the anti-aliasing settings and trigger an update of the image.
 function updateAA(select) {
   var value = select.options[select.selectedIndex].value;
@@ -78,12 +68,56 @@ function zoom() {
   return;
 }
 
+// Increase the iteration depth.
 function deeper() {
   model.max = model.max * 2;
   updateImage();
 
   var depthDisplayElement = document.getElementById(depthDisplayId);
   depthDisplayElement.replaceChild(document.createTextNode(model.max), depthDisplayElement.firstChild);
+
+  return;
+}
+
+// Find the x,y coordinates of a given element on the page.
+// Code from here: http://www.quirksmode.org/js/findpos.html
+function findPos(obj) {
+  var curleft = curtop = 0;
+  if (obj.offsetParent) {
+    do {
+      curleft += obj.offsetLeft;
+      curtop +=obj.offsetTop;
+    } while (obj = obj.offsetParent);
+  }
+  return [curleft, curtop];
+}
+
+
+// Figure out the new center position for the image. (onclick handler)
+function newPosition(e) {
+  var imageElement = document.getElementById(imageId);
+  var imageXY = findPos(e);
+
+  var x = e.pageX - imageXY[0];
+  var y = e.pageY - imageXY[1];
+
+  model.re = model.re - model.size/model.ppu/2 + x / model.ppu;
+  model.im = model.im - model.size/model.ppu/2 + y / model.ppu;
+
+  updateImage();
+
+  return;
+}
+
+// Create the DOM elements needed to display the image.
+function createImage() {
+  image = document.createElement("img");
+
+  image.alt = "The Mandelbrot Set";
+  image.onclick = function() { newPosition(event); }
+  image.id = imageId;
+  document.getElementById(imageDivId).appendChild(image);
+  updateImage();
 
   return;
 }

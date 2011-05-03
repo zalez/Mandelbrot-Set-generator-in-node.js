@@ -101,8 +101,8 @@ function newPosition(e) {
   var x = e.pageX - imageXY[0];
   var y = e.pageY - imageXY[1];
 
-  model.re = model.re - model.size/model.ppu/2 + x / model.ppu;
-  model.im = model.im - model.size/model.ppu/2 + y / model.ppu;
+  model.re = model.re - (model.size/model.ppu)/2 + x / model.ppu;
+  model.im = model.im - (model.size/model.ppu)/2 + y / model.ppu;
 
   updateImage();
 

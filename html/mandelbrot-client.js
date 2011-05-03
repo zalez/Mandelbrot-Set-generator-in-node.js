@@ -96,7 +96,7 @@ function findPos(obj) {
 // Figure out the new center position for the image. (onclick handler)
 function newPosition(e) {
   var imageElement = document.getElementById(imageId);
-  var imageXY = findPos(e);
+  var imageXY = findPos(imageElement);
 
   var x = e.pageX - imageXY[0];
   var y = e.pageY - imageXY[1];

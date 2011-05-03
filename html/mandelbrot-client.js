@@ -104,6 +104,8 @@ function newPosition(e) {
   model.re = model.re - (model.size/model.ppu)/2 + x / model.ppu;
   model.im = model.im - (model.size/model.ppu)/2 + y / model.ppu;
 
+  alert("Element X/Y: " + imageXY[0] + ", " + imageXY[1] + ". Mouse X/Y: " + x + ", " + y + ".");
+
   updateImage();
 
   return;

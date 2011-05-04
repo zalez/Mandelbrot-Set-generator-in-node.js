@@ -642,12 +642,41 @@ var todo = [];
       newsizey = sizey;
     }
 
+    // Add the job to the queue
     todo.push({
       startx: startx,
       starty: starty,
       sizex: sizex,
       sizey: newsizey,
       method: "basic",
+      iterator: iterate_basic
+    });
+  }
+
+
+  // Use more optimization for the part between 1.2 and 1.0. No need to test for bulbs, though.
+  if (top_im > 1.0) {
+    if (top_im > 1.2) {
+      var new_top_im = 1.2;
+    } else {
+      var new_top_im = top_im;
+    }
+    var newstarty = starty + Math.floor((new_top_im - top_im) * ppu + 0.5);
+
+    if (bottom_im < 1.0) {
+      var new_bottom_im = 1.0;
+    } else {
+      var new_bottom_im = bottom_im;
+    }
+    var newsizey = Math.floor((new_top_im - new_bottom_im) * ppu + 0.5);
+
+    // Add the job to the queue
+    todo.push({
+      startx: startx,
+      starty: newstarty,
+      sizex: sizex,
+      sizey: newsizey,
+      method: "subdivide",
       iterator: iterate_basic
     });
   }
@@ -659,6 +688,12 @@ var todo = [];
         render_basic(re, im, ppu, max,
           todo[i].startx, todo[i].starty, todo[i].sizex, todo[i].sizey,
           result, todo[i].iterator, size);
+        break;
+
+      case "subdivide":
+        subdivide_quadratic(re, im, ppu, max, size,
+          todo[i].startx, todo[i].starty, todo[i].sizex, todo[i].sizey,
+          result, iterator);
         break;
     }
   }

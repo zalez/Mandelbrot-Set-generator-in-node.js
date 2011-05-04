@@ -20,7 +20,7 @@ const PXPERUNIT = 150;   // How much units in the complex plane are covered by o
 // Other iteration parameters.
 const MAX_ITER = 300;
 const COLORS = MAX_ITER * 10;
-const OPT = 5; // Default optimization level.
+const OPT = 4; // Default optimization level.
 const MAX_OPT = 5;
 
 // We'll render at a much higher size than the image we produce, so we can get antialiasing.

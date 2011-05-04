@@ -661,7 +661,7 @@ var todo = [];
     } else {
       var new_top_im = top_im;
     }
-    var newstarty = starty + Math.floor((new_top_im - top_im) * ppu + 0.5);
+    var newstarty = starty + Math.floor((top_im - new_top_im) * ppu + 0.5);
 
     if (bottom_im < 1.0) {
       var new_bottom_im = 1.0;

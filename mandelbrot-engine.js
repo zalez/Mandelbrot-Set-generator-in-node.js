@@ -630,7 +630,7 @@ function render_adaptive(re, im, ppu, max, size, startx, starty, sizex, sizey, r
 // go through that todo list.
 var todo = [];
   var top_im = im + (size / ppu) / 2;
-  var bottom_im = im + (size / ppu) / 2;
+  var bottom_im = im - (size / ppu) / 2;
 
   var newsizey;
 

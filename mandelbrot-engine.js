@@ -693,7 +693,7 @@ var todo = [];
       case "subdivide":
         subdivide_quadratic(re, im, ppu, max, size,
           todo[i].startx, todo[i].starty, todo[i].sizex, todo[i].sizey,
-          result, iterator);
+          result, todo[i].iterator);
         break;
     }
   }

@@ -663,7 +663,7 @@ function render_adaptive(re, im, ppu, max, size, startx, starty, sizex, sizey, r
   var lws = 0, lw = 0;
   if (lre < -2) {
     var lws = startx; // No need to test here.
-    if (rre > -2) lw = Math.floor(-2 / inc - lre / inc + 0.5); else lw = sizex;
+    if (rre > -2) { lw = Math.floor(-2 / inc - lre / inc + 0.5); } else { lw = sizex; }
   }
 
   // Figure out values for left of the period 2 bulb. [-2..-1.25)
@@ -811,13 +811,13 @@ function render_adaptive(re, im, ppu, max, size, startx, starty, sizex, sizey, r
   // Can we reuse something through mirroring?
   if (tim > 0 && bim < 0) {
     if (tim > -bim) {
-      newsizey = -bim / inc; // Vertical size of the mirrorable range
+      newsizey = Math.floor(-bim / inc + 0.5); // Vertical size of the mirrorable range
     } else {
-      newsizey = tim / inc; 
+      newsizey = Math.floor(tim / inc + 0.5); 
     }
 
-    var source = Math.floor(tim / inc - 1) * size;
-    var dest = Math.floor(tim / inc + 1) * size; 
+    var source = Math.floor(tim / inc - 1 + 0.5) * size;
+    var dest = Math.floor(tim / inc + 1 + 0.5) * size; 
     for (var y = 0; y < newsizey - 1; y++) {
       source += startx * 3;
       dest += startx * 3;

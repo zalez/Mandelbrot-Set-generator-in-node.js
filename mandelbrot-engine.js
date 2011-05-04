@@ -562,7 +562,7 @@ function render_vline(re, im, ppu, max, size, startx, starty, sizey, result, ite
   for (var y = starty; y < starty + sizey; y++) {
     result[pos] = iterator(lre, zim, max);
     pos += size;
-    zim += inc; 
+    zim -= inc; 
   }
   return;
 }

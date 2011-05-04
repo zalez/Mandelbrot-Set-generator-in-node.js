@@ -658,7 +658,7 @@ var todo = [];
       case "basic":
         render_basic(re, im, ppu, max,
           todo[i].startx, todo[i].starty, todo[i].sizex, todo[i].sizey,
-          result, iterator, size);
+          result, todo[i].iterator, size);
         break;
     }
   }

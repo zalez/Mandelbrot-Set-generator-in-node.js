@@ -649,7 +649,7 @@ var todo = [];
       sizey: newsizey,
       method: "basic",
       iterator: iterate_basic
-    );
+    });
   }
 
   // Complete todo-list.

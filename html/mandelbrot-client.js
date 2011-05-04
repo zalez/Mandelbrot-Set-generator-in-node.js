@@ -24,7 +24,7 @@ const optValues = [
   "Check for 2 biggest bulbs",
   "Subdivide areas, search for black circumferences",
   "Both subdivision and known bulb check",
-  "Adaptive: Apply best optimization to specific areas"
+  "Adaptive: Apply best optimization to specific areas (experimental)"
 ];
 
 // Default configuration of the Mandelbrot view to be rendered.

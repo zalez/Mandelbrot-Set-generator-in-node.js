@@ -620,10 +620,55 @@ function subdivide_quadratic(re, im, ppu, max, size, startx, starty, sizex, size
 }
 
 /*
+ * Subdivide the given area of the mandelbrot set into zones, apply a different, optimal
+ * optimization setting to that zones.
+ * The idea here is to save detection times for zones that are known to not profit from that
+ * detection, and to exploit mirroring opportunities.
+ */
+function render_adaptive(re, im, ppu, max, size, startx, starty, sizex, sizey, result) {
+// We will fill a todo-list-array with startx, starty, sizex, and sizey plus method and iterators, then
+// go through that todo list.
+var todo = [];
+  var top_im = im + (size / ppu) / 2;
+  var bottom_im = im + (size / ppu) / 2;
+
+  var newsizey;
+
+  // Render the top part until +1.2 with minimal optimization, as it's very easy anyway.
+  if (top_im >= 1.2) {
+    if (bottom_im < 1.2) {
+      newsizey = Math.floor((top_im - 1.2) * ppu + 0.5);
+    } else {
+      newsizey = sizey;
+    }
+
+    todo.push({
+      startx: startx,
+      starty: starty,
+      sizex: sizex,
+      sizey: newsizey,
+      method: "basic",
+      iterator: iterate_basic
+    );
+  }
+
+  // Complete todo-list.
+  for (var i = 0; i < todo.length; i++) {
+    switch (todo[i].method) {
+      case "basic":
+        render_basic(re, im, ppu, max,
+          todo[i].startx, todo[i].starty, todo[i].sizex, todo[i].sizey,
+          result, iterator, size);
+        break;
+    }
+  }
+}
+
+/*
  * Render the Mandelbrot set using adaptive optimization: Decompose the image into areas,
  * then select the right strategies for each area.
  */
-function render_adaptive(re, im, ppu, max, size, startx, starty, sizex, sizey, result) {
+function render_adaptive_old(re, im, ppu, max, size, startx, starty, sizex, sizey, result) {
   /* Subdivide the image into special areas with specific optimization strategies.
    *
    * Horizontal areas of interest:

@@ -309,7 +309,7 @@ function render_basic(re, im, ppu, max, startx, starty, xsize, ysize, result, it
  * This will be used to determine if a quadratic area is contained in the Mandelbrot set. Its
  * inner part doesn't need to be rendered if the circumference is completelty part of it.
  */
-function walk_around(minre, minim, inc, max, size, startx, starty, subsize, result, iterator) {
+function walk_around(minre, maxim, inc, max, size, startx, starty, subsize, result, iterator) {
   // We draw 4 lines simultaneously to minimize loop overhead.
   var pos1 = starty * size + startx;
   var pos2 = pos1 + subsize - 1;
@@ -319,9 +319,9 @@ function walk_around(minre, minim, inc, max, size, startx, starty, subsize, resu
   var zre2 = minre + (subsize - 1) * inc;
   var zre3 = zre2;
   var zre4 = minre;
-  var zim1 = minim;
-  var zim2 = minim;
-  var zim3 = minim + (subsize - 1) * inc;
+  var zim1 = maxim;
+  var zim2 = maxim;
+  var zim3 = maxim - (subsize - 1) * inc;
   var zim4 = zim3;
   var touche = 0;
 

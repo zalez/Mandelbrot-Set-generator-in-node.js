@@ -371,13 +371,13 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
 
   // Minimum real and imaginary values for the whole master tile.
   var minre = re - size / ppu / 2;
-  var minim = im - size / ppu / 2;
+  var maxim = im + size / ppu / 2;
 
   // Figure out the real and imaginary values for the 4 corners of our subtile.
   var lre = minre + startx * inc;      // Left real.
   var rre = lre + (subsize - 1) * inc; // Right real.
-  var tim = minim + starty * inc;      // Top imaginary.
-  var bim = tim + (subsize - 1) * inc; // Bottom imaginary.
+  var tim = maxim - starty * inc;      // Top imaginary.
+  var bim = tim - (subsize - 1) * inc; // Bottom imaginary.
 
   // Treat the lower subsizes as special cases to save on overhead.
   switch (subsize) {
@@ -528,11 +528,11 @@ function render_hline(re, im, ppu, max, size, startx, starty, sizex, result, ite
 
   // Minimum real and imaginary values for the whole master tile.
   var minre = re - size / ppu / 2;
-  var minim = im - size / ppu / 2;
+  var maxim = im + size / ppu / 2;
 
   // Figure out the real and imaginary values for the 4 corners of our subtile.
   var lre = minre + startx * inc;      // Left real.
-  var tim = minim + starty * inc;      // Top imaginary.
+  var tim = maxim - starty * inc;      // Top imaginary.
 
   var pos = starty * size + startx;
   var zre = lre;
@@ -551,11 +551,11 @@ function render_vline(re, im, ppu, max, size, startx, starty, sizey, result, ite
 
   // Minimum real and imaginary values for the whole master tile.
   var minre = re - size / ppu / 2;
-  var minim = im - size / ppu / 2;
+  var maxim = im + size / ppu / 2;
 
   // Figure out the real and imaginary values for the 4 corners of our subtile.
   var lre = minre + startx * inc;      // Left real.
-  var tim = minim + starty * inc;      // Top imaginary.
+  var tim = maxim - starty * inc;      // Top imaginary.
 
   var pos = starty * size + startx;
   var zim = tim;

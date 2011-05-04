@@ -332,7 +332,7 @@ function walk_around(minre, minim, inc, max, size, startx, starty, subsize, resu
 
     // Right edge
     if (result[pos2] = iterator(zre2, zim2, max)) touche = 1;
-    zim2 += inc;
+    zim2 -= inc;
     pos2 += size;
 
     // Bottom edge
@@ -341,7 +341,7 @@ function walk_around(minre, minim, inc, max, size, startx, starty, subsize, resu
 
     // Left edge
     if (result[pos4] = iterator(zre4, zim4, max)) touche = 1;
-    zim4 -= inc;
+    zim4 += inc;
     pos4 -= size;
   }
 

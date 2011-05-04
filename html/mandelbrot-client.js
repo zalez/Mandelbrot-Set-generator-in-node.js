@@ -9,12 +9,22 @@ const controlsDivId = "mandelbrot-controls";
 const depthDisplayId = "depthDisplay";
 
 const imageBaseURL = "http://constantin.no.de/mandelbrot/image.png?";
+
 const aaValues = [
   "No Antialiasing",
   "Simple: 3x3 Antialiasing, Gaussian filter",
   "Good: 3x3 Antialiasing, Mitchell/Netravali filter",
   "Better: 5x5 Antialiasing, Gaussian filter",
   "Best: 5x5 Antialiasing, Mitchell/Netravali filter"
+];
+
+const optValues = [
+  "Default Optimization Level",
+  "No Optimization",
+  "Check for 2 biggest bulbs",
+  "Subdivide areas, search for black circumferences",
+  "Both subdivision and known bulb check",
+  "Adaptive: Apply best optimization to specific areas"
 ];
 
 // Default configuration of the Mandelbrot view to be rendered.
@@ -24,7 +34,8 @@ const defaultModel = {
   size: 512,
   max: 100,
   ppu: 150,
-  aa: 0
+  aa: 0,
+  opt: 0
 };
 
 var image;    // The <img> element that contains the Mandelbrot image.
@@ -55,6 +66,17 @@ function updateAA(select) {
 
   if (model.aa != value) {
     model.aa = value;
+    updateImage();
+  }
+  return;
+}
+
+// Update the optimization settings and trigger an update of the image.
+function updateOpt(select) {
+  var value = select.options[select.selectedIndex].value;
+
+  if (model.opt != value) {
+    model.opt = value;
     updateImage();
   }
   return;
@@ -140,6 +162,22 @@ function createControls() {
     aaSelection.appendChild(aaOption);
   }
 
+  // Optimization controls: A popup menu with options.
+  var optSelection = document.createElement("select");
+  optSelection.name = "optSelect";
+  optSelection.onchange = function() { updateOpt(this); };
+
+  var optOption;
+  for (var i = 0; i < optValues.length; i++) {
+    optOption = document.createElement("option");
+    optOption.value = i;
+    if (i == model.opt) {
+      optOption.selected = "selected";
+    }
+    optOption.appendChild(document.createTextNode(optValues[i]));
+    optSelection.appendChild(optOption);
+  }
+
   // Zoom button: 2x zoom at every press.
   var zoomButton = document.createElement("input");
   zoomButton.type = "button";
@@ -165,6 +203,7 @@ function createControls() {
   var form = document.createElement("form");
   form.name = "aaForm";
   form.appendChild(aaSelection);
+  form.appendChild(optSelection);
   form.appendChild(zoomButton);
   form.appendChild(maxDepth);
 

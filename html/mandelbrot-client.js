@@ -252,7 +252,6 @@ function createControls() {
   // Increase Maximum number of recursions.
   var maxDepth = document.createElement("div");
   maxDepth.id="maxDepth";
-  maxDepth.appendChild(document.createTextNode("Maximum depth: "));
 
   var maxDepthButton = document.createElement("input");
   maxDepthButton.type = "button";

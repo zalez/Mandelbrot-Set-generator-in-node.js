@@ -34,10 +34,10 @@ const optValues = [
 ];
 
 const paramDisplays = [
-  { param: re, span: reDisplayId },
-  { param: im, span: imDisplayId },
-  { param: ppu, span: ppuDisplayId },
-  { param: max, span: maxDisplayId }
+  { param: "re", span: reDisplayId },
+  { param: "im", span: imDisplayId },
+  { param: "ppu", span: ppuDisplayId },
+  { param: "max", span: maxDisplayId }
 ];
 
 // Default configuration of the Mandelbrot view to be rendered.

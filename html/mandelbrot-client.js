@@ -7,6 +7,7 @@ const imageDivId = "mandelbrot-image-div";
 const imageId = "mandelbrot-image-img";
 const paramsDivId = "mandelbrot-image-div";
 const paramDisplayIdPrefix = "mandelbrot-params-";
+const paramDisplayClassPrefix = paramDisplayIdPrefix + "class";
 const controlsDivId = "mandelbrot-controls-div";
 
 const imageBaseURL = "http://constantin.no.de/mandelbrot/image.png?";
@@ -139,7 +140,6 @@ function newPosition(e) {
   model.im = model.im + (model.size/model.ppu)/2 - y / model.ppu;
 
   updateImage();
-
   return;
 }
 
@@ -166,16 +166,20 @@ function createParams() {
 
   for (var i = 0; i < paramDisplays.length; i++) {
     displayDiv = document.createElement("div");
+    // Add hooks for CSS.
+    displayDiv.id = paramDisplayIdPrefix + "div-" + paramDisplays[i].param;
+    displayDiv.setAttribute("class", paramDisplayClass + "," + paramDisplayClass + "-" + paramDisplays[i].param)
+
       if (paramDisplays[i].pre) {
         displayDiv.appendChild(document.createTextNode(paramDisplays[i].pre));
       }
 
       displaySpan = document.createElement("span");
       displaySpans.push(displaySpan); // We'll use this later for lookups.
-      displaySpan.id = paramDisplayIdPrefix + paramDisplays[i].param;
+      displaySpan.id = paramDisplayIdPrefix + "span-" + paramDisplays[i].param;
       displayDiv.appendChild(displaySpan);
 
-      if (paramDisplays[i].pre) {
+      if (paramDisplays[i].post) {
         displayDiv.appendChild(document.createTextNode(paramDisplays[i].pre));
       }
 

@@ -48,6 +48,7 @@ var image = null;    // The <img> element that contains the Mandelbrot image.
 var params = null;   // The <div> element that displays the current parameters.
 var reDisplaySpan = null; // The <span> element that displays the real value of the center value for c.
 var imDisplaySpan = null; // The <span> element that didplays the imaginary value of the center for c.
+var ppuDisplaySpan = null; // The <span> element that displays the pixel per unit zoom value.
 var controls = null; // The <div> element that containes the controls.
 var model = null;    // The Mandelbrot view configuration.
 
@@ -156,6 +157,7 @@ function createImage() {
 
 // Create the DOM elements that display the current parameters.
 function createParams() {
+  // Display center coordinates in the complex plane.
   var reimDisplayDiv = document.createElement("div");
 
   reimDisplayDiv.appendChild(document.createTextNode("Center: "));
@@ -172,8 +174,18 @@ function createParams() {
 
   reimDisplayDiv.appendChild(document.createTextNode("i"));
 
+  // Display zoom level (pixels per unit)
+  var ppuDisplayDiv = document.createElement("div");
+
+  ppuDisplayDiv.appendChild(document.createTextNode("Zoom level: "));
+  ppuDisplaySpan = document.createElement("span");
+  ppuDisplaySpan.id = ppuDisplayId;
+  ppuDisplayDiv.appendChild(ppuDisplaySpan);
+  ppuDisplayDiv.appendChild(document.createTextNode(" pixel per unit.");
+
   params = document.getElementById(paramsDivId);
   params.appendChild(reimDisplayDiv);
+  params.appendChild(ppuDisplayDiv);
 
   return;
 }
@@ -197,6 +209,16 @@ function updateParams() {
       imDisplaySpan.replaceChild(text, imDisplaySpan.firstChild);
     } else {
       imDisplaySpan.appendChild(text);
+    }
+  }
+
+  text = document.createTextNode(model.ppu);
+
+  if (ppuDisplaySpan) {
+    if (ppuDisplaySpan.firstChild) {
+      ppuDisplaySpan.replaceChild(text, ppuDisplaySpan.firstChild);
+    } else {
+      ppuDisplaySpan.appendChild(text);
     }
   }
 

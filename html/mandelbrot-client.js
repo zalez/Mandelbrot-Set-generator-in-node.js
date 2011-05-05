@@ -168,7 +168,7 @@ function createParams() {
     displayDiv = document.createElement("div");
     // Add hooks for CSS.
     displayDiv.id = paramDisplayIdPrefix + "div-" + paramDisplays[i].param;
-    displayDiv.setAttribute("class", paramDisplayClass + "," + paramDisplayClass + "-" + paramDisplays[i].param)
+    displayDiv.setAttribute("class", paramDisplayClass + "," + paramDisplayClass + "-" + paramDisplays[i].param);
 
       if (paramDisplays[i].pre) {
         displayDiv.appendChild(document.createTextNode(paramDisplays[i].pre));

@@ -146,7 +146,7 @@ function createImage() {
 
   image.alt = "The Mandelbrot Set";
   image.onclick = function() { newPosition(event); }
-  image.onload = function() { udpateParams(); }
+  image.onload = function() { updateParams(); }
   image.id = imageId;
   document.getElementById(imageDivId).appendChild(image);
   updateImage();

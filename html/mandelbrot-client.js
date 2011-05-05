@@ -6,12 +6,7 @@
 const imageDivId = "mandelbrot-image-div";
 const imageId = "mandelbrot-image-img";
 const paramsDivId = "mandelbrot-image-div";
-const reDisplayId = "mandelbrot-params-re";
-const imDisplayId = "mandelbrot-params-im";
-const maxDisplayId = "mandelbrot-params-max";
-const ppuDisplayId = "mandelbrot-params-ppu";
-const aaDisplayId = "mandelbrot-params-aa";
-const optDisplayId = "mandelbrot-params-opt";
+const paramDisplayIdPrefix = "mandelbrot-params-";
 const controlsDivId = "mandelbrot-controls-div";
 
 const imageBaseURL = "http://constantin.no.de/mandelbrot/image.png?";
@@ -34,10 +29,10 @@ const optValues = [
 ];
 
 const paramDisplays = [
-  { param: "re", span: reDisplayId },
-  { param: "im", span: imDisplayId },
-  { param: "ppu", span: ppuDisplayId },
-  { param: "max", span: maxDisplayId }
+  { param: "re", pre: "Real: "},
+  { param: "im", pre: "Imaginary: "},
+  { param: "ppu", pre: "Zoom level: ", post: " Pixel per unit." },
+  { param: "max", pre: "Max # of iterations: "}
 ];
 
 // Default configuration of the Mandelbrot view to be rendered.
@@ -53,10 +48,10 @@ const defaultModel = {
 
 var image = null;    // The <img> element that contains the Mandelbrot image.
 var params = null;   // The <div> element that displays the current parameters.
-var reDisplaySpan = null; // The <span> element that displays the real value of the center value for c.
-var imDisplaySpan = null; // The <span> element that didplays the imaginary value of the center for c.
-var ppuDisplaySpan = null; // The <span> element that displays the pixel per unit zoom value.
 var controls = null; // The <div> element that containes the controls.
+
+var displaySpans = []; // The <span> elements for display values. Corresponds to paramDisplays.
+
 var model = null;    // The Mandelbrot view configuration.
 
 // Update the mandelbrot image with a new set of parameters.
@@ -164,44 +159,28 @@ function createImage() {
 
 // Create the DOM elements that display the current parameters.
 function createParams() {
-  // Display center coordinates in the complex plane.
-  var reimDisplayDiv = document.createElement("div");
-
-  reimDisplayDiv.appendChild(document.createTextNode("Center: "));
-
-  reDisplaySpan = document.createElement("span");
-  reDisplaySpan.id = reDisplayId;
-  reimDisplayDiv.appendChild(reDisplaySpan);
-
-  reimDisplayDiv.appendChild(document.createTextNode(" + "));
-
-  imDisplaySpan = document.createElement("span");
-  imDisplaySpan.id = imDisplayId;
-  reimDisplayDiv.appendChild(imDisplaySpan);
-
-  reimDisplayDiv.appendChild(document.createTextNode("i"));
-
-  // Display zoom level (pixels per unit)
-  var ppuDisplayDiv = document.createElement("div");
-
-  ppuDisplayDiv.appendChild(document.createTextNode("Zoom level: "));
-  ppuDisplaySpan = document.createElement("span");
-  ppuDisplaySpan.id = ppuDisplayId;
-  ppuDisplayDiv.appendChild(ppuDisplaySpan);
-  ppuDisplayDiv.appendChild(document.createTextNode(" pixel per unit."));
-
-  // Display max iterations
-  var maxDisplayDiv = document.createElement("div");
-
-  maxDisplayDiv.appendChild(document.createTextNode("Max # of iterations: "));
-  maxDisplaySpan = document.createElement("span");
-  maxDisplaySpan.id = maxDisplayId;
-  maxDisplayDiv.appendChild(maxDisplaySpan);
-
   params = document.getElementById(paramsDivId);
-  params.appendChild(reimDisplayDiv);
-  params.appendChild(ppuDisplayDiv);
-  params.appendChild(maxDisplayDiv);
+
+  // Go through parameter descriptions and create the display elements.
+  var displayDiv, displaySpan = null;
+
+  for (var i = 0; i < paramDisplays.length; i++) {
+    displayDiv = document.createElement("div");
+      if (paramDisplays[i].pre) {
+        displayDiv.appendChild(document.createTextNode(paramDisplays[i].pre));
+      }
+
+      displaySpan = document.createElement("span");
+      displaySpans.push(displaySpan); // We'll use this later for lookups.
+      displaySpan.id = paramDisplayIdPrefix + paramDisplays[i].param;
+      displayDiv.appendChild(displaySpan);
+
+      if (paramDisplays[i].pre) {
+        displayDiv.appendChild(document.createTextNode(paramDisplays[i].pre));
+      }
+
+      params.appendChild(displayDiv);
+  }
 
   return;
 }
@@ -210,14 +189,13 @@ function createParams() {
 function updateParams() {
   var text = "";
 
-  for (var i = 0; i < paramDisplays.length; i++) {
-    text = document.createTextNode(model[paramDisplays[i][param]]);
+  for (var i = 0; i < displaySpans.length; i++) {
+    text = document.createTextNode(model[paramDisplays[i].param]);
 
-    if (paramDisplays[i][span]) {
-      if (paramDisplays[i][span].firstChild) {
-        paramDisplays[i][span].replaceChild(text, paramDisplays[i][span].firstChild);
+    if (displaySpans[i].firstChild) {
+        displaySpans[i].replaceChild(text, displaySpans[i].firstChild);
       } else {
-        paramDisplays[i][span].appendChild(text);
+        displaySpans[i].appendChild(text);
       }
     }
   }

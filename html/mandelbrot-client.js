@@ -182,7 +182,7 @@ function createParams() {
       displayDiv.appendChild(displaySpan);
 
       if (paramDisplays[i].post) {
-        displayDiv.appendChild(document.createTextNode(paramDisplays[i].pre));
+        displayDiv.appendChild(document.createTextNode(paramDisplays[i].post));
       }
 
       params.appendChild(displayDiv);

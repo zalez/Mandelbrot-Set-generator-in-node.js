@@ -44,10 +44,12 @@ const defaultModel = {
   opt: 0
 };
 
-var image;    // The <img> element that contains the Mandelbrot image.
-var params;   // The <div> element that displays the current parameters.
-var controls; // The <div> element that containes the controls.
-var model;    // The Mandelbrot view configuration.
+var image = null;    // The <img> element that contains the Mandelbrot image.
+var params = null;   // The <div> element that displays the current parameters.
+var reDisplaySpan = null; // The <span> element that displays the real value of the center value for c.
+var imDisplaySpan = null; // The <span> element that didplays the imaginary value of the center for c.
+var controls = null; // The <div> element that containes the controls.
+var model = null;    // The Mandelbrot view configuration.
 
 // Update the mandelbrot image with a new set of parameters.
 function updateImage() {
@@ -144,6 +146,7 @@ function createImage() {
 
   image.alt = "The Mandelbrot Set";
   image.onclick = function() { newPosition(event); }
+  image.onload = function() { udpateParams(); }
   image.id = imageId;
   document.getElementById(imageDivId).appendChild(image);
   updateImage();
@@ -157,13 +160,13 @@ function createParams() {
 
   reimDisplayDiv.appendChild(document.createTextNode("Center: "));
 
-  var reDisplaySpan = document.createElement("span");
+  reDisplaySpan = document.createElement("span");
   reDisplaySpan.id = reDisplayId;
   reimDisplayDiv.appendChild(reDisplaySpan);
 
   reimDisplayDiv.appendChild(document.createTextNode(" + "));
 
-  var imDisplaySpan = document.createElement("span");
+  imDisplaySpan = document.createElement("span");
   imDisplaySpan.id = imDisplayId;
   reimDisplayDiv.appendChild(imDisplaySpan);
 
@@ -171,7 +174,35 @@ function createParams() {
 
   params = document.getElementById(paramsDivId);
   params.appendChild(reimDisplayDiv);
+
+  return;
 }
+
+// Update parameter display section with current values.
+function updateParams() {
+  var text = document.createTextNode(model.re);
+
+  if (reDisplaySpan) {
+    if (reDisplaySpan.firstChild) {
+      reDisplaySpan.replaceChild(text, reDisplaySpan.firstChild);
+    } else {
+      reDisplaySpan.appendChild(text);
+    }
+  }
+
+  text = document.createTextNode(model.im);
+
+  if (imDisplaySpan) {
+    if (imDisplaySpan.firstChild) {
+      imDisplaySpan.replaceChild(text, imDisplaySpan.firstChild);
+    } else {
+      imDisplaySpan.appendChild(text);
+    }
+  }
+
+  return;  
+}
+  
 
 // Create the DOM elements needed for the controls.
 function createControls() {

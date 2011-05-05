@@ -193,10 +193,9 @@ function updateParams() {
     text = document.createTextNode(model[paramDisplays[i].param]);
 
     if (displaySpans[i].firstChild) {
-        displaySpans[i].replaceChild(text, displaySpans[i].firstChild);
-      } else {
-        displaySpans[i].appendChild(text);
-      }
+      displaySpans[i].replaceChild(text, displaySpans[i].firstChild);
+    } else {
+      displaySpans[i].appendChild(text);
     }
   }
 

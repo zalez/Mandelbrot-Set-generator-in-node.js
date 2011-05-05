@@ -155,7 +155,7 @@ function createImage() {
 function createParams() {
   var reimDisplayDiv = document.createElement("div");
 
-  reimDisplayDiv.appenChild(document.createTextNode("Center: "));
+  reimDisplayDiv.appendChild(document.createTextNode("Center: "));
 
   var reDisplaySpan = document.createElement("span");
   reDisplaySpan.id = reDisplayId;

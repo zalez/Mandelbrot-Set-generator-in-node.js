@@ -33,6 +33,13 @@ const optValues = [
   "Adaptive: Per-area optimization (experimental)"
 ];
 
+const paramDisplays = [
+  { param: re, span: reDisplayId },
+  { param: im, span: imDisplayId },
+  { param: ppu, span: ppuDisplayId },
+  { param: max, span: maxDisplayId }
+];
+
 // Default configuration of the Mandelbrot view to be rendered.
 const defaultModel = {
   re: -0.75,
@@ -183,42 +190,35 @@ function createParams() {
   ppuDisplayDiv.appendChild(ppuDisplaySpan);
   ppuDisplayDiv.appendChild(document.createTextNode(" pixel per unit."));
 
+  // Display max iterations
+  var maxDisplayDiv = document.createElement("div");
+
+  maxDisplayDiv.appendChild(document.createTextNode("Max # of iterations: "));
+  maxDisplaySpan = document.createElement("span");
+  maxDisplaySpan.id = maxDisplayId;
+  maxDisplayDiv.appendChild(maxDisplaySpan);
+
   params = document.getElementById(paramsDivId);
   params.appendChild(reimDisplayDiv);
   params.appendChild(ppuDisplayDiv);
+  params.appendChild(maxDisplayDiv);
 
   return;
 }
 
 // Update parameter display section with current values.
 function updateParams() {
-  var text = document.createTextNode(model.re);
+  var text = "";
 
-  if (reDisplaySpan) {
-    if (reDisplaySpan.firstChild) {
-      reDisplaySpan.replaceChild(text, reDisplaySpan.firstChild);
-    } else {
-      reDisplaySpan.appendChild(text);
-    }
-  }
+  for (var i = 0; i < paramDisplays.length; i++) {
+    text = document.createTextNode(model[paramDisplays[i][param]]);
 
-  text = document.createTextNode(model.im);
-
-  if (imDisplaySpan) {
-    if (imDisplaySpan.firstChild) {
-      imDisplaySpan.replaceChild(text, imDisplaySpan.firstChild);
-    } else {
-      imDisplaySpan.appendChild(text);
-    }
-  }
-
-  text = document.createTextNode(model.ppu);
-
-  if (ppuDisplaySpan) {
-    if (ppuDisplaySpan.firstChild) {
-      ppuDisplaySpan.replaceChild(text, ppuDisplaySpan.firstChild);
-    } else {
-      ppuDisplaySpan.appendChild(text);
+    if (paramDisplays[i][span]) {
+      if (paramDisplays[i][span].firstChild) {
+        paramDisplays[i][span].replaceChild(text, paramDisplays[i][span].firstChild);
+      } else {
+        paramDisplays[i][span].appendChild(text);
+      }
     }
   }
 

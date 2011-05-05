@@ -254,11 +254,6 @@ function createControls() {
   maxDepth.id="maxDepth";
   maxDepth.appendChild(document.createTextNode("Maximum depth: "));
 
-  var maxDepthDisplay = document.createElement("span");
-  maxDepthDisplay.id = maxDisplayId;
-  maxDepthDisplay.appendChild(document.createTextNode(model.max));
-  maxDepth.appendChild(maxDepthDisplay);
-  
   var maxDepthButton = document.createElement("input");
   maxDepthButton.type = "button";
   maxDepthButton.value = "Deeper";

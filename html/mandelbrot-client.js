@@ -181,7 +181,7 @@ function createParams() {
   ppuDisplaySpan = document.createElement("span");
   ppuDisplaySpan.id = ppuDisplayId;
   ppuDisplayDiv.appendChild(ppuDisplaySpan);
-  ppuDisplayDiv.appendChild(document.createTextNode(" pixel per unit.");
+  ppuDisplayDiv.appendChild(document.createTextNode(" pixel per unit."));
 
   params = document.getElementById(paramsDivId);
   params.appendChild(reimDisplayDiv);

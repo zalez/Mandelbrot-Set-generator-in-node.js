@@ -3,10 +3,16 @@
  */
 
 // Constants
-const imageDivId = "mandelbrot-image";
-const imageId = "mandelbrot-image-element";
-const controlsDivId = "mandelbrot-controls";
-const depthDisplayId = "depthDisplay";
+const imageDivId = "mandelbrot-image-div";
+const imageId = "mandelbrot-image-img";
+const paramsDivId = "mandelbrot-image-div";
+const reDisplayId = "mandelbrot-params-re";
+const imDisplayId = "mandelbrot-params-im";
+const maxDisplayId = "mandelbrot-params-max";
+const ppuDisplayId = "mandelbrot-params-ppu";
+const aaDisplayId = "mandelbrot-params-aa";
+const optDisplayId = "mandelbrot-params-opt";
+const controlsDivId = "mandelbrot-controls-div";
 
 const imageBaseURL = "http://constantin.no.de/mandelbrot/image.png?";
 
@@ -24,7 +30,7 @@ const optValues = [
   "Check for 2 biggest bulbs",
   "Subdivide areas, search for black circumferences",
   "Both subdivision and known bulb check",
-  "Adaptive: Apply best optimization to specific areas (experimental)"
+  "Adaptive: Per-area optimization (experimental)"
 ];
 
 // Default configuration of the Mandelbrot view to be rendered.
@@ -39,6 +45,7 @@ const defaultModel = {
 };
 
 var image;    // The <img> element that contains the Mandelbrot image.
+var params;   // The <div> element that displays the current parameters.
 var controls; // The <div> element that containes the controls.
 var model;    // The Mandelbrot view configuration.
 
@@ -95,7 +102,7 @@ function deeper() {
   model.max = model.max * 2;
   updateImage();
 
-  var depthDisplayElement = document.getElementById(depthDisplayId);
+  var depthDisplayElement = document.getElementById(maxDisplayId);
   depthDisplayElement.replaceChild(document.createTextNode(model.max), depthDisplayElement.firstChild);
 
   return;
@@ -144,6 +151,28 @@ function createImage() {
   return;
 }
 
+// Create the DOM elements that display the current parameters.
+function createParams() {
+  var reimDisplayDiv = document.createElement("div");
+
+  reimDisplayDiv.appenChild(document.createTextNode("Center: "));
+
+  var reDisplaySpan = document.createElement("span");
+  reDisplaySpan.id = reDisplayId;
+  reimDisplayDiv.appendChild(reDisplaySpan);
+
+  reimDisplayDiv.appendChild(document.createTextNode(" + "));
+
+  var imDisplaySpan = document.createElement("span");
+  imDisplaySpan.id = imDisplayId;
+  reimDisplayDiv.appendChild(imDisplaySpan);
+
+  reimDisplayDiv.appendChild(document.createTextNode("i"));
+
+  params = document.getElementById(paramsDivId);
+  params.appendChild(reimDisplayDiv);
+}
+
 // Create the DOM elements needed for the controls.
 function createControls() {
   // Antialiasing controls: A popup menu with options.
@@ -190,7 +219,7 @@ function createControls() {
   maxDepth.appendChild(document.createTextNode("Maximum depth: "));
 
   var maxDepthDisplay = document.createElement("span");
-  maxDepthDisplay.id = depthDisplayId;
+  maxDepthDisplay.id = maxDisplayId;
   maxDepthDisplay.appendChild(document.createTextNode(model.max));
   maxDepth.appendChild(maxDepthDisplay);
   
@@ -216,12 +245,13 @@ function init() {
   model = defaultModel;
 
   createImage();
+  createParams();
   createControls();
 }
 
-// This writes two div tags at the place this script was loaded. They'll be filled
+// This writes three div tags at the place this script was loaded. They'll be filled
 // with the Mandelbrot image and its controls.
-document.write("<div id=\"" + imageDivId + "\"></div><div id=\"" + controlsDivId + "\"></div>\n");
+document.write("<div id=\"" + imageDivId + "\"></div><div id=\"" + paramsDivId + "\"></div><div id=\"" + controlsDivId + "\"></div>\n");
 
 // Initialize.
 init();

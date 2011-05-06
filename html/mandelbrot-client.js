@@ -47,13 +47,18 @@ const defaultModel = {
   opt: 0
 };
 
+// Global variables.
 var image = null;    // The <img> element that contains the Mandelbrot image.
 var params = null;   // The <div> element that displays the current parameters.
 var controls = null; // The <div> element that containes the controls.
 
 var displaySpans = []; // The <span> elements for display values. Corresponds to paramDisplays.
+var timeSpan = null;   // The <span> element for displaying load time.
 
 var model = null;    // The Mandelbrot view configuration.
+
+var time = 0; // Used for timing loads.
+var elapsed = 0; // Used for timing loads.
 
 // Update the mandelbrot image with a new set of parameters.
 function updateImage() {
@@ -68,6 +73,7 @@ function updateImage() {
   url += "date=" + new Date().getTime();
 
   // Update the URL of the image. This will trigger a reload.
+  time = Date.now();
   image.src = url;
 
   return;
@@ -188,11 +194,27 @@ function createParams() {
       params.appendChild(displayDiv);
   }
 
+  // Special "parameter": Load time.
+  displayDiv = document.createElement("div");
+  displayDiv.id = paramDisplayIdPrefix + "div-" + "loadtime";
+  displayDiv.setAttribute(
+    "class", paramDisplayClassPrefix + "," + paramDisplayClassPrefix + "-" + "loadtime"
+  );
+  displayDiv.appendChild(document.createTextNode("Render/Load time: "));
+  timeSpan = document.createElement("span");
+  timeSpan.id = paramDisplayIdPrefix + "span-" + "loadtime";
+  displayDiv.appendChild(timeSpan);
+  displayDiv.appendChild(document.createTextNode("ms"));
+  params.appendChild(displayDiv);
+  
   return;
 }
 
 // Update parameter display section with current values.
+// This is called exactly when loading the image has finished, so we'll also use it to measure time.
 function updateParams() {
+  elapsed = Date.now() - time;
+
   var text = "";
 
   for (var i = 0; i < displaySpans.length; i++) {
@@ -203,6 +225,14 @@ function updateParams() {
     } else {
       displaySpans[i].appendChild(text);
     }
+  }
+
+  // Special "parameter": elapsed time.
+  text = document.createTextNode(elapsed);
+  if (timeSpan.firstChild) {
+      timeSpan.replaceChild(text, timeSpan.firstChild);
+    } else {
+      timeSpan.appendChild(text);
   }
 
   return;  

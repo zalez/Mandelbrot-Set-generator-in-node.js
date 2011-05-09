@@ -262,7 +262,8 @@ function image(buffer, stride, x, y, sx, sy) {
 // Method for mandset: Dump data for diagnostic purposes.
 function mandset_dump() {
   return "Center: " + this.center.re + " + " + this.center.im + "i. Max: " + this.center.max + "\n" +
-    "Image:  " + this.image.x + ", " + this.image.y + ", " + this.image.sx + "x" + this.image.sy + "\n";
+    "Image:  " + this.image.x + ", " + this.image.y + ", " + this.image.sx + "x" + this.image.sy + "\n" +
+    "Minre: " + this.minre + ", Maxim: " + this.maxim + "\n";
 }
 
 /*

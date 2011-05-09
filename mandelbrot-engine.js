@@ -253,6 +253,8 @@ function image(buffer, stride, x, y, sx, sy) {
 
   // Number of index values to go from the end of a line to the beginning of next.
   this.xextra = this.stride - this.sx;
+
+  return;
 }
 
 /*
@@ -267,11 +269,9 @@ function mandset(center, img, ppu) {
   this.ppu = ppu;
 
   // Convenience values
-  this.inc = 1 / ppu; // The increment in complex value per pixel.
-  this.resize = img.sx / ppu; // The width of the image in the complex plane.
-  this.imsize = img.sy / ppu; // The height of the image in the complex plane.
-  this.minre = this.center.re - this.image.resize / 2;
-  this.maxim = this.center.im + this.image.resize / 2;
+  this.inc = 1 / this.ppu; // The increment in complex value per pixel.
+  this.minre = this.center.re - this.image.sx / this.ppu / 2;
+  this.maxim = this.center.im + this.image.sy / this.ppu / 2;
   
   return;
 }

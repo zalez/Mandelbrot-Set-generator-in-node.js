@@ -737,7 +737,7 @@ function render_adaptive(set) {
   var todo = [];
   var newset = null;
 
-  // Render the top part until +1.2 with minimal optimization, as it's very easy anyway.
+  // Render the top part until +1.2i with minimal optimization, as it's very easy anyway.
   newset = set.intersect(null, null, null, 1.2);
   if (newset.image.sy > 0) {
     todo.push({
@@ -748,9 +748,26 @@ function render_adaptive(set) {
   }
 
 
-  // Use more optimization for the part between 1.2 and 1.0. No need to test for bulbs, though.
-  // tbd.
+  // Use more optimization for the part between 1.2i and 0.75i. No need to test for bulbs, though.
+  // Use the brain-dead algorithm for everything < 0.75 (re) and the subdivision algorithm for the right part.
+  newset = set.intersect(null, 0.75, 1.2, 0.75);
+  if (newset.image.sy > 0 && newset.image.sx > 0) {
+    todo.push({
+      set: newset,
+      method: "basic",
+      iterator: iterate_basic
+    });
+  }
 
+  newset = set.intersect(0.75, null, 1.2, 0.75);
+  if (newset.image.sy > 0 && newset.image.sx > 0) {
+    todo.push({
+      set: newset,
+      method: "subdivide",
+      iterator: iterate_basic
+    });
+  }
+  
   // Complete todo-list.
   for (var i = 0; i < todo.length; i++) {
     switch (todo[i].method) {

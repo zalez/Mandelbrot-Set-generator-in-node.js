@@ -574,31 +574,31 @@ function render_opt(set, iterator) {
         // Figure out how to best subdivide the remainder.
         if ((set.image.sx - 2) % 2 == 0) { // We can divide the remainder evenly
           newsize = (set.image.sx - 2) >> 1;
-          render_opt(set.subimage(set.image.x + 1, set.image.y + 1, newsize, newsize, iterator));
-          render_opt(set.subimage(set.image.x + 1 + newsize, set.image.y + 1, newsize, newsize, iterator));
-          render_opt(set.subimage(set.image.x + 1, set.image.y + 1 + newsize, newsize, newsize, iterator));
-          render_opt(set.subimage(set.image.x + 1 + newsize, set.image.y + 1 + newsize, newsize, newsize, iterator));
+          render_opt(set.subimage(set.image.x + 1, set.image.y + 1, newsize, newsize), iterator);
+          render_opt(set.subimage(set.image.x + 1 + newsize, set.image.y + 1, newsize, newsize), iterator);
+          render_opt(set.subimage(set.image.x + 1, set.image.y + 1 + newsize, newsize, newsize), iterator);
+          render_opt(set.subimage(set.image.x + 1 + newsize, set.image.y + 1 + newsize, newsize, newsize), iterator);
         } else if ((set.image.sx - 2) % 3 == 0) { // We can subdivide by 3.
           newsize = Math.floor((set.image.sx - 2) / 3); // Protect against float imprecision.
-          render_opt(set.subimage(set.image.x + 1, set.image.y + 1, newsize, newsize, iterator));
-          render_opt(set.subimage(set.image.x + 1 + newsize, set.image.y + 1, newsize, newsize, iterator));
-          render_opt(set.subimage(set.image.x + 1 + (newsize << 1), set.image.y + 1, newsize, newsize, iterator));
-          render_opt(set.subimage(set.image.x + 1, set.image.y + 1 + newsize, newsize, newsize, iterator));
-          render_opt(set.subimage(set.image.x + 1 + newsize, set.image.y + 1 + newsize, newsize, newsize, iterator));
-          render_opt(set.subimage(set.image.x + 1 + (newsize << 1), set.image.y + 1 + newsize, newsize, newsize, iterator));
-          render_opt(set.subimage(set.image.x + 1, set.image.y + 1 + (newsize << 1), newsize, newsize, iterator));
-          render_opt(set.subimage(set.image.x + 1 + newsize, set.image.y + 1 + (newsize << 1), newsize, newsize, iterator));
-          render_opt(set.subimage(set.image.x + 1 + (newsize << 1), set.image.y + 1 + (newsize << 1), newsize, newsize, iterator));
+          render_opt(set.subimage(set.image.x + 1, set.image.y + 1, newsize, newsize), iterator);
+          render_opt(set.subimage(set.image.x + 1 + newsize, set.image.y + 1, newsize, newsize), iterator);
+          render_opt(set.subimage(set.image.x + 1 + (newsize << 1), set.image.y + 1, newsize, newsize), iterator);
+          render_opt(set.subimage(set.image.x + 1, set.image.y + 1 + newsize, newsize, newsize), iterator);
+          render_opt(set.subimage(set.image.x + 1 + newsize, set.image.y + 1 + newsize, newsize, newsize), iterator);
+          render_opt(set.subimage(set.image.x + 1 + (newsize << 1), set.image.y + 1 + newsize, newsize, newsize), iterator);
+          render_opt(set.subimage(set.image.x + 1, set.image.y + 1 + (newsize << 1), newsize, newsize), iterator);
+          render_opt(set.subimage(set.image.x + 1 + newsize, set.image.y + 1 + (newsize << 1), newsize, newsize), iterator);
+          render_opt(set.subimage(set.image.x + 1 + (newsize << 1), set.image.y + 1 + (newsize << 1), newsize, newsize), iterator);
         } else { // A generic uneven subsize.
           // Render 1 pixel stripes at bottom and right, then subdivide by 2.
           render_hline(set.subimage(set.image.x, set.image.y + set.image.sy - 2, set.image.sx - 1, 1), iterator);
           render_vline(set.subimage(set.image.x + set.image.sx - 2, set.image.y, 1, set.image.sy - 1), iterator);
            
           newsize = (subsize - 3) >> 1;
-          render_opt(set.subimage(set.image.x + 1, set.image.y + 1, newsize, newsize, iterator));
-          render_opt(set.subimage(set.image.x + 1 + newsize, set.image.y + 1, newsize, newsize, iterator));
-          render_opt(set.subimage(set.image.x + 1, set.image.y + 1 + newsize, newsize, newsize, iterator));
-          render_opt(set.subimage(set.image.x + 1 + newsize, set.image.y + 1 + newsize, newsize, newsize, iterator));
+          render_opt(set.subimage(set.image.x + 1, set.image.y + 1, newsize, newsize), iterator);
+          render_opt(set.subimage(set.image.x + 1 + newsize, set.image.y + 1, newsize, newsize), iterator);
+          render_opt(set.subimage(set.image.x + 1, set.image.y + 1 + newsize, newsize, newsize), iterator);
+          render_opt(set.subimage(set.image.x + 1 + newsize, set.image.y + 1 + newsize, newsize, newsize), iterator);
         }
         return;
     }

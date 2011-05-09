@@ -341,7 +341,6 @@ exports.render = function (size, re, im, ppu, max, opt) {
  * image: The description of the (sub)image structure to render into.
  *        We assume that the image is quadratic, i.e. sx = sy. We only use sx and ignore sy.
  *
- * Returns: An xsize * ysize array with iteration results.
  */
 function render_basic(set, iterator) {
   var zre = 0;
@@ -350,9 +349,9 @@ function render_basic(set, iterator) {
   var pos = set.image.y * set.image.stride + set.image.x;
 
   for (var y = set.image.y; y < set.image.y + set.image.sy; y++) {
-    zim = set.maxim - y * set.image.inc;
+    zim = set.maxim - y * set.inc;
     for (var x = set.image.x; x < set.image.x + set.image.sx; x++) {
-      zre = set.minre + x * set.image.inc;
+      zre = set.minre + x * set.inc;
       set.image.buffer[pos++] = iterator(zre, zim, set.center.max);
     }
     pos += set.image.extra;

@@ -253,6 +253,7 @@ function image(buffer, stride, x, y, sx, sy) {
 
   // Number of index values to go from the end of a line to the beginning of next.
   this.xextra = this.stride - this.sx;
+  this.startpos = this.y * this.stride + this.x;
 
   return;
 }
@@ -272,6 +273,21 @@ function mandset(center, img, ppu) {
   this.inc = 1 / this.ppu; // The increment in complex value per pixel.
   this.minre = this.center.re - this.image.sx / this.ppu / 2;
   this.maxim = this.center.im + this.image.sy / this.ppu / 2;
+
+  // Figure out the real and imaginary values for the 4 corners of the (sub)image.
+  this.lre = this.minre + this.image.x * this.inc;      // Left real.
+  this.rre = this.lre + (this.image.sx - 1) * this.inc; // Right real.
+  this.tim = this.maxim - this.image.y * this.inc;      // Top imaginary.
+  this.bim = this.tim - (this.image.sy - 1) * this.inc; // Bottom imaginary.
+
+  // Return a new mandset Object that references the specified subimage.
+  this.subimage = function(x, y, sizex, sizey) {
+    return new mandset(
+      this.center,
+      new image(this.image.buffer, this.image.stride, x, y, sizex, sizey),
+      this.ppu
+    );
+  }
   
   return;
 }
@@ -310,24 +326,20 @@ exports.render = function (size, re, im, ppu, max, opt) {
     case 3:
       // The subdivision algorithm assumes that the buffer has been zeroed.
       set.image.clear();
-      // During the data structure redesign, only render_basic works.
-      render_basic(set, iterate_basic);
-      //render_opt(set, image, iterate_basic);
+      render_opt(set, image, iterate_basic);
       return set.image.buffer;
 
     case 4:
       // The subdivision algorithm assumes that the buffer has been zeroed.
       set.image.clear();
-      // During the data structure redesign, only render_basic works.
-      render_basic(set, iterate_basic);
-      //render_opt(set, image, iterate_opt);
+      render_opt(set, image, iterate_opt);
       return set.image.buffer;
 
     default: // 0 = 5 = best algorithm.
       // The subdivision algorithm assumes that the buffer has been zeroed.
       set.image.clear();
       // During the data structure redesign, only render_basic works.
-      render_basic(set, iterate_basic);
+      render_opt(set, iterate_basic);
       //render_adaptive(set, image, iterate_opt);
       return set.image.buffer;
   }
@@ -346,7 +358,7 @@ function render_basic(set, iterator) {
   var zre = 0;
   var zim = 0;
 
-  var pos = set.image.y * set.image.stride + set.image.x;
+  var pos = set.image.startpos;
 
   for (var y = set.image.y; y < set.image.y + set.image.sy; y++) {
     zim = set.maxim - y * set.inc;
@@ -360,180 +372,195 @@ function render_basic(set, iterator) {
   return;
 }
 
-
 /*
  * Walk the circumference of a quadratic area of the mandelbrot set and compute the iterations.
  * Return 0 if all results were 0, 1 otherwise.
  * This will be used to determine if a quadratic area is contained in the Mandelbrot set. Its
  * inner part doesn't need to be rendered if the circumference is completelty part of it.
  */
-function walk_around(minre, maxim, inc, max, size, startx, starty, subsize, result, iterator) {
+function walk_around(set, iterator) {
   // We draw 4 lines simultaneously to minimize loop overhead.
-  var pos1 = starty * size + startx;
-  var pos2 = pos1 + subsize - 1;
-  var pos3 = pos2 + size * (subsize - 1);
-  var pos4 = pos3 - subsize + 1;
-  var zre1 = minre;
-  var zre2 = minre + (subsize - 1) * inc;
+  var pos1 = set.image.y * set.image.stride + set.image.x;
+  var pos2 = pos1 + set.image.sx - 1;
+  var pos3 = pos2 + set.image.stride * (set.image.sy - 1);
+  var pos4 = pos3 - set.image.sx + 1;
+  var zre1 = set.minre;
+  var zre2 = set.minre + (set.image.sx - 1) * set.inc;
   var zre3 = zre2;
-  var zre4 = minre;
-  var zim1 = maxim;
-  var zim2 = maxim;
-  var zim3 = maxim - (subsize - 1) * inc;
+  var zre4 = set.minre;
+  var zim1 = set.maxim;
+  var zim2 = set.maxim;
+  var zim3 = set.maxim - (set.image.sy - 1) * set.inc;
   var zim4 = zim3;
   var touche = 0;
 
-  for (var i = 0; i < subsize - 1; i++) { // No need to go all the way, the corner's covered elsewhere.
+  // Walk the horizontal paths
+  for (var i = 0; i < set.image.sx - 1; i++) { // No need to go all the way, the corner's covered elsewhere.
     // Upper edge
-    if (result[pos1++] = iterator(zre1, zim1, max)) touche = 1;
-    zre1 += inc;
-
-    // Right edge
-    if (result[pos2] = iterator(zre2, zim2, max)) touche = 1;
-    zim2 -= inc;
-    pos2 += size;
+    if (set.image.buffer[pos1++] = iterator(zre1, zim1, set.center.max)) touche = 1;
+    zre1 += set.inc;
 
     // Bottom edge
-    if (result[pos3--] = iterator(zre3, zim3, max)) touche = 1;
-    zre3 -= inc;
+    if (set.image.buffer[pos3--] = iterator(zre3, zim3, set.center.max)) touche = 1;
+    zre3 -= set.inc;
+  }
+
+  // Walt the vertical paths
+  for (var i = 0; i < set.image.sy - 1; i++) { // No need to go all the way, the corner's covered elsewhere.
+    // Right edge
+    if (set.image.buffer[pos2] = iterator(zre2, zim2, set.center.max)) touche = 1;
+    zim2 -= set.inc;
+    pos2 += set.image.stride;
 
     // Left edge
-    if (result[pos4] = iterator(zre4, zim4, max)) touche = 1;
-    zim4 += inc;
-    pos4 -= size;
+    if (set.image.buffer[pos4] = iterator(zre4, zim4, set.center.max)) touche = 1;
+    zim4 += set.inc;
+    pos4 -= set.image.stride;
   }
 
   return touche;
 }
 
 /*
- * Here's a different approach: Segment the picture into quadrants, then apply some
- * Optimization by figuring out if the circumference of quadrants is inside the mandelbrot
- * Set. Since the Mandelbrot set is interconnected, there can't be any holes or islands, so if the
- * whole circumference of a quadrant is 0, the whole quadrant must be.
+ * Render a horizontal line of pixels. We'll render the top line of the image specified in the set.
+ */
+function render_hline(set, iterator) {
+  var pos = set.image.startpos;
+  var zre = set.lre;
+  for (var x = set.image.x; x < set.image.x + set.image.sx; x++) {
+    set.image.buffer[pos++] = iterator(zre, set.tim, set.center.max);
+    zre += set.inc; 
+  }
+  return;
+}
+
+/*
+ * Render a vertical line of pixels. We'll render the left vertical line of the image given.
+ */
+function render_vline(set, iterator) {
+  var pos = set.image.startpos;
+  var zim = set.tim;
+  for (var y = set.image.y; y < set.image.y + set.image.sy; y++) {
+    result[pos] = iterator(set.lre, zim, set.center.max);
+    pos += set.image.stride;
+    zim -= set.inc; 
+  }
+  return;
+}
+
+/*
+ * Segment the picture into quadrants, then apply some optimization by figuring out if the
+ * circumference of a quadrant is contained inside the Mandelbrot set. Since the Mandelbrot
+ * set is interconnected, there can't be any holes or islands, so if the whole circumference
+ * of a quadrant is 0, the whole quadrant must be.
  *
  * We will call this function recursively to look at sub-tiles.
  *
  * Inputs:
- * re, im, ppu, max as usual.
- * size is the size of the whole tile.
- * startx, starty are the top left coordinates of the subtile to look at.
- * subsize is the size of the subtile.
- * buffer is a pre-allocated buffer for the whole tile. We assume that the buffer has been
- * zeroed from the beginning.
+ * set:      A data structure describing the set and the (sub)image.
+ *           We assume that the buffer has been zeroed from the beginning.
+ * iterator: A function that computes the Mandelbrot set iteration for us.
  *
- * Assumptions: Size must be an even number, and the tiles are of course quadratic.
+ * Assumption: The image to be rendered are quadratic. We will only use set.image.sx
+ *             for determining a quadratic tile's size.
  */
-function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, iterator) {
-  var inc = 1 / ppu; // increment per pixel.
-
-  // Minimum real and imaginary values for the whole master tile.
-  var minre = re - size / ppu / 2;
-  var maxim = im + size / ppu / 2;
-
-  // Figure out the real and imaginary values for the 4 corners of our subtile.
-  var lre = minre + startx * inc;      // Left real.
-  var rre = lre + (subsize - 1) * inc; // Right real.
-  var tim = maxim - starty * inc;      // Top imaginary.
-  var bim = tim - (subsize - 1) * inc; // Bottom imaginary.
+function render_opt(set, iterator) {
+  var pos = set.image.startpos;
 
   // Treat the lower subsizes as special cases to save on overhead.
-  switch (subsize) {
+  switch (set.image.sx) {
     case 1:
-      result[starty * size + startx] = iterator(lre, tim, max);
+      set.image.buffer[pos] = iterator(set.lre, set.tim, set.center.max);
       return;
 
     // Special case: If we're just a 2x2 subtile, render all.
     case 2:
-      var pos = starty * size + startx;
-      result[pos++] = iterator(lre, tim, max); // Top left pixel.
-      result[pos] = iterator(rre, tim, max); // Top right pixel.
-      pos += size;
-      result[pos--] = iterator(rre, bim, max); // Bottom right pixel.
-      result[pos] = iterator(lre, bim, max); // Bottom left pixel.
+      set.image.buffer[pos++] = iterator(set.lre, set.tim, set.center.max); // Top left pixel.
+      set.image.buffer[pos] = iterator(set.rre, set.tim, set.center.max); // Top right pixel.
+      pos += set.image.stride;
+      set.image.buffer[pos--] = iterator(set.rre, set.bim, set.center.max); // Bottom right pixel.
+      set.image.buffer[pos] = iterator(set.lre, set.bim, set.center.max); // Bottom left pixel.
       return;
 
     // Special case: 3x3.
     case 3:
-      var pos = starty * size + startx;
       var touche = 0;
-      var zre = lre;
-      var zim = tim;
+      var zre = set.lre;
+      var zim = set.tim;
 
       // Walk the 3x3 circumference by hand. Faster than a subroutine and/or loop.
-      if (result[pos++] = iterator(zre, zim, max)) touche = 1;
-      zre += inc;
-      if (result[pos++] = iterator(zre, zim, max)) touche = 1;
-      zre += inc;
-      if (result[pos] = iterator(zre, zim, max)) touche = 1;
-      zim += inc;
-      pos += size;
-      if (result[pos] = iterator(zre, zim, max)) touche = 1;
-      zim += inc;
-      pos += size;
-      if (result[pos--] = iterator(zre, zim, max)) touche = 1;
-      zre -= inc;
-      if (result[pos--] = iterator(zre, zim, max)) touche = 1;
-      zre -= inc;
-      if (result[pos] = iterator(zre, zim, max)) touche = 1;
-      pos -= size;
-      zim -= inc;
-      if (result[pos++] = iterator(zre, zim, max)) touche = 1;
+      if (set.image.buffer[pos++] = iterator(zre, zim, set.center.max)) touche = 1;
+      zre += set.inc;
+      if (set.image.buffer[pos++] = iterator(zre, zim, set.center.max)) touche = 1;
+      zre += set.inc;
+      if (set.image.buffer[pos] = iterator(zre, zim, set.center.max)) touche = 1;
+      zim += set.inc;
+      pos += set.image.stride;
+      if (set.image.buffer[pos] = iterator(zre, zim, set.center.max)) touche = 1;
+      zim += set.inc;
+      pos += set.image.stride;
+      if (set.image.buffer[pos--] = iterator(zre, zim, set.center.max)) touche = 1;
+      zre -= set.inc;
+      if (set.image.buffer[pos--] = iterator(zre, zim, set.center.max)) touche = 1;
+      zre -= set.inc;
+      if (set.image.buffer[pos] = iterator(zre, zim, set.center.max)) touche = 1;
+      pos -= set.image.stride;
+      zim -= set.inc;
+      if (set.image.buffer[pos++] = iterator(zre, zim, set.center.max)) touche = 1;
       // Fill the rectangle only if needed.
       if (touche) {
-        zre += inc;
-        result[pos] = iterator(zre, zim, max);
+        zre += set.inc;
+        set.image.buffer[pos] = iterator(zre, zim, set.center.max);
       }
       return;
 
     // Special case: 4x4.
     case 4:
-      var pos = starty * size + startx;
       var touche = 0;
-      var zre = lre;
-      var zim = tim;
+      var zre = set.lre;
+      var zim = set.tim;
 
       // Walk the 4x4 circumference by hand. Faster than a subroutine and/or loop.
-      if (result[pos++] = iterator(zre, zim, max)) touche = 1;
-      zre += inc;
-      if (result[pos++] = iterator(zre, zim, max)) touche = 1;
-      zre += inc;
-      if (result[pos++] = iterator(zre, zim, max)) touche = 1;
-      zre = rre;
-      if (result[pos] = iterator(zre, zim, max)) touche = 1;
-      zim += inc;
-      pos += size;
-      if (result[pos] = iterator(zre, zim, max)) touche = 1;
-      zim += inc;
-      pos += size;
-      if (result[pos] = iterator(zre, zim, max)) touche = 1;
-      zim = bim;
-      pos += size;
-      if (result[pos--] = iterator(zre, zim, max)) touche = 1;
-      zre -= inc;
-      if (result[pos--] = iterator(zre, zim, max)) touche = 1;
-      zre -= inc;
-      if (result[pos--] = iterator(zre, zim, max)) touche = 1;
-      zre == lre;
-      if (result[pos] = iterator(zre, zim, max)) touche = 1;
-      pos -= size;
-      zim -= inc;
-      if (result[pos] = iterator(zre, zim, max)) touche = 1;
-      pos -= size;
-      zim -= inc;
-      if (result[pos++] = iterator(zre, zim, max)) touche = 1;
+      if (set.image.buffer[pos++] = iterator(zre, zim, set.center.max)) touche = 1;
+      zre += set.inc;
+      if (set.image.buffer[pos++] = iterator(zre, zim, set.center.max)) touche = 1;
+      zre += set.inc;
+      if (set.image.buffer[pos++] = iterator(zre, zim, set.center.max)) touche = 1;
+      zre = set.rre;
+      if (set.image.buffer[pos] = iterator(zre, zim, set.center.max)) touche = 1;
+      zim += set.inc;
+      pos += set.image.stride;
+      if (set.image.buffer[pos] = iterator(zre, zim, set.center.max)) touche = 1;
+      zim += set.inc;
+      pos += set.image.stride;
+      if (set.image.buffer[pos] = iterator(zre, zim, set.center.max)) touche = 1;
+      zim = set.bim;
+      pos += set.image.stride;
+      if (set.image.buffer[pos--] = iterator(zre, zim, set.center.max)) touche = 1;
+      zre -= set.inc;
+      if (set.image.buffer[pos--] = iterator(zre, zim, set.center.max)) touche = 1;
+      zre -= set.inc;
+      if (set.image.buffer[pos--] = iterator(zre, zim, set.center.max)) touche = 1;
+      zre == set.lre;
+      if (set.image.buffer[pos] = iterator(zre, zim, set.center.max)) touche = 1;
+      pos -= set.image.stride;
+      zim -= set.inc;
+      if (set.image.buffer[pos] = iterator(zre, zim, set.center.max)) touche = 1;
+      pos -= set.image.stride;
+      zim -= set.inc;
+      if (set.image.buffer[pos++] = iterator(zre, zim, set.center.max)) touche = 1;
 
       // Fill the rectangle only if needed.
       if (touche) {
-        zre += inc;
-        result[pos++] = iterator(zre, zim, max);
-        zre += inc;
-        result[pos] = iterator(zre, zim, max);
-        zim += inc;
-        pos += size;
-        result[pos--] = iterator(zre, zim, max);
-        zre -= inc;
-        result[pos] = iterator(zre, zim, max);
+        zre += set.inc;
+        set.image.buffer[pos++] = iterator(zre, zim, set.center.max);
+        zre += set.inc;
+        set.image.buffer[pos] = iterator(zre, zim, set.center.max);
+        zim += set.inc;
+        pos += set.image.stride;
+        set.image.buffer[pos--] = iterator(zre, zim, set.center.max);
+        zre -= set.inc;
+        set.image.buffer[pos] = iterator(zre, zim, set.center.max);
       }
 
       return;
@@ -541,88 +568,41 @@ function render_opt(re, im, ppu, max, size, startx, starty, subsize, result, ite
     default:
       // Walk the circumference of the buffer, then figure out if all values were equal.
 
-      if (walk_around(lre, tim, inc, max, size, startx, starty, subsize, result, iterator)) {
+      if (walk_around(set, iterator)) {
 
-        var new_subsize = 0;
+        var newsize = 0;
         // Figure out how to best subdivide the remainder.
-        if ((subsize - 2) % 2 == 0) { // We can divide the remainder evenly
-          new_subsize = (subsize - 2) >> 1;
-          render_opt(re, im, ppu, max, size, startx + 1, starty + 1, new_subsize, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1, new_subsize, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 1, starty + 1 + new_subsize, new_subsize, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1 + new_subsize, new_subsize, result, iterator);
-        } else if ((subsize - 2) % 3 == 0) { // We can subdivide by 3.
-          new_subsize = Math.floor((subsize - 2) / 3); // Protect against float imprecision.
-          render_opt(re, im, ppu, max, size, startx + 1, starty + 1, new_subsize, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1, new_subsize, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 1 + (new_subsize << 1), starty + 1, new_subsize, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 1, starty + 1 + new_subsize, new_subsize, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1 + new_subsize, new_subsize, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 1 + (new_subsize << 1), starty + 1 + new_subsize, new_subsize, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 1, starty + 1 + (new_subsize << 1), new_subsize, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1 + (new_subsize << 1), new_subsize, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 1 + 2 * new_subsize, starty + 1 + (new_subsize << 1), new_subsize, result, iterator);
+        if ((set.image.sx - 2) % 2 == 0) { // We can divide the remainder evenly
+          newsize = (set.image.sx - 2) >> 1;
+          render_opt(set.subset(set.image.x + 1, set.image.y + 1, newsize, newsize, iterator));
+          render_opt(set.subset(set.image.x + 1 + newsize, set.image.y + 1, newsize, newsize, iterator));
+          render_opt(set.subset(set.image.x + 1, set.image.y + 1 + newsize, newsize, newsize, iterator));
+          render_opt(set.subset(set.image.x + 1 + newsize, set.image.y + 1 + newsize, newsize, newsize, iterator));
+        } else if ((set.image.sx - 2) % 3 == 0) { // We can subdivide by 3.
+          newsize = Math.floor((set.image.sx - 2) / 3); // Protect against float imprecision.
+          render_opt(set.subset(set.image.x + 1, set.image.y + 1, newsize, newsize, iterator));
+          render_opt(set.subset(set.image.x + 1 + newsize, set.image.y + 1, newsize, newsize, iterator));
+          render_opt(set.subset(set.image.x + 1 + (newsize << 1), set.image.y + 1, newsize, newsize, iterator));
+          render_opt(set.subset(set.image.x + 1, set.image.y + 1 + newsize, newsize, newsize, iterator));
+          render_opt(set.subset(set.image.x + 1 + newsize, set.image.y + 1 + newsize, newsize, newsize, iterator));
+          render_opt(set.subset(set.image.x + 1 + (newsize << 1), set.image.y + 1 + newsize, newsize, newsize, iterator));
+          render_opt(set.subset(set.image.x + 1, set.image.y + 1 + (newsize << 1), newsize, newsize, iterator));
+          render_opt(set.subset(set.image.x + 1 + newsize, set.image.y + 1 + (newsize << 1), newsize, newsize, iterator));
+          render_opt(set.subset(set.image.x + 1 + (newsize << 1), set.image.y + 1 + (newsize << 1), newsize, newsize, iterator));
         } else { // A generic uneven subsize.
           // Render 1 pixel stripes at bottom and right, then subdivide by 2.
-          render_hline(re, im, ppu, max, size, startx, starty + subsize - 2, subsize - 1, result, iterator);
-          render_vline(re, im, ppu, max, size, startx + subsize - 2, starty, subsize - 1, result, iterator);
+          render_hline(set.subset(set.image.x, set.image.y + set.image.sy - 2, set.image.sx - 1, 1), iterator);
+          render_vline(set.subset(set.image.x + set.image.sx - 2, set.image.y, 1, set.image.sy - 1), iterator);
            
-          new_subsize = (subsize - 3) >> 1;
-          render_opt(re, im, ppu, max, size, startx + 1, starty + 1, new_subsize, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1, new_subsize, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 1, starty + 1 + new_subsize, new_subsize, result, iterator);
-          render_opt(re, im, ppu, max, size, startx + 1 + new_subsize, starty + 1 + new_subsize, new_subsize, result, iterator);
+          newsize = (subsize - 3) >> 1;
+          render_opt(set.subset(set.image.x + 1, set.image.y + 1, newsize, newsize, iterator));
+          render_opt(set.subset(set.image.x + 1 + newsize, set.image.y + 1, newsize, newsize, iterator));
+          render_opt(set.subset(set.image.x + 1, set.image.y + 1 + newsize, newsize, newsize, iterator));
+          render_opt(set.subset(set.image.x + 1 + newsize, set.image.y + 1 + newsize, newsize, newsize, iterator));
         }
         return;
     }
   }
-}
-
-/*
- * Render a horizontal line of pixels.
- */
-function render_hline(re, im, ppu, max, size, startx, starty, sizex, result, iterator) {
-  var inc = 1 / ppu; // increment per pixel.
-
-  // Minimum real and imaginary values for the whole master tile.
-  var minre = re - size / ppu / 2;
-  var maxim = im + size / ppu / 2;
-
-  // Figure out the real and imaginary values for the 4 corners of our subtile.
-  var lre = minre + startx * inc;      // Left real.
-  var tim = maxim - starty * inc;      // Top imaginary.
-
-  var pos = starty * size + startx;
-  var zre = lre;
-  for (var x = startx; x < startx + sizex; x++) {
-    result[pos++] = iterator(zre, tim, max);
-    zre += inc; 
-  }
-  return;
-}
-
-/*
- * Render a vertical line of pixels.
- */
-function render_vline(re, im, ppu, max, size, startx, starty, sizey, result, iterator) {
-  var inc = 1 / ppu; // increment per pixel.
-
-  // Minimum real and imaginary values for the whole master tile.
-  var minre = re - size / ppu / 2;
-  var maxim = im + size / ppu / 2;
-
-  // Figure out the real and imaginary values for the 4 corners of our subtile.
-  var lre = minre + startx * inc;      // Left real.
-  var tim = maxim - starty * inc;      // Top imaginary.
-
-  var pos = starty * size + startx;
-  var zim = tim;
-  for (var y = starty; y < starty + sizey; y++) {
-    result[pos] = iterator(lre, zim, max);
-    pos += size;
-    zim -= inc; 
-  }
-  return;
 }
 
 /*

@@ -284,7 +284,7 @@ function mandset(center, img, ppu) {
   // Return a new mandset Object that references the specified subimage.
   this.subimage = function(x, y, sizex, sizey) {
     return new mandset(
-      this.center,
+      new point(this.center.re, this.center.im, this.center.max),
       new image(this.image.buffer, this.image.stride, x, y, sizex, sizey),
       this.ppu
     );

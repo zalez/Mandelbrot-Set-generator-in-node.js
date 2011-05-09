@@ -229,21 +229,19 @@ function point(re, im, max) {
  * Describe an image table for a rendition of the Mandelbrot set.
  * buffer: An array containing iteration results, one per x/y coordinate. If this is
  *         null, a new buffer will be created.
- * stride: The total width of the image. An index + stride brings us to the next line
- *         at the same x co-ordinate.
+ * size:   The total width and height of the image. An index + size brings us to the next line
+ *         at the same x co-ordinate. This also means that the whole image is always quadratic.
  * x,y:    Starting co-ordinates of the subimage.
  * sx, sy: x and y sizes of the subimage.
  */
-function image(buffer, stride, x, y, sx, sy) {
+function image(buffer, size, x, y, sx, sy) {
   if (buffer != null) {
     this.buffer = buffer;
   } else {
-    this.buffer = new Array(sx * sy);
+    this.buffer = new Array(size * size);
   }
-  // A method for clearing the image buffer
-  this.clear = function() { for (var i = 0; i < sx * sy; i++) { this.buffer[i] = 0.0; } };
 
-  this.stride = stride;
+  this.size = size;
   this.x = x;
   this.y = y;
   this.sx = sx;
@@ -252,17 +250,28 @@ function image(buffer, stride, x, y, sx, sy) {
   // Convenience values.
 
   // Number of index values to go from the end of a line to the beginning of next.
-  this.xextra = this.stride - this.sx;
-  this.startpos = this.y * this.stride + this.x;
+  this.xextra = this.size - this.sx;
+  this.startpos = this.y * this.size + this.x;
+
+  // A method for clearing the whole image buffer
+  this.clear = function() { for (var i = 0; i < this.size * this.size; i++) { this.buffer[i] = 0.0; } };
 
   return;
 }
 
+// Method for mandset: Return a new mandset Object that references the specified subimage.
+function mandset_subimage(x, y, sizex, sizey) {
+  return new mandset(
+    this.center,
+    new image(this.image.buffer, this.image.size, x, y, sizex, sizey),
+    this.ppu
+  );
+}
 
 // Method for mandset: Dump data for diagnostic purposes.
 function mandset_dump() {
   return "Center: " + this.center.re + " + " + this.center.im + "i. Max: " + this.center.max + "\n" +
-    "Image:  " + this.image.x + ", " + this.image.y + ", " + this.image.sx + "x" + this.image.sy + "\n" +
+    "Image: Size: " + this.image.size + ", x: " + this.image.x + ", y:" + this.image.y + ", " + this.image.sx + "x" + this.image.sy + "\n" +
     "Minre: " + this.minre + ", Maxim: " + this.maxim + "\n";
 }
 
@@ -280,8 +289,8 @@ function mandset(center, img, ppu) {
   // Convenience values
   this.inc = 1 / this.ppu; // The increment in complex value per pixel.
   // Minimum real and maximum imaginary values for the whole image.
-  this.minre = this.center.re - (this.image.sx / this.ppu) / 2;
-  this.maxim = this.center.im + (this.image.sy / this.ppu) / 2;
+  this.minre = this.center.re - (this.image.size / this.ppu) / 2;
+  this.maxim = this.center.im + (this.image.size / this.ppu) / 2;
 
   // Figure out the real and imaginary values for the 4 corners of the (sub)image.
   this.lre = this.minre + this.image.x * this.inc;      // Left real.
@@ -289,15 +298,10 @@ function mandset(center, img, ppu) {
   this.tim = this.maxim - this.image.y * this.inc;      // Top imaginary.
   this.bim = this.tim - (this.image.sy - 1) * this.inc; // Bottom imaginary.
 
-  // Return a new mandset Object that references the specified subimage.
-  this.subimage = function(x, y, sizex, sizey) {
-    return new mandset(
-      this.center,
-      new image(this.image.buffer, this.image.stride, x, y, sizex, sizey),
-      this.ppu
-    );
-  }
+  // Add a method for returning a subimage.
+  this.subimage = mandset_subimage;
 
+  // Add a method for dumping our data.
   this.dump = mandset_dump;
   
   return;
@@ -396,7 +400,7 @@ function walk_around(set, iterator) {
   // We draw 4 lines simultaneously to minimize loop overhead.
   var pos1 = set.image.startpos
   var pos2 = pos1 + set.image.sx - 1;
-  var pos3 = pos2 + set.image.stride * (set.image.sy - 1);
+  var pos3 = pos2 + set.image.size * (set.image.sy - 1);
   var pos4 = pos3 - set.image.sx + 1;
   var zre1 = set.lre;
   var zre2 = set.rre;
@@ -424,12 +428,12 @@ function walk_around(set, iterator) {
     // Right edge
     if (set.image.buffer[pos2] = iterator(zre2, zim2, set.center.max)) touche = 1;
     zim2 -= set.inc;
-    pos2 += set.image.stride;
+    pos2 += set.image.size;
 
     // Left edge
     if (set.image.buffer[pos4] = iterator(zre4, zim4, set.center.max)) touche = 1;
     zim4 += set.inc;
-    pos4 -= set.image.stride;
+    pos4 -= set.image.size;
   }
 
   return touche;
@@ -456,7 +460,7 @@ function render_vline(set, iterator) {
   var zim = set.tim;
   for (var y = set.image.y; y < set.image.y + set.image.sy; y++) {
     set.image.buffer[pos] = iterator(set.lre, zim, set.center.max);
-    pos += set.image.stride;
+    pos += set.image.size;
     zim -= set.inc; 
   }
   return;
@@ -494,7 +498,7 @@ function render_opt(set, iterator) {
     case 2:
       set.image.buffer[pos++] = iterator(set.lre, set.tim, set.center.max); // Top left pixel.
       set.image.buffer[pos] = iterator(set.rre, set.tim, set.center.max); // Top right pixel.
-      pos += set.image.stride;
+      pos += set.image.size;
       set.image.buffer[pos--] = iterator(set.rre, set.bim, set.center.max); // Bottom right pixel.
       set.image.buffer[pos] = iterator(set.lre, set.bim, set.center.max); // Bottom left pixel.
       return;
@@ -512,16 +516,16 @@ function render_opt(set, iterator) {
       zre += set.inc;
       if (set.image.buffer[pos] = iterator(zre, zim, set.center.max)) touche = 1;
       zim += set.inc;
-      pos += set.image.stride;
+      pos += set.image.size;
       if (set.image.buffer[pos] = iterator(zre, zim, set.center.max)) touche = 1;
       zim += set.inc;
-      pos += set.image.stride;
+      pos += set.image.size;
       if (set.image.buffer[pos--] = iterator(zre, zim, set.center.max)) touche = 1;
       zre -= set.inc;
       if (set.image.buffer[pos--] = iterator(zre, zim, set.center.max)) touche = 1;
       zre -= set.inc;
       if (set.image.buffer[pos] = iterator(zre, zim, set.center.max)) touche = 1;
-      pos -= set.image.stride;
+      pos -= set.image.size;
       zim -= set.inc;
       if (set.image.buffer[pos++] = iterator(zre, zim, set.center.max)) touche = 1;
       // Fill the rectangle only if needed.
@@ -546,13 +550,13 @@ function render_opt(set, iterator) {
       zre = set.rre;
       if (set.image.buffer[pos] = iterator(zre, zim, set.center.max)) touche = 1;
       zim += set.inc;
-      pos += set.image.stride;
+      pos += set.image.size;
       if (set.image.buffer[pos] = iterator(zre, zim, set.center.max)) touche = 1;
       zim += set.inc;
-      pos += set.image.stride;
+      pos += set.image.size;
       if (set.image.buffer[pos] = iterator(zre, zim, set.center.max)) touche = 1;
       zim = set.bim;
-      pos += set.image.stride;
+      pos += set.image.size;
       if (set.image.buffer[pos--] = iterator(zre, zim, set.center.max)) touche = 1;
       zre -= set.inc;
       if (set.image.buffer[pos--] = iterator(zre, zim, set.center.max)) touche = 1;
@@ -560,10 +564,10 @@ function render_opt(set, iterator) {
       if (set.image.buffer[pos--] = iterator(zre, zim, set.center.max)) touche = 1;
       zre == set.lre;
       if (set.image.buffer[pos] = iterator(zre, zim, set.center.max)) touche = 1;
-      pos -= set.image.stride;
+      pos -= set.image.size;
       zim -= set.inc;
       if (set.image.buffer[pos] = iterator(zre, zim, set.center.max)) touche = 1;
-      pos -= set.image.stride;
+      pos -= set.image.size;
       zim -= set.inc;
       if (set.image.buffer[pos++] = iterator(zre, zim, set.center.max)) touche = 1;
 
@@ -574,7 +578,7 @@ function render_opt(set, iterator) {
         zre += set.inc;
         set.image.buffer[pos] = iterator(zre, zim, set.center.max);
         zim += set.inc;
-        pos += set.image.stride;
+        pos += set.image.size;
         set.image.buffer[pos--] = iterator(zre, zim, set.center.max);
         zre -= set.inc;
         set.image.buffer[pos] = iterator(zre, zim, set.center.max);

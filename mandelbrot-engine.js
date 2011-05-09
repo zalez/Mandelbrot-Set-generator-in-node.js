@@ -369,7 +369,7 @@ function render_basic(set, iterator) {
   var pos = set.image.startpos;
 
   // For debugging.
-  process.stdout.write("Render Basic:\n" + set.dump);
+  process.stdout.write("Render Basic:\n" + set.dump());
 
   for (var y = set.image.y; y < set.image.y + set.image.sy; y++) {
     zim = set.maxim - y * set.inc;
@@ -479,7 +479,7 @@ function render_opt(set, iterator) {
   var pos = set.image.startpos;
 
   // For debugging.
-  process.stdout.write("Render Opt:\n" + set.dump);
+  process.stdout.write("Render Opt:\n" + set.dump());
 
   // Treat the lower subsizes as special cases to save on overhead.
   switch (set.image.sx) {

@@ -258,6 +258,14 @@ function image(buffer, stride, x, y, sx, sy) {
   return;
 }
 
+
+// Method for mandset: Dump data for diagnostic purposes.
+function mandset_dump() {
+  return
+    "Center: " + this.center.re + " + " + this.center.im + "i. Max: " + this.center.max + "\n" +
+    "Image:  " + this.image.x + ", " + this.image.y + ", " + this.image.sx + "x" + this.image.sy + "\n";
+}
+
 /*
  * Describe a Mandelbrot set rendition.
  * center: A point referencing the center of the mandelbrot set to be rendered, plus max iteration.
@@ -290,12 +298,7 @@ function mandset(center, img, ppu) {
     );
   }
 
-  // For diagnostic purposes.
-  this.dump = function() {
-    return
-      "Center: " + this.center.re + " + " + this.center.im + "i. Max: " + this.center.max + "\n" +
-      "Image:  " + this.image.x + ", " + this.image.y + ", " + this.image.sx + "x" + this.image.sy + "\n";
-  }
+  this.dump = mandset_dump;
   
   return;
 }

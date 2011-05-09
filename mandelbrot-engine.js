@@ -335,7 +335,7 @@ function render_basic(set, image, iterator) {
     zim = maxim - y * image.inc;
     for (var x = image.x; x < image.x + image.sx; x++) {
       zre = minre + x * image.inc;
-      image.buffer[pos++] = iterator(zre, zim, max);
+      image.buffer[pos++] = iterator(zre, zim, set.max);
     }
     pos += xextra;
   }

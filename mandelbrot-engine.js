@@ -384,13 +384,13 @@ function walk_around(set, iterator) {
   var pos2 = pos1 + set.image.sx - 1;
   var pos3 = pos2 + set.image.stride * (set.image.sy - 1);
   var pos4 = pos3 - set.image.sx + 1;
-  var zre1 = set.minre + set.image.x * set.inc;
-  var zre2 = set.minre + (set.image.x + set.image.sx - 1) * set.inc;
+  var zre1 = set.minre;
+  var zre2 = set.minre + (set.image.sx - 1) * set.inc;
   var zre3 = zre2;
   var zre4 = zre1;
-  var zim1 = set.maxim - set.image.y * set.inc;
+  var zim1 = set.maxim;
   var zim2 = zim1;
-  var zim3 = set.maxim - (set.image.y + set.image.sy - 1) * set.inc;
+  var zim3 = set.maxim - (set.image.sy - 1) * set.inc;
   var zim4 = zim3;
   var touche = 0;
 

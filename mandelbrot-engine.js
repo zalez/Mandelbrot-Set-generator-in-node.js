@@ -283,9 +283,9 @@ exports.render = function (size, re, im, ppu, max, opt) {
   // Create some data structures.
   var center = new point(re, im, max);
   // The subimage structure contains the whole image at first.
-  var image = new image(null, size, 0, 0, size, size); // The whole image.
+  var img = new image(null, size, 0, 0, size, size); // The whole image.
   // Now combine into the mandelbrot set structure.
-  var set = new mandset(center, image, ppu);
+  var set = new mandset(center, img, ppu);
 
   /*
    * Four levels of optimization:

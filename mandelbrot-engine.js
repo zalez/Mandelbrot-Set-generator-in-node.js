@@ -235,7 +235,7 @@ function point(re, im, max) {
  * sx, sy: x and y sizes of the subimage.
  */
 function image(buffer, stride, x, y, sx, sy) {
-  if (buffer) {
+  if (buffer != null) {
     this.buffer = buffer;
   } else {
     this.buffer = new Array(sx * sy);
@@ -261,15 +261,15 @@ function image(buffer, stride, x, y, sx, sy) {
  * image:  The image (portion) to render into.
  * ppu:    The resolution: How many pixels to use per complex plane unit.
  */
-function mandset(center, image, ppu) {
+function mandset(center, img, ppu) {
   this.center = center;
-  this.image = image;
+  this.image = img;
   this.ppu = ppu;
 
   // Convenience values
   this.inc = 1 / ppu; // The increment in complex value per pixel.
-  this.resize = image.sx / ppu; // The width of the image in the complex plane.
-  this.imsize = image.sy / ppu; // The height of the image in the complex plane.
+  this.resize = img.sx / ppu; // The width of the image in the complex plane.
+  this.imsize = img.sy / ppu; // The height of the image in the complex plane.
   this.minre = this.center.re - this.image.resize / 2;
   this.maxim = this.center.im + this.image.resize / 2;
   

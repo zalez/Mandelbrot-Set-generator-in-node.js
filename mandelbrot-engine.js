@@ -316,9 +316,9 @@ function mandset_intersect(re1, im1, re2, im2) {
   } else {
     newy = Math.floor((this.tim - im1) * this.ppu + 0.5);
     if (im2 != null && this.bim < im2) {
-      newsy = Math.floor((newy - im2) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
+      newsy = Math.floor((im2 - newy) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
     } else {
-      newsy = Math.floor((newy - this.tim) * this.ppu + 0.5);
+      newsy = Math.floor((this.bim - newy) * this.ppu + 0.5);
     }
   }
     
@@ -749,7 +749,7 @@ function render_adaptive(set) {
 
   // Use more optimization for the part between 1.2i and 0.75i. No need to test for bulbs, though.
   // Use the brain-dead algorithm for everything < 0.75 (re) and the subdivision algorithm for the right part.
-  newset = set.intersect(null, 1.2, 0.75, 0.75);
+  newset = set.intersect(null, 1.2, -0.75, 0.75);
   if (newset.image.sy > 0 && newset.image.sx > 0) {
     todo.push({
       set: newset,

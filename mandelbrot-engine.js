@@ -271,8 +271,9 @@ function mandset(center, img, ppu) {
 
   // Convenience values
   this.inc = 1 / this.ppu; // The increment in complex value per pixel.
-  this.minre = this.center.re - this.image.sx / this.ppu / 2;
-  this.maxim = this.center.im + this.image.sy / this.ppu / 2;
+  // Minimum real and maximum imaginary values for the whole image.
+  this.minre = this.center.re - (this.image.sx / this.ppu) / 2;
+  this.maxim = this.center.im + (this.image.sy / this.ppu) / 2;
 
   // Figure out the real and imaginary values for the 4 corners of the (sub)image.
   this.lre = this.minre + this.image.x * this.inc;      // Left real.
@@ -384,13 +385,13 @@ function walk_around(set, iterator) {
   var pos2 = pos1 + set.image.sx - 1;
   var pos3 = pos2 + set.image.stride * (set.image.sy - 1);
   var pos4 = pos3 - set.image.sx + 1;
-  var zre1 = set.minre;
-  var zre2 = set.minre + (set.image.sx - 1) * set.inc;
+  var zre1 = set.lre;
+  var zre2 = set.rre;
   var zre3 = zre2;
   var zre4 = zre1;
-  var zim1 = set.maxim;
+  var zim1 = set.tim;
   var zim2 = zim1;
-  var zim3 = set.maxim - (set.image.sy - 1) * set.inc;
+  var zim3 = set.bim
   var zim4 = zim3;
   var touche = 0;
 

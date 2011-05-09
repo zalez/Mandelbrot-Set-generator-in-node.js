@@ -326,13 +326,13 @@ exports.render = function (size, re, im, ppu, max, opt) {
     case 3:
       // The subdivision algorithm assumes that the buffer has been zeroed.
       set.image.clear();
-      render_opt(set, image, iterate_basic);
+      render_opt(set, iterate_basic);
       return set.image.buffer;
 
     case 4:
       // The subdivision algorithm assumes that the buffer has been zeroed.
       set.image.clear();
-      render_opt(set, image, iterate_opt);
+      render_opt(set, iterate_opt);
       return set.image.buffer;
 
     default: // 0 = 5 = best algorithm.
@@ -340,7 +340,7 @@ exports.render = function (size, re, im, ppu, max, opt) {
       set.image.clear();
       // During the data structure redesign, only render_basic works.
       render_opt(set, iterate_basic);
-      //render_adaptive(set, image, iterate_opt);
+      //render_adaptive(set, iterate_opt);
       return set.image.buffer;
   }
 }

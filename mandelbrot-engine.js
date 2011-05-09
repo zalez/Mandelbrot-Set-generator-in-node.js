@@ -594,7 +594,7 @@ function render_opt(set, iterator) {
           render_hline(set.subimage(set.image.x, set.image.y + set.image.sy - 2, set.image.sx - 1, 1), iterator);
           render_vline(set.subimage(set.image.x + set.image.sx - 2, set.image.y, 1, set.image.sy - 1), iterator);
            
-          newsize = (subsize - 3) >> 1;
+          newsize = (set.image.sx - 3) >> 1;
           render_opt(set.subimage(set.image.x + 1, set.image.y + 1, newsize, newsize), iterator);
           render_opt(set.subimage(set.image.x + 1 + newsize, set.image.y + 1, newsize, newsize), iterator);
           render_opt(set.subimage(set.image.x + 1, set.image.y + 1 + newsize, newsize, newsize), iterator);

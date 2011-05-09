@@ -300,7 +300,7 @@ function mandset_intersect(re1, im1, re2, im2) {
       newsx = Math.floor((re2 - this.lre) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
     } // Otherwise keep newsx = old sx.
   } else {
-    newx = Math.floor((re1 - this.lre) * ppu + 0.5);
+    newx = Math.floor((re1 - this.lre) * this.ppu + 0.5);
     if (re2 != null && this.rre > re2) {
       newsx = Math.floor((re2 - newx) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
     } else {
@@ -314,7 +314,7 @@ function mandset_intersect(re1, im1, re2, im2) {
       newsy = Math.floor((this.tim - im2) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
     } // Otherwise keep newsx = old sx.
   } else {
-    newy = Math.floor((this.tim - im1) * ppu + 0.5);
+    newy = Math.floor((this.tim - im1) * this.ppu + 0.5);
     if (im2 != null && this.bim < im2) {
       newsy = Math.floor((newy - im2) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
     } else {
@@ -746,7 +746,6 @@ function render_adaptive(set) {
       iterator: iterate_basic
     });
   }
-
 
   // Use more optimization for the part between 1.2i and 0.75i. No need to test for bulbs, though.
   // Use the brain-dead algorithm for everything < 0.75 (re) and the subdivision algorithm for the right part.

@@ -738,7 +738,7 @@ function render_adaptive(set) {
   var newset = null;
 
   // Render the top part until +1.2 with minimal optimization, as it's very easy anyway.
-  newset = set.intersection(null, null, null, 1.2);
+  newset = set.intersect(null, null, null, 1.2);
   if (newset.image.sy > 0) {
     todo.push({
       set: newset,

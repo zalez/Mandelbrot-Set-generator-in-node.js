@@ -272,41 +272,42 @@ exports.render = function (size, re, im, ppu, max, opt) {
   switch (opt) {
     case 1:
       render_basic(set, image, iterate_basic);
-      return result;
+      return image.buffer;
 
     case 2:
       render_basic(set, image, iterate_opt);
-      return result;
+      return image.buffer;
 
     case 3:
       // The subdivision algorithm assumes that the buffer has been zeroed.
+      // Zeroing a buffer should really be made a function of the image object...
       for (var i = 0; i < size * size; i++) {
-        result[i] = 0.0;
+        image.buffer[i] = 0.0;
       }
       // During the data structure redesign, only render_basic works.
       render_basic(set, image, iterate_basic);
       //render_opt(set, image, iterate_basic);
-      return result;
+      return image.buffer;
 
     case 4:
       // The subdivision algorithm assumes that the buffer has been zeroed.
       for (var i = 0; i < size * size; i++) {
-        result[i] = 0.0;
+        image.buffer[i] = 0.0;
       }
       // During the data structure redesign, only render_basic works.
       render_basic(set, image, iterate_basic);
       //render_opt(set, image, iterate_opt);
-      return result;
+      return image.buffer;
 
     default: // 0 = 5 = best algorithm.
       // The subdivision algorithm assumes that the buffer has been zeroed.
       for (var i = 0; i < size * size; i++) {
-        result[i] = 0.0;
+        image.buffer[i] = 0.0;
       }
       // During the data structure redesign, only render_basic works.
       render_basic(set, image, iterate_basic);
       //render_adaptive(set, image, iterate_opt);
-      return result;
+      return image.buffer;
   }
 }
 
@@ -334,7 +335,7 @@ function render_basic(set, image, iterator) {
     zim = maxim - y * image.inc;
     for (var x = image.x; x < image.x + image.sx; x++) {
       zre = minre + x * image.inc;
-      result[pos++] = iterator(zre, zim, max);
+      image.buffer[pos++] = iterator(zre, zim, max);
     }
     pos += xextra;
   }

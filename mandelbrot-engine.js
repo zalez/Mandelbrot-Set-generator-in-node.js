@@ -212,8 +212,13 @@ function iterate_opt_2(cr, ci, max) {
   return 0;
 }
 
-// Describe a particular center of the mandelbrot set.
-function mandset(re, im, max) {
+
+/*
+ * "Object" definitions for Mandelbrot set image stuctures.
+ */
+
+// Describe a particular point of the mandelbrot set, with a max iteration value.
+function point(re, im, max) {
   this.re = re;
   this.im = im;
   this.max = max;
@@ -221,26 +226,52 @@ function mandset(re, im, max) {
 }
 
 /*
- * Describe a region inside an image table of iteration results.
- * buffer: An array containing iteration results, one per x/y coordinate.
+ * Describe an image table for a rendition of the Mandelbrot set.
+ * buffer: An array containing iteration results, one per x/y coordinate. If this is
+ *         null, a new buffer will be created.
  * stride: The total width of the image. An index + stride brings us to the next line
  *         at the same x co-ordinate.
  * x,y:    Starting co-ordinates of the subimage.
  * sx, sy: x and y sizes of the subimage.
- * ppu:    Number of pixels per numerical unit: ppu = 100, then [0..1] is 100 pixels.
  */
-function subimage(buffer, stride, x, y, sx, sy, ppu) {
-  this.buffer = buffer;
+function image(buffer, stride, x, y, sx, sy) {
+  if (buffer) {
+    this.buffer = buffer;
+  } else {
+    this.buffer = new Array(sx * sy);
+  }
+  // A method for clearing the image buffer
+  this.clear = function() { for (var i = 0; i < sx * sy; i++) { this.buffer[i] = 0.0; } };
+
   this.stride = stride;
   this.x = x;
   this.y = y;
   this.sx = sx;
   this.sy = sy;
+
+  // Convenience values.
+
+  // Number of index values to go from the end of a line to the beginning of next.
+  this.xextra = this.stride - this.sx;
+}
+
+/*
+ * Describe a Mandelbrot set rendition.
+ * center: A point referencing the center of the mandelbrot set to be rendered, plus max iteration.
+ * image:  The image (portion) to render into.
+ * ppu:    The resolution: How many pixels to use per complex plane unit.
+ */
+function mandset(center, image, ppu) {
+  this.center = center;
+  this.image = image;
   this.ppu = ppu;
+
   // Convenience values
   this.inc = 1 / ppu; // The increment in complex value per pixel.
-  this.resize = sx / ppu; // The width of the image in the complex plane.
-  this.imsize = sy / ppu; // The height of the image in the complex plane.
+  this.resize = image.sx / ppu; // The width of the image in the complex plane.
+  this.imsize = image.sy / ppu; // The height of the image in the complex plane.
+  this.minre = this.center.re - this.image.resize / 2;
+  this.maxim = this.center.im + this.image.resize / 2;
   
   return;
 }
@@ -250,13 +281,11 @@ function subimage(buffer, stride, x, y, sx, sy, ppu) {
  */
 exports.render = function (size, re, im, ppu, max, opt) {
   // Create some data structures.
-  var set = new mandset(re, im, max);
-
-  // Create the result array and fill it with zeroes.
-  var buffer = new Array(size * size);
-
+  var center = new point(re, im, max);
   // The subimage structure contains the whole image at first.
-  var image = new subimage(buffer, size, 0, 0, size, size, ppu); // The whole image.
+  var image = new subimage(null, size, 0, 0, size, size); // The whole image.
+  // Now combine into the mandelbrot set structure.
+  var set = new mandset(center, image, ppu);
 
   /*
    * Four levels of optimization:
@@ -271,43 +300,36 @@ exports.render = function (size, re, im, ppu, max, opt) {
    */
   switch (opt) {
     case 1:
-      render_basic(set, image, iterate_basic);
-      return image.buffer;
+      render_basic(set, iterate_basic);
+      return set.image.buffer;
 
     case 2:
-      render_basic(set, image, iterate_opt);
-      return image.buffer;
+      render_basic(set, iterate_opt);
+      return set.image.buffer;
 
     case 3:
       // The subdivision algorithm assumes that the buffer has been zeroed.
-      // Zeroing a buffer should really be made a function of the image object...
-      for (var i = 0; i < size * size; i++) {
-        image.buffer[i] = 0.0;
-      }
+      set.image.clear();
       // During the data structure redesign, only render_basic works.
-      render_basic(set, image, iterate_basic);
+      render_basic(set, iterate_basic);
       //render_opt(set, image, iterate_basic);
-      return image.buffer;
+      return set.image.buffer;
 
     case 4:
       // The subdivision algorithm assumes that the buffer has been zeroed.
-      for (var i = 0; i < size * size; i++) {
-        image.buffer[i] = 0.0;
-      }
+      set.image.clear();
       // During the data structure redesign, only render_basic works.
-      render_basic(set, image, iterate_basic);
+      render_basic(set, iterate_basic);
       //render_opt(set, image, iterate_opt);
-      return image.buffer;
+      return set.image.buffer;
 
     default: // 0 = 5 = best algorithm.
       // The subdivision algorithm assumes that the buffer has been zeroed.
-      for (var i = 0; i < size * size; i++) {
-        image.buffer[i] = 0.0;
-      }
+      set.image.clear();
       // During the data structure redesign, only render_basic works.
-      render_basic(set, image, iterate_basic);
+      render_basic(set, iterate_basic);
       //render_adaptive(set, image, iterate_opt);
-      return image.buffer;
+      return set.image.buffer;
   }
 }
 
@@ -321,23 +343,19 @@ exports.render = function (size, re, im, ppu, max, opt) {
  *
  * Returns: An xsize * ysize array with iteration results.
  */
-function render_basic(set, image, iterator) {
-  var minre = set.re - image.resize / 2;
-  var maxim = set.im + image.imsize / 2;
-  var xextra = image.stride - image.sx;
-
+function render_basic(set, iterator) {
   var zre = 0;
   var zim = 0;
 
-  var pos = image.y * image.stride + image.x;
+  var pos = set.image.y * set.image.stride + set.image.x;
 
-  for (var y = image.y; y < image.y + image.sy; y++) {
-    zim = maxim - y * image.inc;
-    for (var x = image.x; x < image.x + image.sx; x++) {
-      zre = minre + x * image.inc;
-      image.buffer[pos++] = iterator(zre, zim, set.max);
+  for (var y = set.image.y; y < set.image.y + set.image.sy; y++) {
+    zim = set.maxim - y * set.image.inc;
+    for (var x = set.image.x; x < set.image.x + set.image.sx; x++) {
+      zre = set.minre + x * set.image.inc;
+      set.image.buffer[pos++] = iterator(zre, zim, set.center.max);
     }
-    pos += xextra;
+    pos += set.image.extra;
   }
 
   return;

@@ -441,7 +441,7 @@ function render_vline(set, iterator) {
   var pos = set.image.startpos;
   var zim = set.tim;
   for (var y = set.image.y; y < set.image.y + set.image.sy; y++) {
-    result[pos] = iterator(set.lre, zim, set.center.max);
+    set.image.buffer[pos] = iterator(set.lre, zim, set.center.max);
     pos += set.image.stride;
     zim -= set.inc; 
   }

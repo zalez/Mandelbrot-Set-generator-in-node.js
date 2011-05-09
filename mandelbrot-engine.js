@@ -276,6 +276,56 @@ function mandset_subimage(x, y, sizex, sizey) {
   );
 }
 
+/*
+ * Method for mandset: Return a new mandset which describes the intersection with the given
+ * coordinates in the complex plane. This is used to apply different optimizations to different
+ * areas of interest in the set.
+ *
+ * Args:
+ * re1, im1: Top left corner of the region to intersect with. Can be null for "unlimited top/left".
+ * re2, im2: Bottom right corner of the region to intersect with. Can be null for "unlimited bottom/right".
+ *
+ * Returns:
+ * A new mandset Object with an image region that is the intersection of the old Object and the parameters.
+ */
+function mandset_intersect(re1, im1, re2, im2) {
+  var newx = this.image.x;
+  var newy = this.image.y;
+  var newsx = this.image.sx;
+  var newsy = this.image.sy;
+
+  // Figure out the new x and sx values.
+  if (re1 == null || re1 <= this.lre) { // Keep newx = x;
+    if (re2 != null && this.rre > re2) {
+      newsx = Math.floor((re2 - this.lre) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
+    } // Otherwise keep newsx = old sx.
+  } else {
+    newx = Math.floor((re1 - this.lre) * ppu + 0.5);
+    if (re2 != null && this.rre > re2) {
+      newsx = Math.floor((re2 - newx) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
+    } else {
+      newsx = Math.floor((this.rre - newx) * this.ppu + 0.5);
+    }
+  }
+
+  // Figure out the new y and sy values.
+  if (im1 == null || im1 >= this.tim) { // Keep newy = y;
+    if (im2 != null && this.bim < im2) {
+      newsy = Math.floor((this.tim - im2) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
+    } // Otherwise keep newsx = old sx.
+  } else {
+    newy = Math.floor((this.tim - im1) * ppu + 0.5);
+    if (im2 != null && this.bim < im2) {
+      newsy = Math.floor((newy - im2) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
+    } else {
+      newsy = Math.floor((newy - this.tim) * this.ppu + 0.5);
+    }
+  }
+    
+  return this.subimage(newx, newy, newsx, newsy);
+
+}
+
 // Method for mandset: Dump data for diagnostic purposes.
 function mandset_dump() {
   return "Center: " + this.center.re + " + " + this.center.im + "i. Max: " + this.center.max + "\n" +
@@ -308,6 +358,9 @@ function mandset(center, img, ppu) {
 
   // Add a method for returning a subimage.
   this.subimage = mandset_subimage;
+
+  // Add a method for returning an intersectio with a complex rectangular area.
+  this.intersect = mandset_intersect;
 
   // Add a method for dumping our data.
   this.dump = mandset_dump;
@@ -361,9 +414,7 @@ exports.render = function (size, re, im, ppu, max, opt) {
     default: // 0 = 5 = best algorithm.
       // The subdivision algorithm assumes that the buffer has been zeroed.
       set.image.clear();
-      // During the data structure redesign, only render_basic works.
-      render_opt(set, iterate_basic);
-      //render_adaptive(set, iterate_opt);
+      render_adaptive(set);
       return set.image.buffer;
   }
 }
@@ -431,7 +482,7 @@ function walk_around(set, iterator) {
     zre3 -= set.inc;
   }
 
-  // Walt the vertical paths
+  // Walk the vertical paths
   for (var i = 0; i < set.image.sy - 1; i++) { // No need to go all the way, the corner's covered elsewhere.
     // Right edge
     if (set.image.buffer[pos2] = iterator(zre2, zim2, set.center.max)) touche = 1;
@@ -638,49 +689,37 @@ function render_opt(set, iterator) {
  * Subdivide the given subarea of the Mandelbrot set into quadratic regions that are as large as
  * possible, then render them using the optimized quadratic method.
  */
-function subdivide_quadratic(re, im, ppu, max, size, startx, starty, sizex, sizey, result, iterator) {
+function subdivide_quadratic(set, iterator) {
   // Perhaps we're already quadratic?
-  if (sizex == sizey) {
-    render_opt(re, im, ppu, max, size, startx, starty, sizex, result, iterator);
+  if (set.image.sx == set.image.sy) {
+    render_opt(set, iterator);
     return;
-  } else if (sizex > sizey) { // wider than tall
-    var subsize = sizey;
+  } else if (set.image.sx > set.image.sy) { // wider than tall
+    var subsize = set.image.sy;
     // Render all quadratic areas with size y
     var x = 0;
-    for (x = startx; x < startx + sizex - subsize; x += subsize) {
-      render_opt(re, im, ppu, max, size, x, starty, subsize, result, iterator);
+    for (x = set.image.x; x < set.image.x + set.image.sx - subsize; x += subsize) {
+      render_opt(set.subimage(x, set.image.y, subsize, subsize), iterator);
     }
     // Recurse over the rest, if necessary.
-    if (sizex % subsize) {
-      subdivide_quadratic(re, im, ppu, max, size,
-        x,
-        starty,
-        sizex % subsize,
-        sizey,
-        result, iterator
-      );
+    if (set.image.sx % subsize) {
+      subdivide_quadratic(set.subset(x, set.image.y, set.image.sx % subsize, set.image.sy), iterator);
     } else { // If there's no rest, then there's still one more left to render.
-      render_opt(re, im, ppu, max, size, x, starty, subsize, result, iterator);
+      render_opt(set.subset(x, set.image.y, subsize, subsize), iterator);
     }
     return;
   } else { // taller than wide
-    var subsize = sizex;
+    var subsize = set.image.sx;
     // Render all quadratic areas with size x
     var y = 0;
-    for (y = starty; y < starty + sizey - subsize; y += subsize) {
-      render_opt(re, im, ppu, max, size, startx, y, subsize, result, iterator);
+    for (y = set.image.y; y < set.image.y + set.image.sy - subsize; y += subsize) {
+      render_opt(set.subimage(set.image.x, y, subsize, subsize), iterator);
     }
     // Recurse over the rest, if necessary.
-    if (sizey % subsize) {
-      subdivide_quadratic(re, im, ppu, max, size,
-        startx,
-        y,
-        sizex,
-        sizey % subsize,
-        result, iterator
-      );
+    if (set.image.sy % subsize) {
+      subdivide_quadratic(set.subset(set.image.x, y, set.image.sx, set.image.sy & subsize), iterator);
     } else {
-      render_opt(re, im, ppu, max, size, startx, y, subsize, result, iterator);
+      render_opt(set.subimage(set.image.x, y, subsize, subsize), iterator);
     }
     return;
   }
@@ -692,29 +731,17 @@ function subdivide_quadratic(re, im, ppu, max, size, startx, starty, sizex, size
  * The idea here is to save detection times for zones that are known to not profit from that
  * detection, and to exploit mirroring opportunities.
  */
-function render_adaptive(re, im, ppu, max, size, startx, starty, sizex, sizey, result) {
-// We will fill a todo-list-array with startx, starty, sizex, and sizey plus method and iterators, then
-// go through that todo list.
-var todo = [];
-  var top_im = im + (size / ppu) / 2;
-  var bottom_im = im - (size / ppu) / 2;
-
-  var newsizey;
+function render_adaptive(set) {
+  // We will fill a todo-list-array with set descriptions, method and iterators, then
+  // go through that todo list.
+  var todo = [];
+  var newset = null;
 
   // Render the top part until +1.2 with minimal optimization, as it's very easy anyway.
-  if (top_im >= 1.2) {
-    if (bottom_im < 1.2) {
-      newsizey = Math.floor((top_im - 1.2) * ppu + 0.5);
-    } else {
-      newsizey = sizey;
-    }
-
-    // Add the job to the queue
+  newset = set.intersection(null, null, null, 1.2);
+  if (newset.image.sy > 0) {
     todo.push({
-      startx: startx,
-      starty: starty,
-      sizex: sizex,
-      sizey: newsizey,
+      set: newset,
       method: "basic",
       iterator: iterate_basic
     });
@@ -722,45 +749,17 @@ var todo = [];
 
 
   // Use more optimization for the part between 1.2 and 1.0. No need to test for bulbs, though.
-  if (top_im > 1.0) {
-    if (top_im > 1.2) {
-      var new_top_im = 1.2;
-    } else {
-      var new_top_im = top_im;
-    }
-    var newstarty = starty + Math.floor((top_im - new_top_im) * ppu + 0.5);
-
-    if (bottom_im < 1.0) {
-      var new_bottom_im = 1.0;
-    } else {
-      var new_bottom_im = bottom_im;
-    }
-    var newsizey = Math.floor((new_top_im - new_bottom_im) * ppu + 0.5);
-
-    // Add the job to the queue
-    todo.push({
-      startx: startx,
-      starty: newstarty,
-      sizex: sizex,
-      sizey: newsizey,
-      method: "subdivide",
-      iterator: iterate_basic
-    });
-  }
+  // tbd.
 
   // Complete todo-list.
   for (var i = 0; i < todo.length; i++) {
     switch (todo[i].method) {
       case "basic":
-        render_basic(re, im, ppu, max,
-          todo[i].startx, todo[i].starty, todo[i].sizex, todo[i].sizey,
-          result, todo[i].iterator, size);
+        render_basic(todo[i].set, todo[i].iterator);
         break;
 
       case "subdivide":
-        subdivide_quadratic(re, im, ppu, max, size,
-          todo[i].startx, todo[i].starty, todo[i].sizex, todo[i].sizey,
-          result, todo[i].iterator);
+        subdivide_quadratic(todo[i].set, todo[i].iterator);
         break;
     }
   }
@@ -769,6 +768,7 @@ var todo = [];
 /*
  * Render the Mandelbrot set using adaptive optimization: Decompose the image into areas,
  * then select the right strategies for each area.
+ * Old, unused implementation, for reference use only.
  */
 function render_adaptive_old(re, im, ppu, max, size, startx, starty, sizex, sizey, result) {
   /* Subdivide the image into special areas with specific optimization strategies.

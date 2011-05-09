@@ -758,14 +758,14 @@ function render_adaptive(set) {
     });
   }
 
-  newset = set.intersect(0.75, null, 1.2, 0.75);
-  if (newset.image.sy > 0 && newset.image.sx > 0) {
-    todo.push({
-      set: newset,
-      method: "subdivide",
-      iterator: iterate_basic
-    });
-  }
+  //newset = set.intersect(0.75, null, 1.2, 0.75);
+  //if (newset.image.sy > 0 && newset.image.sx > 0) {
+  //  todo.push({
+  //    set: newset,
+  //    method: "subdivide",
+  //    iterator: iterate_basic
+  //  });
+  //}
   
   // Complete todo-list.
   for (var i = 0; i < todo.length; i++) {

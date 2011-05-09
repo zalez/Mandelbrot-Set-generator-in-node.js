@@ -283,7 +283,9 @@ exports.render = function (size, re, im, ppu, max, opt) {
       for (var i = 0; i < size * size; i++) {
         result[i] = 0.0;
       }
-      render_opt(set, image, iterate_basic);
+      // During the data structure redesign, only render_basic works.
+      render_basic(set, image, iterate_basic);
+      //render_opt(set, image, iterate_basic);
       return result;
 
     case 4:
@@ -291,7 +293,9 @@ exports.render = function (size, re, im, ppu, max, opt) {
       for (var i = 0; i < size * size; i++) {
         result[i] = 0.0;
       }
-      render_opt(set, image, iterate_opt);
+      // During the data structure redesign, only render_basic works.
+      render_basic(set, image, iterate_basic);
+      //render_opt(set, image, iterate_opt);
       return result;
 
     default: // 0 = 5 = best algorithm.
@@ -299,7 +303,9 @@ exports.render = function (size, re, im, ppu, max, opt) {
       for (var i = 0; i < size * size; i++) {
         result[i] = 0.0;
       }
-      render_adaptive(set, image, iterate_opt);
+      // During the data structure redesign, only render_basic works.
+      render_basic(set, image, iterate_basic);
+      //render_adaptive(set, image, iterate_opt);
       return result;
   }
 }

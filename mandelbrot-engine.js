@@ -354,7 +354,7 @@ function render_basic(set, iterator) {
       zre = set.minre + x * set.inc;
       set.image.buffer[pos++] = iterator(zre, zim, set.center.max);
     }
-    pos += set.image.extra;
+    pos += set.image.xextra;
   }
 
   return;

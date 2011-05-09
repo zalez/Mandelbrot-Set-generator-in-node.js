@@ -739,13 +739,13 @@ function render_adaptive(set) {
 
   // Render the top part until +1.2i with minimal optimization, as it's very easy anyway.
   newset = set.intersect(null, null, null, 1.2);
-  if (newset.image.sy > 0) {
-    todo.push({
-      set: newset,
-      method: "basic",
-      iterator: iterate_basic
-    });
-  }
+  //if (newset.image.sy > 0) {
+  //  todo.push({
+  //    set: newset,
+  //    method: "basic",
+  //    iterator: iterate_basic
+  //  });
+  //}
 
   // Use more optimization for the part between 1.2i and 0.75i. No need to test for bulbs, though.
   // Use the brain-dead algorithm for everything < 0.75 (re) and the subdivision algorithm for the right part.

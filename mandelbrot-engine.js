@@ -29,7 +29,7 @@ function iterate_basic(cr, ci, max) {
   // Iterate through all pixels.
   for (var i = 1; i < max; i++) {
     // z = z^2 ...
-    t = zr2  - zi2;
+    t = zr2 - zi2;
     zi = 2 * zr * zi;
     zr = t;
 
@@ -43,8 +43,9 @@ function iterate_basic(cr, ci, max) {
 
     // Test if we escaped the equation
     m2 = zr2 + zi2
-    if (m2 > 4) { // Mandelbrot escape radius is 2, hence 4 since we compare to
+    if (m2 > 4) { // Mandelbrot escape radius is 2, r^2=4
       // Return smoothed escape value.
+      // Look up Mandelbrot on Wikipedia and Google to get the smoothing equation.
       return (i + 1 - (Math.log(Math.log(Math.sqrt(m2))) / Math.LN2));
     }
   }
@@ -211,12 +212,51 @@ function iterate_opt_2(cr, ci, max) {
   return 0;
 }
 
+// Describe a particular center of the mandelbrot set.
+function mandset(re, im, max) {
+  this.re = re;
+  this.im = im;
+  this.max = max;
+  return;
+}
+
+/*
+ * Describe a region inside an image table of iteration results.
+ * buffer: An array containing iteration results, one per x/y coordinate.
+ * stride: The total width of the image. An index + stride brings us to the next line
+ *         at the same x co-ordinate.
+ * x,y:    Starting co-ordinates of the subimage.
+ * sx, sy: x and y sizes of the subimage.
+ * ppu:    Number of pixels per numerical unit: ppu = 100, then [0..1] is 100 pixels.
+ */
+function subimage(buffer, stride, x, y, sx, sy, ppu) {
+  this.buffer = buffer;
+  this.stride = stride;
+  this.x = x;
+  this.y = y;
+  this.sx = sx;
+  this.sy = sy;
+  this.ppu = ppu;
+  // Convenience values
+  this.inc = 1 / ppu; // The increment in complex value per pixel.
+  this.resize = sx / ppu; // The width of the image in the complex plane.
+  this.imsize = sy / ppu; // The height of the image in the complex plane.
+  
+  return;
+}
+
 /*
  * Set up a buffer, then render the Mandelbrot set into it.
  */
 exports.render = function (size, re, im, ppu, max, opt) {
+  // Create some data structures.
+  var set = new mandset(re, im, max);
+
   // Create the result array and fill it with zeroes.
-  var result = new Array(size * size);
+  var buffer = new Array(size * size);
+
+  // The subimage structure contains the whole image at first.
+  var image = new subimage(buffer, size, 0, 0, size, size, ppu); // The whole image.
 
   /*
    * Four levels of optimization:
@@ -231,11 +271,11 @@ exports.render = function (size, re, im, ppu, max, opt) {
    */
   switch (opt) {
     case 1:
-      render_basic(re, im, ppu, max, 0, 0, size, size, result, iterate_basic, size);
+      render_basic(set, image, iterate_basic);
       return result;
 
     case 2:
-      render_basic(re, im, ppu, max, 0, 0, size, size, result, iterate_opt, size);
+      render_basic(set, image, iterate_opt);
       return result;
 
     case 3:
@@ -243,7 +283,7 @@ exports.render = function (size, re, im, ppu, max, opt) {
       for (var i = 0; i < size * size; i++) {
         result[i] = 0.0;
       }
-      render_opt(re, im, ppu, max, size, 0, 0, size, result, iterate_basic);
+      render_opt(set, image, iterate_basic);
       return result;
 
     case 4:
@@ -251,15 +291,15 @@ exports.render = function (size, re, im, ppu, max, opt) {
       for (var i = 0; i < size * size; i++) {
         result[i] = 0.0;
       }
-      render_opt(re, im, ppu, max, size, 0, 0, size, result, iterate_opt);
+      render_opt(set, image, iterate_opt);
       return result;
 
-    default:
+    default: // 0 = 5 = best algorithm.
       // The subdivision algorithm assumes that the buffer has been zeroed.
       for (var i = 0; i < size * size; i++) {
         result[i] = 0.0;
       }
-      render_adaptive(re, im, ppu, max, size, 0, 0, size, size, result);
+      render_adaptive(set, image, iterate_opt);
       return result;
   }
 }
@@ -268,32 +308,26 @@ exports.render = function (size, re, im, ppu, max, opt) {
  * Our main function that does the work.
  *
  * Arguments:
- * re, im: Real and imaginary part of the center of the image.
- * ppu: Number of pixels in the image per unit in the complex plane (zoom factor).
- * max: Maximum value to iterate to.
- * xsize, ysize: the size of the area to render.
- * result: The Array to render into.
- * iterator: A function that performy the Mandelbrot calculation.
- * size: The x and y size of the final quadratic image. This allows to use the function to render
- *   arbitrary parts of it.
+ * set: The description of the Mandelbrot subset to render.
+ * image: The description of the (sub)image structure to render into.
+ *        We assume that the image is quadratic, i.e. sx = sy. We only use sx and ignore sy.
  *
  * Returns: An xsize * ysize array with iteration results.
  */
-function render_basic(re, im, ppu, max, startx, starty, xsize, ysize, result, iterator, size) {
-  var minre = re - size / ppu / 2;
-  var maxim = im + size / ppu / 2;
-  var inc = 1 / ppu;
-  var xextra = size - xsize;
+function render_basic(set, image, iterator) {
+  var minre = set.re - image.resize / 2;
+  var maxim = set.im + image.imsize / 2;
+  var xextra = image.stride - image.sx;
 
   var zre = 0;
   var zim = 0;
 
-  var pos = starty * size + startx;
+  var pos = image.y * image.stride + image.x;
 
-  for (var y = starty; y < starty + ysize; y++) {
-    zim = maxim - y * inc;
-    for (var x = startx; x < startx + xsize; x++) {
-      zre = minre + x * inc;
+  for (var y = image.y; y < image.y + image.sy; y++) {
+    zim = maxim - y * image.inc;
+    for (var x = image.x; x < image.x + image.sx; x++) {
+      zre = minre + x * image.inc;
       result[pos++] = iterator(zre, zim, max);
     }
     pos += xextra;

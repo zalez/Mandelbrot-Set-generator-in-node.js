@@ -284,10 +284,17 @@ function mandset(center, img, ppu) {
   // Return a new mandset Object that references the specified subimage.
   this.subimage = function(x, y, sizex, sizey) {
     return new mandset(
-      new point(this.center.re, this.center.im, this.center.max),
+      this.center,
       new image(this.image.buffer, this.image.stride, x, y, sizex, sizey),
       this.ppu
     );
+  }
+
+  // For diagnostic purposes.
+  this.dump = function() {
+    return
+      "Center: " + this.center.re + " + " + this.center.im + "i. Max: " + this.center.max + "\n" +
+      "Image:  " + this.image.x + ", " + this.image.y + ", " + this.image.sx + "x" + this.image.sy + "\n";
   }
   
   return;
@@ -360,6 +367,9 @@ function render_basic(set, iterator) {
   var zim = 0;
 
   var pos = set.image.startpos;
+
+  // For debugging.
+  process.stdout.write("Render Basic:\n" + set.dump);
 
   for (var y = set.image.y; y < set.image.y + set.image.sy; y++) {
     zim = set.maxim - y * set.inc;
@@ -467,6 +477,9 @@ function render_vline(set, iterator) {
  */
 function render_opt(set, iterator) {
   var pos = set.image.startpos;
+
+  // For debugging.
+  process.stdout.write("Render Opt:\n" + set.dump);
 
   // Treat the lower subsizes as special cases to save on overhead.
   switch (set.image.sx) {

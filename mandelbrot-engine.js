@@ -316,9 +316,9 @@ function mandset_intersect(re1, im1, re2, im2) {
   } else {
     newy = Math.floor((this.tim - im1) * this.ppu + 0.5);
     if (im2 != null && this.bim < im2) {
-      newsy = Math.floor((im2 - newy) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
+      newsy = Math.floor((newy - im2) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
     } else {
-      newsy = Math.floor((this.bim - newy) * this.ppu + 0.5);
+      newsy = Math.floor((newy - this.bim) * this.ppu + 0.5);
     }
   }
     

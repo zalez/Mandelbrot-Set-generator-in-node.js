@@ -225,6 +225,14 @@ function point(re, im, max) {
   return;
 }
 
+// A method for image: Clear the buffer.
+function image_clear() {
+  for (var i = 0; i < this.size * this.size; i++) {
+    this.buffer[i] = 0.0;
+  }
+  return;
+};
+
 /*
  * Describe an image table for a rendition of the Mandelbrot set.
  * buffer: An array containing iteration results, one per x/y coordinate. If this is
@@ -253,8 +261,8 @@ function image(buffer, size, x, y, sx, sy) {
   this.xextra = this.size - this.sx;
   this.startpos = this.y * this.size + this.x;
 
-  // A method for clearing the whole image buffer
-  this.clear = function() { for (var i = 0; i < this.size * this.size; i++) { this.buffer[i] = 0.0; } };
+  // Add a method for clearing the whole image buffer
+  this.clear = image_clear;
 
   return;
 }
@@ -376,7 +384,7 @@ function render_basic(set, iterator) {
   var pos = set.image.startpos;
 
   // For debugging.
-  process.stdout.write("Render Basic:\n" + set.dump());
+  //process.stdout.write("Render Basic:\n" + set.dump());
 
   for (var y = set.image.y; y < set.image.y + set.image.sy; y++) {
     zim = set.maxim - y * set.inc;
@@ -486,7 +494,7 @@ function render_opt(set, iterator) {
   var pos = set.image.startpos;
 
   // For debugging.
-  process.stdout.write("Render Opt:\n" + set.dump());
+  //process.stdout.write("Render Opt:\n" + set.dump());
 
   // Treat the lower subsizes as special cases to save on overhead.
   switch (set.image.sx) {
@@ -595,10 +603,10 @@ function render_opt(set, iterator) {
         // Figure out how to best subdivide the remainder.
         if ((set.image.sx - 2) % 2 == 0) { // We can divide the remainder evenly
           newsize = (set.image.sx - 2) >> 1;
-          render_basic(set.subimage(set.image.x + 1, set.image.y + 1, newsize, newsize), iterator);
-          render_basic(set.subimage(set.image.x + 1 + newsize, set.image.y + 1, newsize, newsize), iterator);
-          render_basic(set.subimage(set.image.x + 1, set.image.y + 1 + newsize, newsize, newsize), iterator);
-          render_basic(set.subimage(set.image.x + 1 + newsize, set.image.y + 1 + newsize, newsize, newsize), iterator);
+          render_opt(set.subimage(set.image.x + 1, set.image.y + 1, newsize, newsize), iterator);
+          render_opt(set.subimage(set.image.x + 1 + newsize, set.image.y + 1, newsize, newsize), iterator);
+          render_opt(set.subimage(set.image.x + 1, set.image.y + 1 + newsize, newsize, newsize), iterator);
+          render_opt(set.subimage(set.image.x + 1 + newsize, set.image.y + 1 + newsize, newsize, newsize), iterator);
         } else if ((set.image.sx - 2) % 3 == 0) { // We can subdivide by 3.
           newsize = Math.floor((set.image.sx - 2) / 3); // Protect against float imprecision.
           render_opt(set.subimage(set.image.x + 1, set.image.y + 1, newsize, newsize), iterator);

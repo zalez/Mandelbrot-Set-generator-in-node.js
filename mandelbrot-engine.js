@@ -295,7 +295,7 @@ function mandset_intersect(re1, im1, re2, im2) {
   var newsy = this.image.sy;
 
   // Figure out the new x and sx values.
-  if (re1 == null || re1 <= this.lre) { // Keep newx = x;
+  if (re1 == null || re1 < this.lre) { // Keep newx = x;
     if (re2 != null && re2 < this.rre) {
       newsx = Math.floor((re2 - this.lre) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
     } // Otherwise keep newsx = old sx.
@@ -309,7 +309,7 @@ function mandset_intersect(re1, im1, re2, im2) {
   }
 
   // Figure out the new y and sy values.
-  if (im1 == null || im1 >= this.tim) { // Keep newy = y;
+  if (im1 == null || im1 > this.tim) { // Keep newy = y;
     if (im2 != null && im2 > this.bim) {
       newsy = Math.floor((this.tim - im2) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
     } // Otherwise keep newsx = old sx.

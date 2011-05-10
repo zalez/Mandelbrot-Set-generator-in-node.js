@@ -701,7 +701,7 @@ function subdivide_quadratic(set, iterator) {
     }
     // Recurse over the rest, if necessary.
     if (set.image.sx % subsize) {
-      // subdivide_quadratic(set.subimage(x, set.image.y, set.image.sx % subsize, set.image.sy), iterator);
+      subdivide_quadratic(set.subimage(x, set.image.y, set.image.sx % subsize, set.image.sy), iterator);
     } else { // If there's no rest, then there's still one more left to render.
       render_opt(set.subimage(x, set.image.y, subsize, subsize), iterator);
     }

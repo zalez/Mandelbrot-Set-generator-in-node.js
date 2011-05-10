@@ -302,9 +302,9 @@ function mandset_intersect(re1, im1, re2, im2) {
   } else {
     newx = Math.floor((re1 - this.lre) * this.ppu + 0.5);
     if (re2 != null && re2 < this.rre) {
-      newsx = Math.floor((re2 - newx) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
+      newsx = Math.floor((re2 - re1) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
     } else {
-      newsx = Math.floor((this.rre - newx) * this.ppu + 0.5);
+      newsx = Math.floor((this.rre - re1) * this.ppu + 0.5);
     }
   }
 
@@ -316,14 +316,13 @@ function mandset_intersect(re1, im1, re2, im2) {
   } else {
     newy = Math.floor((this.tim - im1) * this.ppu + 0.5);
     if (im2 != null && im2 > this.bim) {
-      newsy = Math.floor((newy - im2) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
+      newsy = Math.floor((im1 - im2) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
     } else {
-      newsy = Math.floor((newy - this.bim) * this.ppu + 0.5);
+      newsy = Math.floor((im1 - this.bim) * this.ppu + 0.5);
     }
   }
     
   return this.subimage(newx, newy, newsx, newsy);
-
 }
 
 // Method for mandset: Dump data for diagnostic purposes.
@@ -359,7 +358,7 @@ function mandset(center, img, ppu) {
   // Add a method for returning a subimage.
   this.subimage = mandset_subimage;
 
-  // Add a method for returning an intersectio with a complex rectangular area.
+  // Add a method for returning an intersection with a complex rectangular area.
   this.intersect = mandset_intersect;
 
   // Add a method for dumping our data.

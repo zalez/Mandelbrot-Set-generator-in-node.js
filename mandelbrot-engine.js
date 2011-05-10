@@ -798,14 +798,7 @@ function render_adaptive(set) {
       iterator: iterate_opt_1
     });
   }
-  
-  // Complete todo-list.
-  for (var i = 0; i < todo.length; i++) {
-    switch (todo[i].method) {
-      case "basic":
-        render_basic(todo[i].set, todo[i].iterator);
-        break;
-  
+
   // Complete todo-list.
   for (var i = 0; i < todo.length; i++) {
     switch (todo[i].method) {

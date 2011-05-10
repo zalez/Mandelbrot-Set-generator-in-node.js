@@ -304,7 +304,8 @@ function mandset_intersect(re1, im1, re2, im2) {
     if (re2 != null && re2 < this.rre) {
       newsx = Math.floor((re2 - re1) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
     } else {
-      newsx = Math.floor((this.rre - re1) * this.ppu + 0.5);
+      newsx = newsx - this.image.x + newx;
+      //newsx = Math.floor((this.rre - re1) * this.ppu + 0.5);
     }
   }
 
@@ -318,7 +319,8 @@ function mandset_intersect(re1, im1, re2, im2) {
     if (im2 != null && im2 > this.bim) {
       newsy = Math.floor((im1 - im2) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
     } else {
-      newsy = Math.floor((im1 - this.bim) * this.ppu + 0.5);
+      newsy = newsy - this.image.y + newy;
+      //newsy = Math.floor((im1 - this.bim) * this.ppu + 0.5);
     }
   }
     

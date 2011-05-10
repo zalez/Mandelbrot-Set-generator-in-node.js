@@ -435,7 +435,7 @@ function render_basic(set, iterator) {
   var pos = set.image.startpos;
 
   // For debugging.
-  //process.stdout.write("Render Basic:\n" + set.dump());
+  process.stdout.write("Render Basic:\n" + set.dump());
 
   for (var y = set.image.y; y < set.image.y + set.image.sy; y++) {
     zim = set.maxim - y * set.inc;

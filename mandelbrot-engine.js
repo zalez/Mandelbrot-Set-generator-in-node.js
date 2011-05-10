@@ -296,12 +296,12 @@ function mandset_intersect(re1, im1, re2, im2) {
 
   // Figure out the new x and sx values.
   if (re1 == null || re1 <= this.lre) { // Keep newx = x;
-    if (re2 != null && this.rre > re2) {
+    if (re2 != null && re2 < this.rre) {
       newsx = Math.floor((re2 - this.lre) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
     } // Otherwise keep newsx = old sx.
   } else {
     newx = Math.floor((re1 - this.lre) * this.ppu + 0.5);
-    if (re2 != null && this.rre > re2) {
+    if (re2 != null && re2 < this.rre) {
       newsx = Math.floor((re2 - newx) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
     } else {
       newsx = Math.floor((this.rre - newx) * this.ppu + 0.5);
@@ -310,15 +310,15 @@ function mandset_intersect(re1, im1, re2, im2) {
 
   // Figure out the new y and sy values.
   if (im1 == null || im1 >= this.tim) { // Keep newy = y;
-    if (im2 != null && this.bim < im2) {
+    if (im2 != null && im2 > this.bim) {
       newsy = Math.floor((this.tim - im2) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
     } // Otherwise keep newsx = old sx.
   } else {
     newy = Math.floor((this.tim - im1) * this.ppu + 0.5);
-    if (im2 == null || im2 < this.bim) {
-      newsy = Math.floor((newy - this.bim) * this.ppu + 0.5);
-    } else {
+    if (im2 != null && im2 > this.bim) {
       newsy = Math.floor((newy - im2) * this.ppu + 0.5); // +0.5 so we can avoid floating point SNAFUs.
+    } else {
+      newsy = Math.floor((newy - this.bim) * this.ppu + 0.5);
     }
   }
     
@@ -750,7 +750,7 @@ function render_adaptive(set) {
   // Use more optimization for the part between 1.2i and 0.75i. No need to test for bulbs, though.
   // Use the brain-dead algorithm for everything < 0.75 (re) and the subdivision algorithm for the right part.
   newset = set.intersect(null, 1.2, -0.75, 0.75);
-  if (newset.image.sy > 0 && newset.image.sx > 0) {
+  if (newset.image.sx > 0 && newset.image.sy > 0) {
     todo.push({
       set: newset,
       method: "basic",

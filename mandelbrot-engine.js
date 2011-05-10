@@ -709,13 +709,12 @@ function subdivide_quadratic(set, iterator) {
   } else { // taller than wide
     var subsize = set.image.sx;
     // Render all quadratic areas with size x
-    var y = 0;
-    for (y = set.image.y; y < set.image.y + set.image.sy - subsize; y += subsize) {
+    for (var y = set.image.y; y < set.image.y + set.image.sy - subsize; y += subsize) {
       render_opt(set.subimage(set.image.x, y, subsize, subsize), iterator);
     }
     // Recurse over the rest, if necessary.
     if (set.image.sy % subsize) {
-      // subdivide_quadratic(set.subimage(set.image.x, y, set.image.sx, set.image.sy & subsize), iterator);
+      subdivide_quadratic(set.subimage(set.image.x, y, set.image.sx, set.image.sy & subsize), iterator);
     } else {
       render_opt(set.subimage(set.image.x, y, subsize, subsize), iterator);
     }

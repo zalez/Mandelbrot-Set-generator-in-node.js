@@ -749,22 +749,22 @@ function render_adaptive(set) {
   // Use more optimization for the part between 1.2i and 0.75i. No need to test for bulbs, though.
   // Use the brain-dead algorithm for everything < 0.75 (re) and the subdivision algorithm for the right part.
   newset = set.intersect(null, 1.2, -0.75, 0.75);
-  if (newset.image.sx > 0 && newset.image.sy > 0) {
-    todo.push({
-      set: newset,
-      method: "basic",
-      iterator: iterate_basic
-    });
-  }
-
-  //newset = set.intersect(0.75, null, 1.2, 0.75);
-  //if (newset.image.sy > 0 && newset.image.sx > 0) {
+  //if (newset.image.sx > 0 && newset.image.sy > 0) {
   //  todo.push({
   //    set: newset,
-  //    method: "subdivide",
+  //    method: "basic",
   //    iterator: iterate_basic
   //  });
   //}
+
+  newset = set.intersect(-0.75, 1.2, null, 0.75);
+  if (newset.image.sy > 0 && newset.image.sx > 0) {
+    todo.push({
+      set: newset,
+      method: "subdivide",
+      iterator: iterate_basic
+    });
+  }
   
   // Complete todo-list.
   for (var i = 0; i < todo.length; i++) {

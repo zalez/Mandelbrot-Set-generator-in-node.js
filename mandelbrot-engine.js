@@ -799,6 +799,16 @@ function render_adaptive(set) {
     });
   }
 
+  // Right of period 1 bulb.
+  newset = set.intersect(0.4, 0.75, null, 0);
+  if (newset.image.sy > 0 && newset.image.sx > 0) {
+    todo.push({
+      set: newset,
+      method: "subdivide",
+      iterator: iterate_opt_1
+    });
+  }
+
   // Complete todo-list.
   for (var i = 0; i < todo.length; i++) {
     switch (todo[i].method) {

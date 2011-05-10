@@ -788,6 +788,23 @@ function render_adaptive(set) {
       iterator: iterate_opt_2
     });
   }
+
+  // Period 1 bulb.
+  newset = set.intersect(-0.75, 0.75, 0.75, 0);
+  if (newset.image.sy > 0 && newset.image.sx > 0) {
+    todo.push({
+      set: newset,
+      method: "subdivide",
+      iterator: iterate_opt_1
+    });
+  }
+  
+  // Complete todo-list.
+  for (var i = 0; i < todo.length; i++) {
+    switch (todo[i].method) {
+      case "basic":
+        render_basic(todo[i].set, todo[i].iterator);
+        break;
   
   // Complete todo-list.
   for (var i = 0; i < todo.length; i++) {

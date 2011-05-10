@@ -696,13 +696,12 @@ function subdivide_quadratic(set, iterator) {
   } else if (set.image.sx > set.image.sy) { // wider than tall
     var subsize = set.image.sy;
     // Render all quadratic areas with size y
-    var x = 0;
-    for (x = set.image.x; x < set.image.x + set.image.sx - subsize; x += subsize) {
+    for (var x = set.image.x; x < set.image.x + set.image.sx - subsize; x += subsize) {
       render_opt(set.subimage(x, set.image.y, subsize, subsize), iterator);
     }
     // Recurse over the rest, if necessary.
     if (set.image.sx % subsize) {
-      subdivide_quadratic(set.subimage(x, set.image.y, set.image.sx % subsize, set.image.sy), iterator);
+      // subdivide_quadratic(set.subimage(x, set.image.y, set.image.sx % subsize, set.image.sy), iterator);
     } else { // If there's no rest, then there's still one more left to render.
       render_opt(set.subimage(x, set.image.y, subsize, subsize), iterator);
     }
@@ -716,7 +715,7 @@ function subdivide_quadratic(set, iterator) {
     }
     // Recurse over the rest, if necessary.
     if (set.image.sy % subsize) {
-      subdivide_quadratic(set.subimage(set.image.x, y, set.image.sx, set.image.sy & subsize), iterator);
+      // subdivide_quadratic(set.subimage(set.image.x, y, set.image.sx, set.image.sy & subsize), iterator);
     } else {
       render_opt(set.subimage(set.image.x, y, subsize, subsize), iterator);
     }

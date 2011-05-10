@@ -795,13 +795,6 @@ function render_adaptive(set) {
       case "basic":
         render_basic(todo[i].set, todo[i].iterator);
         break;
-  
-  // Complete todo-list.
-  for (var i = 0; i < todo.length; i++) {
-    switch (todo[i].method) {
-      case "basic":
-        render_basic(todo[i].set, todo[i].iterator);
-        break;
 
       case "subdivide":
         subdivide_quadratic(todo[i].set, todo[i].iterator);

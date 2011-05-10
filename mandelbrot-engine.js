@@ -790,7 +790,7 @@ function render_adaptive(set) {
   }
 
   // Period 1 bulb.
-  newset = set.intersect(-0.75, 0.75, 0.5, 0);
+  newset = set.intersect(-0.75, 0.75, 0.4, 0);
   if (newset.image.sy > 0 && newset.image.sx > 0) {
     todo.push({
       set: newset,

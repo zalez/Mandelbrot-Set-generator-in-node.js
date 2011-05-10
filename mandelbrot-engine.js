@@ -702,9 +702,9 @@ function subdivide_quadratic(set, iterator) {
     }
     // Recurse over the rest, if necessary.
     if (set.image.sx % subsize) {
-      subdivide_quadratic(set.subset(x, set.image.y, set.image.sx % subsize, set.image.sy), iterator);
+      subdivide_quadratic(set.subimage(x, set.image.y, set.image.sx % subsize, set.image.sy), iterator);
     } else { // If there's no rest, then there's still one more left to render.
-      render_opt(set.subset(x, set.image.y, subsize, subsize), iterator);
+      render_opt(set.subimage(x, set.image.y, subsize, subsize), iterator);
     }
     return;
   } else { // taller than wide
@@ -716,7 +716,7 @@ function subdivide_quadratic(set, iterator) {
     }
     // Recurse over the rest, if necessary.
     if (set.image.sy % subsize) {
-      subdivide_quadratic(set.subset(set.image.x, y, set.image.sx, set.image.sy & subsize), iterator);
+      subdivide_quadratic(set.subimage(set.image.x, y, set.image.sx, set.image.sy & subsize), iterator);
     } else {
       render_opt(set.subimage(set.image.x, y, subsize, subsize), iterator);
     }

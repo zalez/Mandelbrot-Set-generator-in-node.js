@@ -928,6 +928,20 @@ function render_adaptive(set) {
     }
   }
 
+  // -1.2..
+  if (cont > -1.2) {
+    newset = set.intersect(null, -1.2, null, null); // -set.inc for a slight overlap to the next section.
+  } else {
+    newset = set.intersect(null, cont, null, null); // -set.inc for a slight overlap to the next section.
+  }
+  if (newset.image.sy > 0) {
+    todo.push({
+      set: newset,
+      method: "basic",
+      iterator: iterate_basic
+    });
+  }
+
   // Complete todo-list.
   for (var i = 0; i < todo.length; i++) {
     switch (todo[i].method) {

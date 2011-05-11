@@ -841,6 +841,9 @@ function render_adaptive(set) {
   // But before we mirror, we need to test if the 0i horizontal line aligns exactly
   // with a pixel line, i.e. the maximum imaginary value can be evenly divided by the pixel increment.
   // (Within a certain measure of accuracy, since we're subject to floating point inaccuracies.)
+  // This is usually the case, if the application starts with the center and clicking on pixels
+  // is used for navigation.
+  var continue = 0;
   if (Math.abs(Math.floor(set.maxim / set.inc + 0.5) - (set.maxim / set.inc)) < 0.000001) {
     newset = set.intersect(null, 0, null, -set.maxim);
     if (newset.image.sy > 0 && newset.image.sx > 0) {
@@ -848,6 +851,23 @@ function render_adaptive(set) {
         set: newset,
         method: "mirror",
         iterator: null
+      });
+      continue = -set.maxim;
+    }
+  }
+
+  // Now walk through the same optimitation regions modulo the area that has already been
+  // covered by mirroring.
+
+  // 0..-0.75i, 4 regions.
+  if (continue > -0.75) {
+    // Right of period 1 bulb.
+    newset = set.intersect(0.4, continue, null, -0.75);
+    if (newset.image.sy > 0 && newset.image.sx > 0) {
+      todo.push({
+        set: newset,
+        method: "subdivide",
+        iterator: iterate_opt_1
       });
     }
   }

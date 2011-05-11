@@ -904,6 +904,30 @@ function render_adaptive(set) {
     }
   }
 
+  // -0.75i..-1.2, 2 regions.
+  if (cont > -1.2) { // TODO: What's the new start value when cont is set?
+    if (cont > -0.75) { // Adjust the place we continue from if necessary.
+      cont = -0.75;
+    }
+    newset = set.intersect(null, cont, -0.75, -1.2);
+    if (newset.image.sx > 0 && newset.image.sy > 0) {
+      todo.push({
+        set: newset,
+        method: "basic",
+        iterator: iterate_basic
+      });
+    }
+
+    newset = set.intersect(-0.75, cont, null, -1.2);
+    if (newset.image.sy > 0 && newset.image.sx > 0) {
+      todo.push({
+        set: newset,
+        method: "subdivide",
+        iterator: iterate_basic
+      });
+    }
+  }
+
   // Complete todo-list.
   for (var i = 0; i < todo.length; i++) {
     switch (todo[i].method) {

@@ -5,6 +5,7 @@
  * Basic engine that generates an array of results for the mandelbrot iteration.
  * This array can then be mixed with a colormap to create nice pictures.
  *
+ * See http://constantin.glez.de/mandelbrot for details.
  */
 
 /*

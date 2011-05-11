@@ -736,7 +736,7 @@ function mirror_image(img) {
   var dst = img.startpos + img.size;
 
   var x, y;
-  for (y = img.y; y < img.y + img.sy; y++ {
+  for (y = img.y; y < img.y + img.sy; y++) {
     for (x = img.x; x < img.x + img.sx; x++) {
       img.buffer[dst++] = img.buffer[src++];
     }

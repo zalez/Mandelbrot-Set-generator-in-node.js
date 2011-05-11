@@ -731,7 +731,7 @@ function subdivide_quadratic(set, iterator) {
  * We assume that the upper part of the image is large enough to supply the
  * part to fill with values, i.e. y - sy is never smaller than 0.
  */
-mirror_image(img) {
+function mirror_image(img) {
   var src = img.startpos - img.size;
   var dst = img.startpos + img.size;
 

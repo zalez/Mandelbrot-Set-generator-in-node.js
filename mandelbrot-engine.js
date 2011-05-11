@@ -872,6 +872,16 @@ function render_adaptive(set) {
         iterator: iterate_opt_1
       });
     }
+
+    // Period 1 bulb.
+    newset = set.intersect(-0.75, cont, 0.4, -0.75);
+    if (newset.image.sy > 0 && newset.image.sx > 0) {
+      todo.push({
+        set: newset,
+        method: "subdivide",
+        iterator: iterate_opt_1
+      });
+    }
   }
 
   // Complete todo-list.

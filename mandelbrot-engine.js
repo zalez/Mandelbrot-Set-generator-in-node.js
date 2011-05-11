@@ -761,7 +761,7 @@ function render_adaptive(set) {
   var newset = null;
 
   // Render the top part until +1.2i with minimal optimization, as it's very easy anyway.
-  newset = set.intersect(null, null, null, 1.2);
+  newset = set.intersect(null, null, null, 1.2 - set.inc); // -set.inc for a slight overlap to the next section.
   if (newset.image.sy > 0) {
     todo.push({
       set: newset,
@@ -772,7 +772,7 @@ function render_adaptive(set) {
 
   // Use more optimization for the part between 1.2i and 0.75i. No need to test for bulbs, though.
   // Use the brain-dead algorithm for everything < 0.75 (re) and the subdivision algorithm for the right part.
-  newset = set.intersect(null, 1.2, -0.75, 0.75);
+  newset = set.intersect(null, 1.2, -0.75, 0.75 - set.inc);
   if (newset.image.sx > 0 && newset.image.sy > 0) {
     todo.push({
       set: newset,
@@ -781,7 +781,7 @@ function render_adaptive(set) {
     });
   }
 
-  newset = set.intersect(-0.75, 1.2, null, 0.75);
+  newset = set.intersect(-0.75, 1.2, null, 0.75 - set.inc);
   if (newset.image.sy > 0 && newset.image.sx > 0) {
     todo.push({
       set: newset,
@@ -864,7 +864,7 @@ function render_adaptive(set) {
   // 0..-0.75i, 4 regions.
   if (cont > -0.75) {
     // Right of period 1 bulb.
-    newset = set.intersect(0.4, cont, null, -0.75);
+    newset = set.intersect(0.4, cont, null, -0.75 - set.inc);
     if (newset.image.sy > 0 && newset.image.sx > 0) {
       todo.push({
         set: newset,
@@ -874,7 +874,7 @@ function render_adaptive(set) {
     }
 
     // Period 1 bulb.
-    newset = set.intersect(-0.75, cont, 0.4, -0.75);
+    newset = set.intersect(-0.75, cont, 0.4, -0.75 - set.inc);
     if (newset.image.sy > 0 && newset.image.sx > 0) {
       todo.push({
         set: newset,
@@ -884,7 +884,7 @@ function render_adaptive(set) {
     }
 
     // Period 2 bulb.
-    newset = set.intersect(-1.25, cont, -0.75, -0.75);
+    newset = set.intersect(-1.25, cont, -0.75, -0.75 - set.inc);
     if (newset.image.sy > 0 && newset.image.sx > 0) {
       todo.push({
         set: newset,
@@ -894,7 +894,7 @@ function render_adaptive(set) {
     }
 
     // Leftmost part. No tests for bulbs necessary.
-    newset = set.intersect(null, cont, -1.25, -0.75);
+    newset = set.intersect(null, cont, -1.25, -0.75 - set.inc);
     if (newset.image.sy > 0 && newset.image.sx > 0) {
       todo.push({
         set: newset,
@@ -905,7 +905,7 @@ function render_adaptive(set) {
   }
 
   // -0.75i..-1.2, 2 regions.
-  if (cont > -1.2) { // TODO: What's the new start value when cont is set?
+  if (cont > -1.2) {
     if (cont > -0.75) { // Adjust the place we continue from if necessary.
       cont = -0.75;
     }

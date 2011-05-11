@@ -792,9 +792,11 @@ function render_adaptive(set) {
 
   // Here's the busy part of the set at [0.75i .. 0]. We'll distinguish 4 horizontal blocks
   // that test differently for the bulbs (or not).
+  // The end imaginary value is slightly below 0, so we're sure the pixels that are near zero
+  // always get rendered, so mirroring works well. I know it's a hack, but it works :).
 
   // Leftmost part. No tests for bulbs necessary.
-  newset = set.intersect(null, 0.75, -1.25, 0);
+  newset = set.intersect(null, 0.75, -1.25, -set.inc);
   if (newset.image.sy > 0 && newset.image.sx > 0) {
     todo.push({
       set: newset,
@@ -804,7 +806,7 @@ function render_adaptive(set) {
   }
 
   // Period 2 bulb.
-  newset = set.intersect(-1.25, 0.75, -0.75, 0);
+  newset = set.intersect(-1.25, 0.75, -0.75, -set.inc);
   if (newset.image.sy > 0 && newset.image.sx > 0) {
     todo.push({
       set: newset,
@@ -814,7 +816,7 @@ function render_adaptive(set) {
   }
 
   // Period 1 bulb.
-  newset = set.intersect(-0.75, 0.75, 0.4, 0);
+  newset = set.intersect(-0.75, 0.75, 0.4, -set.inc);
   if (newset.image.sy > 0 && newset.image.sx > 0) {
     todo.push({
       set: newset,
@@ -824,7 +826,7 @@ function render_adaptive(set) {
   }
 
   // Right of period 1 bulb.
-  newset = set.intersect(0.4, 0.75, null, 0);
+  newset = set.intersect(0.4, 0.75, null, -set.inc);
   if (newset.image.sy > 0 && newset.image.sx > 0) {
     todo.push({
       set: newset,

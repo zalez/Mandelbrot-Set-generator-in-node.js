@@ -2,6 +2,8 @@
  * colormap.js
  *
  * A module to deal with colormaps when rendering JavaScript
+ *
+ * See http://constantin.glez.de/mandelbrot for details
  */
 
 // Generate a colormap of the given size. This is a table with 3-color-entries, each color a byte.

@@ -2,6 +2,8 @@
  * timer.js
  *
  * Simple timing functions.
+ *
+ * See http://constantin.glez.de/mandelbrot for details.
  */
 
 var time = 0, elapsed = 0;

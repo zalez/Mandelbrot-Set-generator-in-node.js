@@ -4,6 +4,7 @@
  * A node.js implementation of the Mandelbrot set.
  * Trying to be as simple as possible.
  *
+ * See http://constantin.glez.de/mandelbrot
  */
 
 // Modules we want to use.

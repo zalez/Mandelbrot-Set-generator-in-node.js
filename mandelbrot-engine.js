@@ -725,6 +725,30 @@ function subdivide_quadratic(set, iterator) {
 }
 
 /*
+ * Fill the specified subimage with mirrored values from above the subimage.
+ * Used to speed up situations where the image range crosses the 0 imaginary border,
+ * since we know the Mandelbrot set is symmetric.
+ * We assume that the upper part of the image is large enough to supply the
+ * part to fill with values, i.e. y - sy is never smaller than 0.
+ */
+mirror_image(img) {
+  var src = img.startpos - img.size;
+  var dst = img.startpos + img.size;
+
+  var x, y;
+  for (y = img.y; y < img.y + img.sy; y--) {
+    for (x = img.x; x < img.x + img.sx; x++) {
+      img.buffer[dst++] = img.buffer[src++];
+    }
+    dst -= img.sx; // Back to start of x.
+    dst += img.size; // Next line
+    src -= img.sx; // Back to start of x.
+    src -= img.size; // Previous line.
+  }
+  return;
+}
+
+/*
  * Subdivide the given area of the mandelbrot set into zones, apply a different, optimal
  * optimization setting to that zones.
  * The idea here is to save detection times for zones that are known to not profit from that
@@ -809,6 +833,25 @@ function render_adaptive(set) {
     });
   }
 
+  // Now that we are at the border of 0i, let's look for mirroring opportunities.
+  // If the maximum imaginary value is > 0, then the intersection with the negative
+  // imaginary plane yields the mirroring opportunity. We then carry the negative of
+  // the maximum imaginary value so we know where to continue rendering.
+  //
+  // But before we mirror, we need to test if the 0i horizontal line aligns exactly
+  // with a pixel line, i.e. the maximum imaginary value can be evenly divided by the pixel increment.
+  // (Within a certain measure of accuracy, since we're subject to floating point inaccuracies.)
+  if (Math.abs(Math.floor(set.maxim / set.inc + 0.5) - (set.maxim / set.inc)) < 0.000001) {
+    newset = set.intersect(null, 0, null, -set.maxim);
+    if (newset.image.sy > 0 && newset.image.sx > 0) {
+      todo.push({
+        set: newset,
+        method: "mirror",
+        iterator: null
+      });
+    }
+  }
+
   // Complete todo-list.
   for (var i = 0; i < todo.length; i++) {
     switch (todo[i].method) {
@@ -818,6 +861,10 @@ function render_adaptive(set) {
 
       case "subdivide":
         subdivide_quadratic(todo[i].set, todo[i].iterator);
+        break;
+
+      case "mirror":
+        mirror_image(todo[i].set.image);
         break;
     }
   }

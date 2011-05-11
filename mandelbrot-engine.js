@@ -575,10 +575,10 @@ function render_opt(set, iterator) {
       if (set.image.buffer[pos++] = iterator(zre, zim, set.center.max)) touche = 1;
       zre += set.inc;
       if (set.image.buffer[pos] = iterator(zre, zim, set.center.max)) touche = 1;
-      zim += set.inc;
+      zim -= set.inc;
       pos += set.image.size;
       if (set.image.buffer[pos] = iterator(zre, zim, set.center.max)) touche = 1;
-      zim += set.inc;
+      zim -= set.inc;
       pos += set.image.size;
       if (set.image.buffer[pos--] = iterator(zre, zim, set.center.max)) touche = 1;
       zre -= set.inc;
@@ -586,7 +586,7 @@ function render_opt(set, iterator) {
       zre -= set.inc;
       if (set.image.buffer[pos] = iterator(zre, zim, set.center.max)) touche = 1;
       pos -= set.image.size;
-      zim -= set.inc;
+      zim += set.inc;
       if (set.image.buffer[pos++] = iterator(zre, zim, set.center.max)) touche = 1;
       // Fill the rectangle only if needed.
       if (touche) {

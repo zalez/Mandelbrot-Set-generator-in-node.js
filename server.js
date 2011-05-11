@@ -3,6 +3,7 @@
  *
  * A simple connect HTTP server, used to dispatch to more interesting functions.
  *
+ * See http://constantin.glez.de/mandelbrot for details.
  */
 
 // Modules we want to use.
@@ -23,8 +24,7 @@ var server = connect.createServer(
 server.use('/simplemandelbrot', simplemandelbrot.handler);
 server.use('/mandelbrot', mandelbrot.handler);
 
-process.stdout.write("Hello MUCOSUG!\n");
-
+// Hack to determine whether we're running on my laptop or on no.de.
 if (process.env.USER == "constantin") {
   server.listen(8000);
 } else {

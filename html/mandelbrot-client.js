@@ -26,7 +26,7 @@ const optValues = [
   "Check for 2 biggest bulbs",
   "Subdivide areas, search for black circumferences",
   "Both subdivision and known bulb check",
-  "Adaptive: Per-area optimization (experimental)"
+  "Adaptive: Per-area optimization (default)"
 ];
 
 const paramDisplays = [
@@ -103,20 +103,29 @@ function updateOpt(select) {
 
 // Zoom deeper into the Mandelbrot Set.
 function zoom() {
-  model.ppu = model.ppu * 2;
+  model.ppu = model.ppu << 1; // 1337 way of saying "* 2".
   updateImage();
+  return;
+}
 
+// Zoom out of the Mandelbrot Set.
+function unzoom() {
+  model.ppu = model.ppu >> 1; // Guess what?
+  updateImage();
   return;
 }
 
 // Increase the iteration depth.
-function deeper() {
-  model.max = model.max * 2;
+function moreDetails() {
+  model.max = model.max << 1;
   updateImage();
+  return;
+}
 
-  var depthDisplayElement = document.getElementById(maxDisplayId);
-  depthDisplayElement.replaceChild(document.createTextNode(model.max), depthDisplayElement.firstChild);
-
+// Increase the iteration depth.
+function lessDetails() {
+  model.max = model.max >> 1;
+  updateImage();
   return;
 }
 
@@ -273,28 +282,43 @@ function createControls() {
     optSelection.appendChild(optOption);
   }
 
+  // Action buttons get their own div so they stay together.
+  var actionDiv = document.createElement("div");
+  actionDiv.id = "mandelbrot-action-buttons-div";
+
   // Zoom button: 2x zoom at every press.
   var zoomButton = document.createElement("input");
   zoomButton.type = "button";
   zoomButton.value = "Zoom";
   zoomButton.onclick = function() { zoom(); };
+  actionDiv.appendChild(zoomButton);
+
+  // Unzoom button: 2x less zoom at every press.
+  var unzoomButton = document.createElement("input");
+  unzoomButton.type = "button";
+  unzoomButton.value = "Unzoom";
+  unzoomButton.onclick = function() { unzoom(); };
+  actionDiv.appendChild(unzoomButton);
 
   // Increase Maximum number of recursions.
-  var maxDepth = document.createElement("div");
-  maxDepth.id="maxDepth";
+  var moreDepthButton = document.createElement("input");
+  moreDepthButton.type = "button";
+  moreDepthButton.value = "More details";
+  moreDepthButton.onclick =  function() { moreDetails(); };
+  actionDiv.appendChild(moreDepthButton);
 
-  var maxDepthButton = document.createElement("input");
-  maxDepthButton.type = "button";
-  maxDepthButton.value = "Deeper";
-  maxDepthButton.onclick =  function() { deeper(); };
-  maxDepth.appendChild(maxDepthButton);
+  // Decrease Maximum number of recursions.
+  var lessDepthButton = document.createElement("input");
+  lessDepthButton.type = "button";
+  lessDepthButton.value = "Less details";
+  lessDepthButton.onclick =  function() { lessDetails(); };
+  actionDiv.appendChild(lessDepthButton);
 
   var form = document.createElement("form");
   form.name = "aaForm";
   form.appendChild(aaSelection);
   form.appendChild(optSelection);
-  form.appendChild(zoomButton);
-  form.appendChild(maxDepth);
+  form.appendChild(actionDiv);
 
   controls = document.getElementById(controlsDivId);
   controls.appendChild(form);

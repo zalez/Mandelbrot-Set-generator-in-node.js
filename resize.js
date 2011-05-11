@@ -1,9 +1,9 @@
 /*
  * Resize.js
- */
-
-/*
+ *
  * A simple image buffer resizing library in JavaScript.
+ *
+ * See http://constantin.glez.de/mandelbrot for details.
  */
 
 /*
